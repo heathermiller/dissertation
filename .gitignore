@@ -1,0 +1,12 @@
+.DS_Store
+*.pdf
+*.log
+*.aux
+*.blg
+*.bbl
+*.toc
+*.gz
+*.lof
+*.lot
+*.run.xml
+*.out
