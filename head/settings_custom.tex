@@ -20,18 +20,27 @@
 % %\newcommand{\todolist}[1]{}  % to be used when to do is not to be printed
 
 \usepackage{listings}
-\usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{bcprules}
-\usepackage{amsthm} % for definitions/properties
+\usepackage{amsmath, amsthm, amscd, amsfonts, amssymb, color} % for definitions/properties
 \usepackage{mdframed} % for framing theorems/properties?
 \usepackage{mdwlist}
+\usepackage{mathpartir}
+\usepackage{longtable}
+\usepackage{colortbl}%
+  \newcommand{\myrowcolour}{\rowcolor[gray]{0.925}}
 
 % shorthands
 \newcommand{\selfassembly}{\texttt{self-assembly~}}
 \newcommand{\Selfassembly}{\texttt{Self-assembly~}}
 \newcommand{\sselfassembly}{\texttt{self-assembly}}
+\newcommand{\sporeurl}{\url{https://github.com/scala/spores}}
+
+% icons
+\newcommand*\loc{\includegraphics[height=0.65em,keepaspectratio]{loc}}
+\newcommand*\stars{\includegraphics[height=0.8em,keepaspectratio]{stars}}
+\newcommand*\contribs{\includegraphics[height=0.8em,keepaspectratio]{contribs}}
 
 % comments and notes
 \newcommand{\comment}[1]{}
@@ -153,6 +162,10 @@
 \newcommand{\spcomma}{~,~}
 
 % definitions/properties
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{lemma}{Lemma}[section]
+
 \theoremstyle{definition}
 \newmdtheoremenv[hidealllines=true,topline=true,bottomline=true,skipabove=\baselineskip,skipbelow=\baselineskip]{defn}{Definition}[section]
 
