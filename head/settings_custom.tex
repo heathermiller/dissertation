@@ -26,10 +26,16 @@
 \usepackage{bcprules}
 \usepackage{amsthm} % for definitions/properties
 \usepackage{mdframed} % for framing theorems/properties?
+\usepackage{mdwlist}
+
+% shorthands
+\newcommand{\selfassembly}{\texttt{self-assembly~}}
+\newcommand{\Selfassembly}{\texttt{Self-assembly~}}
+\newcommand{\sselfassembly}{\texttt{self-assembly}}
 
 % comments and notes
 \newcommand{\comment}[1]{}
-\newcommand{\note}[1]{{\bf $\clubsuit$ #1 $\spadesuit$}}
+% \newcommand{\note}[1]{{\bf $\clubsuit$ #1 $\spadesuit$}} % already defined?
 \newcommand{\ifreport}[1]{#1}
 %\newcommand{\ifreport}[1]{}
 \newcommand{\todo}{{\bf \colorbox{red}{\color{white}TODO:}}}
