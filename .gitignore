@@ -8,5 +8,6 @@
 *.gz
 *.lof
 *.lot
+*.bak
 *.run.xml
 *.out

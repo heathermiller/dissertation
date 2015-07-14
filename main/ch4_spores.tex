@@ -25,7 +25,7 @@ functional features, such as lambdas in \mbox{Java 8}~\cite{JavaLambdas},
 C++11~\cite{CplusplusLambas}, and Visual Basic 9~\cite{Meijer}, the perceived
 importance of functional programming in general empirical studies on software
 developers~\cite{PLAdoption}, and the popularity of functional
-programming massively online open courses (MOOCs)~\cite{ICSEMOOC}.
+programming massively online open courses (MOOCs)~\cite{Miller2014}.
 
 % , where the
 % fundamental idea is to distribute data across nodes/threads and to perform the
@@ -1422,7 +1422,7 @@ captured types, \eg picklability; spores integrate seamlessly with
 Scala/pickling~\cite{ScalaPickling}.
 
 Transitive properties expressed using known techniques, \eg generics (Zibin
-etal's OIGJ system~\cite{ZibinPLAE10} for transitive immutability) or annotated types, can be
+etal's OIGJ system~\cite{Zibin2010} for transitive immutability) or annotated types, can be
 enforced for captured types using custom spore properties. Instead of merely
 tagging types, implicit macros can generate type class instances for all types
 satisfying a predicate. For example, using OIGJ we can define an implicit macro
@@ -1508,7 +1508,7 @@ picklability/immutability).
 % the captured types \verb|T| have to implement. As we will see below, instead
 % of using Java-style interfaces, we use a combination of traits and
 % implicits~\cite{Oliveira2010} akin to generalized interfaces in
-% JavaGI~\cite{WehrT11} or concepts in C++.
+% JavaGI~\cite{Wehr2011} or concepts in C++.
 
 % For example, a spore from \verb|Int| to \verb|String| that requires all
 % captured types to be serializable would have the following type:
@@ -1863,7 +1863,7 @@ Rule \textsc{S-SporeFun} expresses the fact that spore types are refinements of 
   \vspace{-5mm}
 \end{figure*}
 
-Typing derivations use a judgement of the form $\Gamma ; \Delta \vdash t : T$. Besides the standard variable environment $\Gamma$ we use a property environment $\Delta$ which is a sequence of property names that have been imported using \verb|import| expressions in enclosing scopes of term $t$. The property environment is reminiscent of the implicit parameter context used in the original work on implicit parameters~\cite{LewisLMS00}; it is an environment for names whose definition sites ``just happen to be far removed from their usages.''
+Typing derivations use a judgement of the form $\Gamma ; \Delta \vdash t : T$. Besides the standard variable environment $\Gamma$ we use a property environment $\Delta$ which is a sequence of property names that have been imported using \verb|import| expressions in enclosing scopes of term $t$. The property environment is reminiscent of the implicit parameter context used in the original work on implicit parameters~\cite{Lewis2000}; it is an environment for names whose definition sites ``just happen to be far removed from their usages.''
 
 In the typing rules we assume the existence of a global property mapping $P$ from property names $pn$ to type families $\mathcal{T}$. This technique is reminiscent of the way some object-oriented core languages provide a global class table for type-checking. The main difference is that our core language does not include constructs to extend the global property map; such constructs are left out of the core language for simplicity, since the creation of properties is not essential to our model. We require $P$ to follow behavioral subtyping:
 
@@ -2028,7 +2028,7 @@ Rule \textsc{E-Comp3} is the computation rule for spore composition. Besides com
 
 \subsection{Soundness}\label{sec:soundness}
 
-This section presents a soundness proof of the spore type system. The proof is based on a pair of progress and preservation theorems~\cite{WrightF94}. A complete proof of soundness appears in the companion technical report~\cite{SporesFormally}. In addition to standard lemmas, we also prove a lemma specific to our type system, Lemma~\ref{lem:pres-import}, which ensures types are preserved under property import. Soundness of the type system follows from Theorem~\ref{th:progress} and Theorem~\ref{th:pres}.
+This section presents a soundness proof of the spore type system. The proof is based on a pair of progress and preservation theorems~\cite{Wright1994}. A complete proof of soundness appears in the companion technical report~\cite{SporesFormally}. In addition to standard lemmas, we also prove a lemma specific to our type system, Lemma~\ref{lem:pres-import}, which ensures types are preserved under property import. Soundness of the type system follows from Theorem~\ref{th:progress} and Theorem~\ref{th:pres}.
 
 % \begin{lemma}
 % \emph{(Canonical forms)}
@@ -2586,11 +2586,11 @@ Parallel closures~\cite{ParallelClosures} are a variation of closures that
 make data in the environment available using read-only references using a type
 system for reference immutability. This enables parallel execution without the
 possibility of data races. Spores are not limited to immutable environments,
-and do not require a type system extension. River Trail~\cite{HerhutHSS13}
+and do not require a type system extension. River Trail~\cite{RiverTrail}
 provides a concurrency model for JavaScript, similar to parallel closures;
 however, capturing variables in closures is currently not supported.
 
-ML5~\cite{MurphyML5} provides mobile closures verified not to use
+ML5~\cite{Tom7} provides mobile closures verified not to use
 resources not present on machines where they are applied. This property is
 enforced transitively (for all values reachable from captured values),
 which is stronger than what plain spores provide. However, type constraints
@@ -2603,7 +2603,7 @@ do not require a type system extension.
 A well-known type-based representation of closures uses existential types
 where the existentially quantified variable represents the closure's environment,
 enabling type-preserving
-compilation of functional languages~\cite{MorrisettWCG99}. A spore type
+compilation of functional languages~\cite{Morrisett1999}. A spore type
 may have an abstract \verb|Captured| type, effectively encoding an existantial quantification; however,
 captured types are typically concrete, and the spore type system supports constraints on them.
 
@@ -2616,7 +2616,7 @@ continuations~\cite{DelimitedContinuations} represent a way to serialize
 behavior in Scala, but don't resolve any of the problems of normal Scala
 closures when it comes to accidental capture, as spores do.
 
-Termite Scheme~\cite{Termite} is a Scheme dialect for distributed programming
+Termite Scheme~\cite{TermiteScheme} is a Scheme dialect for distributed programming
 where closures and continuations are
 always serializable; references to non-serializable objects (like open
 files) are automatically wrapped in processes that are
@@ -2625,7 +2625,7 @@ automatic wrapping. Unlike closures in Termite Scheme, spores are statically-typ
 supporting type-based constraints. Serializable closures in a
 dynamically-typed setting are also the basis for~\cite{DFPS}. Python's
 standard serialization module, \verb|pickle|, does not support serializing
-closures. Dill~\cite{dill} extends Python's \verb|pickle| module, adding
+closures. Dill~\cite{McKerns2012} extends Python's \verb|pickle| module, adding
 support for functions and closures, but without constraints.
 
 

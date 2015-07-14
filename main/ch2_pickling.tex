@@ -18,14 +18,14 @@ some other representation.
 As more and more applications evolve the need to communicate with different machines, providing abstractions and constructs for easy-to-use, typesafe, and performant serialization is more important than ever.
 
 On the JVM, serialization has long been
-acknowledged as having a high overhead \cite{Welsh2000, Carpenter1999}, with
+acknowledged as having a high overhead \cite{Jaguar, Carpenter1999}, with
 some estimates purporting object serialization to account for 25-65\% of the
 cost of remote method invocation, and which go on to observe that the cost of
 serialization grows with growing object structures up to 50\%
 \cite{Philippsen2000, Maassen1999}.
 Due to the prohibitive cost of using Java Serialization in high-performance
 distributed applications, many frameworks for distributed computing, like
-Akka~\cite{Akka}, Spark~\cite{Zaharia2012}, SCADS \cite{Armbrust2009}, and
+Akka~\cite{Akka}, Spark~\cite{Spark}, SCADS \cite{Armbrust2009}, and
 others, provide support for higher-performance alternative frameworks such as
 Google's Protocol Buffers~\cite{Protobuf}, Apache Avro~\cite{Avro}, or
 Kryo~\cite{Kryo}. However, the higher efficiency typically comes at the cost
@@ -127,7 +127,7 @@ combinators, capitalizing on their powerful composability.
 
 Our approach of retrofitting existing types with pickling support
 builds on implicits in Scala~\cite{Oliveira2010} and is reminiscent of
-other type-class-like mechanisms, such as JavaGI~\cite{WehrT11} or C++
+other type-class-like mechanisms, such as JavaGI~\cite{Wehr2011} or C++
 Concepts~\cite{ReisS06}.
 
 Additionally, in an effort to further reduce the boilerplate required
@@ -1901,7 +1901,7 @@ automatic pickler generation has been implemented using the experimental
 macros feature introduced in Scala 2.10.0. Macros can be thought of as a
 more regularly structured, localized, and more stable alternative to compiler
 plugins. To simplify tree generation, our implementation leverages a
-quasiquoting library for Scala's macros~\cite{Quasiquotes}.
+quasiquoting library for Scala's macros~\cite{Shabalin2013}.
 
 
 
@@ -2140,7 +2140,7 @@ The plot shows that Java serialization performs, compared to Kryo, surprisingly 
 
 Figure~\ref{fig:application-table} shows a summary of the most
 important data types used in popular distributed computing frameworks
-like Spark~\cite{Zaharia2012} and Storm~\cite{Storm}.
+like Spark~\cite{Spark} and Storm~\cite{Storm}.
 The fully shaded circles in the table representing ``heavy use'' means either
 (a) a feature is used frequently in application-level data types or
 (b) a feature is used frequently in data types that the framework registers
@@ -2213,7 +2213,7 @@ runtime, scala/pickling exists as a macro-based library, enabling further
 extensibility, \eg user-defined pickle formats can be interchanged.
 
 There is a body of work on maximizing sharing of runtime data
-structures~\cite{appel93hashconsing,Elsman2005,TackKS06} which we believe
+structures~\cite{appel93hashconsing,Elsman2005,Tack2006} which we believe
 could be applied to the pickler combinators presented in
 Section~\ref{sec:oopicklers}; however, a complete solution is beyond the scope
 of the present paper.

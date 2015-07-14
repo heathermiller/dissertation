@@ -58,10 +58,10 @@ difficult.
 
 \item {\bf Lost Optimization Opportunities} The absence of certain kinds of
 static type information precludes systems-centric optimizations. Importantly,
-type-based static meta-programming enables fast serialization~\cite{Pickling},
+type-based static meta-programming enables fast serialization~\cite{ScalaPickling},
 but this is only possible if also lower layers (namely those dealing with
 object serialization) are statically typed. Several
-studies~\cite{JavaSerialization, JavaRMI, MoreEfficientJavaRMI, Jaguar} report
+studies~\cite{JavaSerialization, JavaRMI, Philippsen2000, Jaguar} report
 on the high overhead of serialization in widely-used runtime environments such
 as the JVM. This overhead is so important in practice that popular systems,
 like Spark~\cite{Spark} and Akka~\cite{Akka}, leverage alternative
@@ -75,7 +75,7 @@ We present a new programming model we call {\em function passing} (F-P)
 designed to overcome most of these issues by providing a more principled
 substrate on which to build data-centric distributed systems. It builds upon
 two previous veins of work--an approach for generating type-safe and
-performant pickler combinators~\cite{Pickling}, and spores~\cite{Spores},
+performant pickler combinators~\cite{ScalaPickling}, and spores~\cite{Spores},
 closures that are guaranteed to be serializable.  Our model attempts to fit
 the paradigm of data-centric programming more naturally by extending monadic
 programming to the network. Our model can be thought of as somewhat of a dual

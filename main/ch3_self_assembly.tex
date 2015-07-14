@@ -58,7 +58,7 @@
 % software engineering benefits of using type
 % classes~\cite{RetroactiveExtensibility,Oliveira2010}.
 % Because of the flexibility and extensibility of type classes, Scala has
-% embraced them~\cite{Oliveira2010,ScalaCollections,Pickling}.
+% embraced them~\cite{Oliveira2010,ScalaCollections,ScalaPickling}.
 
 % % Due to the flexibility and extensibility of type classes,
 % % Scala provides some language
@@ -113,7 +113,7 @@
 % pretty printing, or equality.
 
 % \Selfassembly uses Scala's \emph{type-safe macro
-%   system}~\cite{Burmako2012, Burmako2013} and it allows generating \emph{efficient} code~\cite{Pickling}.  It
+%   system}~\cite{Burmako2012, Burmako2013} and it allows generating \emph{efficient} code~\cite{ScalaPickling}.  It
 % is inspired by existing approaches to \emph{datatype-generic
 %   programming} (DGP)~\cite{ComparingGPHaskellRodriquez,
 %   ComparingGPHaskellHinze}. DGP is an advanced form of \emph{generic
@@ -142,7 +142,7 @@
 % the definition of generic functions with both subtyping and object identity.
 
 % Using \sselfassembly, we ported a full-featured serialization
-% framework for Scala~\cite{Pickling} as a generic function (or LLE). The
+% framework for Scala~\cite{ScalaPickling} as a generic function (or LLE). The
 % framework is full-featured in that it handles all object-oriented
 % concerns, such as subtyping polymorphism, object identity, and
 % advanced features of the type system. In contrast to the original
@@ -199,7 +199,7 @@ definition of the class. Retroactive extensibility enables flexibility and the
 possibility to customize behavior. As a result, several authors have argued
 for the software engineering benefits of using type
 classes~\cite{RetroactiveExtensibility,Oliveira2010}, and Scala has embraced
-them~\cite{Oliveira2010,ScalaCollections,Pickling}.
+them~\cite{Oliveira2010,ScalaCollections,ScalaPickling}.
 
 Type classes are more general than built-in mechanisms like Java
 serialization, since any functionality (including serialization) can be
@@ -240,7 +240,7 @@ in all cases, however, type class-based approaches offer no way to statically
 restrict runtime behavior. Perhaps most important for mainstream languages is
 the lack of support for pervasively used object-oriented features such as
 subtyping and object identity, which so far have not been addressed, except for
-specialized functionality~\cite{Pickling}.
+specialized functionality~\cite{ScalaPickling}.
 % \footnote{BRUNO: Two important
 %   points here -- restricting run-time behaviour (properties), and lack
 % of support for OO features -- are mentioned in passing in a couple of
@@ -268,9 +268,9 @@ approach is guided by the following principles:
 \end{itemize}
 
 
-In our previous work on Scala/Pickling~\cite{Pickling}, we sought to achieve
+In our previous work on Scala/Pickling~\cite{ScalaPickling}, we sought to achieve
 many of these goals for one particular application: serialization.
-% In our previous work on Scala/Pickling~\cite{Pickling}, we achieved all of these goals, except for
+% In our previous work on Scala/Pickling~\cite{ScalaPickling}, we achieved all of these goals, except for
 % generality.
 % \footnote{BRUNO: I am not sure if this is a good way to promote this
 %   work. It essentially gives the impression that only generic
@@ -614,7 +614,7 @@ implicit object IntInstance extends Show[Int] {
 
 In Scala type classes can be implemented using a combination of
 standard OO features (traits, classes and objects) and implicits~\cite{Oliveira2010}.
-The Scala encoding of type classes is essentially a \emph{design pattern}~\cite{Gamma95}:
+The Scala encoding of type classes is essentially a \emph{design pattern}~\cite{Gamma1995}:
 instead of having built-in language concepts for type classes, Scala
 uses general language features to model type classes.
 A type class is simply an interface that provides operations
@@ -1977,7 +1977,7 @@ val scaled = gscale(obj)
 The \verb|genTransform| macro is based on traversals similar to those of
 generic queries. However, the crucial difference is that the macro generates
 code to {\em clone} visited objects (based on techniques used in
-Scala/Pickling~\cite{Pickling}). Interestingly, the implementations of queries and
+Scala/Pickling~\cite{ScalaPickling}). Interestingly, the implementations of queries and
 transformations share a substantial number of generic building blocks.
 
 
@@ -2318,7 +2318,7 @@ by the library. The library is comprised of $\approx1,150$ LOC.
 \paragraph{Case Study: Scala Pickling}
 
 To evaluate both expressivity and performance, we have ported an industrial-
-strength serialization framework, called Scala/Pickling~\cite{Pickling}, to
+strength serialization framework, called Scala/Pickling~\cite{ScalaPickling}, to
 \sselfassembly\footnote{\url{https://github.com/phaller/selfassembly/tree/master/src/main/scala/selfassembly/examples/pickling}}.
 
 Scala/Pickling is a popular open-source project; on the social code
@@ -2347,7 +2347,7 @@ Scala/Pickling & $<1\%$ & $56\%$  \\
 \end{table}
 
 In terms of efficiency, \selfassembly compares favorably to the original
-library: execution time of the ``Evactor'' benchmark~\cite{Pickling} remains
+library: execution time of the ``Evactor'' benchmark~\cite{ScalaPickling} remains
 within 1\% of Scala/Pickling. At the same time,
 the \sselfassembly-based code is significantly simpler, shorter, and more
 maintainable. The use of \selfassembly reduced the code size for macro-based
@@ -2482,7 +2482,7 @@ extensions to the host language.
 %the original code.
 
 % \cite{TemplateYourBoilerplate}
-% \cite{Pickling}
+% \cite{ScalaPickling}
 % \cite{SYB}
 
 % \vspace{-2mm}
