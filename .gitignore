@@ -9,5 +9,6 @@
 *.lof
 *.lot
 *.bak
+*.cpt
 *.run.xml
 *.out

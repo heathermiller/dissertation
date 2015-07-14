@@ -81,10 +81,10 @@ In order to distribute closures, one must be able to serialize them -- a goal
 that remains tricky to reliably achieve not only in object-oriented
 languages but also in pure functional languages like Haskell:
 
-\begin{lstlisting}
+\begin{minted}{scala}
   sendFunc :: SendPort (Int -> Int) -> Int -> ProcessM ()
   sendFunc p x = sendChan p (\y -> x + y + 1)
-\end{lstlisting}
+\end{minted}
 \noindent
 In this example, in function \verb|sendFunc| we are sending the lambda \verb|(\y -> x + y + 1)| on channel \verb|p|. The lambda captures variable \verb|x|, a parameter of \verb|sendFunc|. Serializing the lambda requires serializing also its captured variables. However, when looking up a serializer for the lambda, only the type of the lambda is taken into account; however, it doesn't tell us anything about the types of its captured variables, which makes it impossible in Haskell to look up serializers for them.
 
@@ -102,7 +102,7 @@ especially in an object-oriented language.
 For example, consider the following use of a distributed collection in Scala
 with higher-order functions \verb|map| and \verb|reduce| (using Spark):
 
-\begin{lstlisting}
+\begin{minted}{scala}
 class MyCoolRddApp {
   val log = new Log(...)
   def shift(p: Int): Int = ...
@@ -111,7 +111,7 @@ class MyCoolRddApp {
     rdd.map(x => x + shift(x)).reduce(...)
   }
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 In this example, the closure \verb|(x => x + shift(x))| is passed to the
 \verb|map| method of the distributed collection \verb|rdd| which requires
@@ -762,7 +762,7 @@ longer possible to accidentally capture the \verb|this| reference.
 \begin{figure}%[b!]
 \begin{subfigure}{.5\textwidth}
   \centering
-  \begin{lstlisting}
+  \begin{minted}{scala}
   {
     val y1: S1 = <expr1>
     ...
@@ -771,13 +771,13 @@ longer possible to accidentally capture the \verb|this| reference.
       // ...
     }
   }
-  \end{lstlisting}
+  \end{minted}
   \caption{A closure block.}
   \label{fig:normal-block}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
   \centering
-  \begin{lstlisting}
+  \begin{minted}{scala}
   spore {
     val y1: S1 = <expr1>
     ...
@@ -786,7 +786,7 @@ longer possible to accidentally capture the \verb|this| reference.
       // ...
     }
   }
-  \end{lstlisting}
+  \end{minted}
   \caption{A spore.}
   \label{fig:normal-spore-shape}
 \end{subfigure}%
@@ -845,23 +845,23 @@ Section~\ref{sec:excluded-types} introduces the \verb|Excluded| type member.
 % \vspace{-4mm}
 \begin{subfigure}{.5\textwidth}
   \centering
-  \begin{lstlisting}
+  \begin{minted}{scala}
     trait Function1[-A, +B] {
       def apply(x: A):  B
     }
-  \end{lstlisting}
+  \end{minted}
   \caption{Scala's arity-1 function type.}
   \label{fig:function-arity1}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
   \centering
-  \begin{lstlisting}
+  \begin{minted}{scala}
     trait Spore[-A, +B]
     extends Function1[A, B] {
       type Captured
       type Excluded
     }
-  \end{lstlisting}
+  \end{minted}
   \caption{The arity-1 \texttt{Spore} type.}
   \label{fig:spore-arity1}
 \end{subfigure}%
@@ -874,18 +874,18 @@ Section~\ref{sec:excluded-types} introduces the \verb|Excluded| type member.
 
 % The result type of the \verb|spore| constructor is not a regular function type, but a subtype of one of Scala's function types. This is possible, because in Scala functions are instances of classes that mix in one of the function traits. For example, the trait for functions of arity one looks like this:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     trait Function1[-A, +B] {
 %       def apply(x: A):  B
 %     }
-% \end{lstlisting}
+% \end{minted}
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     trait Spore[-A, +B] extends Function1[A, B] {
 %       type Captured
 %       type Excluded
 %     }
-% \end{lstlisting}
+% \end{minted}
 
 
 \vspace{2mm}
@@ -907,23 +907,23 @@ represented by the \verb|Captured| type member in the spore's type.
 \begin{figure}[t!]
 \begin{subfigure}{.5\textwidth}
   \centering
-  \begin{lstlisting}
+  \begin{minted}{scala}
     val s = spore {
       val y1: String = expr1;
       val y2: Int = expr2;
       (x: Int) => y1 + y2 + x
     }
-  \end{lstlisting}
+  \end{minted}
   \caption{A spore \texttt{s} which captures a \texttt{String} and an \texttt{Int} in its spore header.}
   \label{fig:captured-spore}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
   \centering
-  \begin{lstlisting}
+  \begin{minted}{scala}
     Spore[Int, String] {
       type Captured = (String, Int)
     }
-  \end{lstlisting}
+  \end{minted}
   \caption{\texttt{s}'s corresponding type.}
   \label{fig:captured-type}
 \end{subfigure}%
@@ -938,9 +938,9 @@ represented by the \verb|Captured| type member in the spore's type.
 
 Consider the following method definition:
 
-\begin{lstlisting}[numbers=none]
+\begin{minted}{scala}
     def sendOverWire(s: Spore[Int, Int]): Unit = ...
-\end{lstlisting}
+\end{minted}
 \noindent
 In this example, the \verb|Captured| (and \verb|Excluded|) type
 member is not specified, meaning it is left abstract. In this case, so long as
@@ -962,19 +962,19 @@ information (and later, constraints) of spores when they are composed.
 
 For example, assume we are given two spores \verb|s1| and \verb|s2| with types:
 
-\begin{lstlisting}[numbers=none]
+\begin{minted}{scala}
     s1: Spore[Int, String] { type Captured = (String, Int) }
     s2: Spore[String, Int] { type Captured = Nothing }
-\end{lstlisting}
+\end{minted}
 
 \noindent The fact that the \verb|Captured| type in \verb|s2| is defined to be
 \verb|Nothing| means that the spore does not capture anything (\verb|Nothing|
 is Scala's bottom type). The composition of \verb|s1| and \verb|s2|, written
 \verb|s1 compose s2|, would therefore have the following refinement type:
 
-\begin{lstlisting}[numbers=none]
+\begin{minted}{scala}
     Spore[String, String] { type Captured = (String, Int) }
-\end{lstlisting}
+\end{minted}
 
 \noindent Note that the \verb|Captured| type member of the result spore is equal to the
 \verb|Captured| type of \verb|s1|, since it is guaranteed that the result
@@ -1039,16 +1039,16 @@ Language Specification~\cite{ScalaSpec}, Section 3.1).}
 
 This enables the use of spores in for-comprehensions, since it's possible to write:
 
-\begin{lstlisting}[numbers=none]
+\begin{minted}{scala}
     for (a <- gen1; b <- capture(gen2)) yield capture(a) + b
-\end{lstlisting}
+\end{minted}
 
 \noindent Note that superfluous \verb|capture| expressions are not harmful. Thus, it is
 legal to write:
 
-\begin{lstlisting}[numbers=none]
+\begin{minted}{scala}
     for (a <- capture(gen1); b <- capture(gen2)) yield capture(a) + capture(b)
-\end{lstlisting}
+\end{minted}
 
 \noindent This allows the use of \verb|capture| in a way that does not require users to
 know how for-comprehensions are desugared. In Section~\ref{sec:case-studies}
@@ -1060,17 +1060,17 @@ spores.
 
 % For example, the spore
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     spore { val y1: String = expr1; val y2: Int = expr2; (x: Int) => y1+y2+x }
-% \end{lstlisting}
+% \end{minted}
 
 % would have the refinement type
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     Spore[Int, String] {
 %       type Captured = (String, Int)
 %     }
-% \end{lstlisting}
+% \end{minted}
 
 \vspace{2mm}
 \subsection{Advanced Usage and Type Constraints}
@@ -1101,29 +1101,29 @@ captured by spores, using refinements of the \verb|Spore| type presented in
 Section~\ref{sec:spore-type}. For example, the following refinement type
 forbids capturing variables of type \verb|Actor|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 type SporeNoActor[-A, +B] = Spore[A, B] {
   type Excluded <: No[Actor]
 }
-\end{lstlisting}
+\end{minted}
 \noindent
-Note the use of the auxiliary type constructor \verb|No| (defined as \lstinline{trait No[-T]}): it enables
+Note the use of the auxiliary type constructor \verb|No| (defined as \verb|trait No[-T]|): it enables
 the exclusion of multiple types while supporting desired sub-typing relationships.
 
-% \begin{lstlisting}[numbers=none]
+% \begin{minted}{scala}
 % trait No[-T]
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 
 % (We explain the "-" annotation on the type parameter below when discussing sub-typing.)
 
 \noindent For example, exclusion of multiple types can be expressed as follows:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 type SafeSpore = Spore[Int, String] {
   type Excluded = No[Actor] with No[Util]
 }
-\end{lstlisting}
+\end{minted}
 
 \noindent Given Scala's sub-typing rules for refinement types, a spore refinement
 excluding a superset of types excluded by an ``otherwise type-compatible''
@@ -1137,11 +1137,11 @@ Using some frameworks typically user-defined subclasses are created that extend 
 As a result, the following refinement type is a supertype of type\\
 \verb|SporeNoActor[Int, Int]| defined above (we assume \verb|MyActor| is a subclass of \verb|Actor|):
 
-\begin{lstlisting}
+\begin{minted}{scala}
 type MySpore = Spore[Int, Int] {
   type Excluded <: No[MyActor]
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 It is important that \verb|MySpore| is a supertype and not a subtype of\\
 \verb|SporeNoActor[Int, Int]|, since an instance of \verb|MySpore| could capture some other subclass of \verb|Actor| which is not itself a subclass of \verb|MyActor|. Thus, it would not be safe to use an instance of \verb|MySpore| where an instance of \verb|SporeNoActor[Int, Int]| is required. On the other hand, an instance of \verb|SporeNoActor[Int, Int]| is safe to use in place of an instance of \verb|MySpore|, since it is guaranteed not to capture \verb|Actor| or any of its subclasses.
@@ -1157,13 +1157,13 @@ the addition of a macro \verb|without[T]| which takes a type parameter
 type \verb|T|. Thus, in the case of the \verb|SafeSpore| example, the same spore
 refinement type can easily be synthesized inline in the definition of a spore value:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val safeSpore = spore {
   val a = ...
   val b = ...
   (x: T) => { ... }
 }.without[Actor].without[Util]
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{Context Bounds for Captured Types}
 \label{sec:context-bounds}
@@ -1204,7 +1204,7 @@ point where a spore is created, then it is enforced that all captured types in
 the spore header have an instance of the \verb|Pickler| type class
 % \footnote{A type class is a combination of a generic trait and a set of implicit values that provide type-specialized implementations of that trait. It's an alternative for providing implementations of generic interfaces and a way to automatically dispatch to them.}:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 import spores.withPickler
 
 spore {
@@ -1212,29 +1212,29 @@ spore {
   val age: Int = <expr2>
   (x: String) => { ...}
 }
-\end{lstlisting}
+\end{minted}
 \noindent While an imported property does not have an impact on how a spore is
 constructed (besides the property import), it has an impact on the result type
 of the spore macro. In the above example, the result type would be a
 refinement of the \verb|Spore| type:\footnote{In the code example, \texttt{implicitly[T]} returns the uniquely-defined implicit value of \texttt{T} which is in scope at the invocation site.}
 
 
-\begin{lstlisting}
+\begin{minted}{scala}
 Spore[String, Int] {
   type Captured = (String, Int)
   implicit val ev$0 = implicitly[Pickler[Captured]]
 }
-\end{lstlisting}
+\end{minted}
 \noindent For each property that is imported, the resulting spore refinement type
 contains an implicit value with the corresponding type class instance for type
 \verb|Captured|.
 
 % Such implicit values allow retrieving a type class instance for the captured types of a given spore using Scala's implicitly function as follows:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     val s = spore { ... }
 %     implicitly[Pickler[s.Captured]]
-% \end{lstlisting}
+% \end{minted}
 
 % Note that s.Captured is defined to be the type of the environment of spore s: a tuple with all types of captured variables.
 
@@ -1245,39 +1245,39 @@ to require argument spores to have certain context bounds. For example,
 requiring argument spores to have picklers defined for their captured types
 can be achieved as follows:
 
-\begin{lstlisting}[numbers=none]
+\begin{minted}{scala}
 def m[A, B](s: Spore[A, B])(implicit p: Pickler[s.Captured]) = ...
-\end{lstlisting}
+\end{minted}
 
 
 \subsubsection{Defining Custom Properties}
 
 Properties can be introduced using the \verb|Property| trait (provided by the
-spores library): \lstinline{trait Property[C[_]]}
+spores library): \verb|trait Property[C[_]]|
 
 As a running example, we will be defining a custom  property for
 immutable types. A custom property can be introduced using a generic trait,
 and an implicit ``property'' object that mixes in the above \verb|Property|
 trait:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 object safe {
   trait Immutable[T]
   implicit object immutableProp extends Property[Immutable]
   ...
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 The next step is to mark selected types as immutable by defining an implicit object extending the desired list of types, each type wrapped in the \verb|Immutable| type constructor:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 object safe {
   ...
   import scala.collection.immutable.{Map, Set, Seq}
   implicit object collections extends Immutable[Map[_, _]] with
     Immutable[Set[_]] with Immutable[Seq[_]] with ...
 }
-\end{lstlisting}
+\end{minted}
 
 \noindent
 The above definitions allow us to create spores that are guaranteed to capture
@@ -1286,9 +1286,9 @@ only types \verb|T| for which an implicit of type \verb|Immutable[T]| exists.
 It's also possible to define compound properties by mixing in multiple traits
 into an implicit property object:
 
-\begin{lstlisting}[numbers=none]
+\begin{minted}{scala}
 implicit object myProps extends Property[Pickler] with Property[Immutable]
-\end{lstlisting}
+\end{minted}
 \noindent By making this compound property available in a scope within which spores are
 created (for example, using an \verb|import|), it is enforced that those
 spores have both the context bound \verb|Pickler| and the context bound
@@ -1328,23 +1328,23 @@ For example, assume two spores \verb|s1| and \verb|s2| with types:
 \vspace{0.5mm}
 \begin{subfigure}{.5\textwidth}
   \centering
-  \begin{lstlisting}
+  \begin{minted}{scala}
 Spore[Int, String] {
   type Captured = (Int, Util)
   type Excluded = No[Actor]
 }
-  \end{lstlisting}
+  \end{minted}
   \vspace{-4mm}
   \caption{Type of spore \texttt{s1}.}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
   \centering
-  \begin{lstlisting}
+  \begin{minted}{scala}
 Spore[String, Int] {
   type Captured = (String, Int)
   type Excluded = No[Actor] with No[Util]
 }
-  \end{lstlisting}
+  \end{minted}
   \vspace{-4mm}
   \caption{Type of spore \texttt{s2}.}
 \end{subfigure}%
@@ -1352,31 +1352,31 @@ Spore[String, Int] {
 \vspace{0.5mm}
 \end{figure}
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % Spore[Int, String] {
 %   type Captured = (Int, Util)
 %   type Excluded = No[Actor]
 % }
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % and
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % Spore[String, Int] {
 %   type Captured = (String, Int)
 %   type Excluded = No[Actor] with No[Util]
 % }
-% \end{lstlisting}
+% \end{minted}
 
 % \vspace{1mm}
 \noindent
 The result of composing the two spores, \verb|s1 compose s2|, thus has the following type:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 Spore[String, String] {
   type Captured = (Int, Util, String, Int)
   type Excluded = No[Actor]
 }
-\end{lstlisting}
+\end{minted}
 
 \paragraph{\textbf{Loosening constraints}}
 
@@ -1389,21 +1389,21 @@ Let's say we have a spore with the following (too elaborate) refinement type:
 
 % assigning the spore to a variable or by passing it to a parameter of a supertype:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val s2: Spore[String, Int] {
   type Captured = (String, Int)
   type Excluded = No[Actor] with No[Util]
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 Then we can soundly drop constraints by using a supertype such as \verb|MySafeSpore|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 type MySafeSpore = Spore[String, Int] {
   type Captured
   type Excluded <: No[Actor]
 }
-\end{lstlisting}
+\end{minted}
 
 % val simpleSpore: MySafeSpore = s2
 % def m(s: Spore[String, Int] { type Excluded <: No[Actor] })
@@ -1427,9 +1427,9 @@ enforced for captured types using custom spore properties. Instead of merely
 tagging types, implicit macros can generate type class instances for all types
 satisfying a predicate. For example, using OIGJ we can define an implicit macro
 
-\begin{lstlisting}[numbers=none]
+\begin{minted}{scala}
 implicit def isImmutable[T: TypeTag]: Immutable[T]
-\end{lstlisting}
+\end{minted}
 
 which returns a type class instance for all types of the shape \verb|C[O, Immut]|
 that is deeply immutable (analyzing the \verb|TypeTag|). Custom spore properties
@@ -1482,22 +1482,22 @@ picklability/immutability).
 
 % The type of single-argument spores is defined as follows:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     trait Spore[-A, +R] extends Function1[A, R] {
 %       type Capture[T]
 %     }
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % The \verb|Spore| trait extends the \verb|Function1| trait~\todo{variance annotations} which is defined as
 % follows in Scala's standard library:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     trait Function1[-A, +R] extends AnyRef {
 %       def apply(v: A): R
 %       def andThen[B](g: R => B): A => B
 %       def compose[B](g: B => A): B => R
 %     }
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % The above definition expresses the fact that functions are objects with an
 % \verb|apply| method; function composition is supported using the
@@ -1512,11 +1512,11 @@ picklability/immutability).
 
 % For example, a spore from \verb|Int| to \verb|String| that requires all
 % captured types to be serializable would have the following type:
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     Spore[Int, String] {
 %       type Capture[T] = Pickler[T]
 %     }
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % The type member \verb|Capture[T]| is defined such that for each captured type
 % \verb|T| there must exist an instance of type \verb|Pickler[T]| (a ``pickler''
@@ -1531,12 +1531,12 @@ picklability/immutability).
 % of boilerplate. Instead, we introduce another type member \verb|NoCapture[T]|
 % used to express properties that lead to rejection of a captured type:\todo{also discuss subtypes}
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     trait Spore[-A, +R] extends Function1[A, R] {
 %       type Capture[T]
 %       type NoCapture[T]
 %     }
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % Given this way of introducing constraints it's even possible to require
 % captured types to have multiple properties. Since properties are expressed
@@ -1544,11 +1544,11 @@ picklability/immutability).
 % example, a spore requiring all captured types to be both serializable and
 % thread-safe would look as follows:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     Spore[Int, String] {
 %       type Capture[T] = Pickler[T] with ThreadSafe[T]
 %     }
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % The idea behind the property \verb|ThreadSafe| is that thread-safe types could
 % provide dummy implementations of the interface \verb|ThreadSafe[T]|. Moreover,
@@ -1558,12 +1558,12 @@ picklability/immutability).
 % \verb|AnyRef|, the top type of all reference types in Scala.
 
 % Spores without constraints have types of the following form:
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     Spore[A, R] {
 %       type Capture[T] = NoConstraint[T]
 %       type NoCapture[T] = NoConstraint[T]
 %     }
-% \end{lstlisting}
+% \end{minted}
 
 % \subsection{Library-specific constraints}
 
@@ -1578,19 +1578,19 @@ picklability/immutability).
 % type class instance. For example, the following implicit object introduces an
 % instance of the \verb|Unsafe| type class for type \verb|Actor|:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     implicit object unsafeActor extends Unsafe[Actor]
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % To ensure that closures never capture types that are declared in such a way as
 % unsafe, the library could use the following type alias in place of the regular
 % type for functions of arity one:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     type SafeSpore[A, R] = Spore[A, R] {
 %       type NoCapture[T] <: Unsafe[T]
 %     }
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % The \verb|NoCapture| type member of the above \verb|Spore| subtype is refined
 % with the {\em upper type bound} \verb|Unsafe[T]|. This ensures that only spore
@@ -1603,14 +1603,14 @@ picklability/immutability).
 
 
 % Type constraints for a newly defined spore can be introduced as follows:
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     spore {
 %       val s: String = // ...
 %       (p: Int) => {
 %         (1 to p).map(x => s).mkString("-")
 %       }
 %     }.with[Pickler]
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 
 % [explain how to exclude certain types]
@@ -2252,9 +2252,9 @@ An expression \verb|spore { val y: S = s; (x: T) => /* body */ }| invokes the \v
 
 Type constraints are implemented as follows. First, invoking the generic \verb|without| macro passing a type argument \verb|T|, say, augments the generated \verb|Spore| refinement type by effectivly adding the clause \verb|with No[T]| to the definition of its \verb|Excluded| type member. Second, the existence of additional bounds on the captured types is detected by attempting to infer an implicit value of type \verb|Property[_]|. If such an implicit value can be inferred, a sequence of types specifying type bounds is obtained as follows. The type of the implicit value is matched against the pattern \verb|Property[t1] with ... with Property[tn]|. For each type \verb|ti| an implicit member of the following shape is added to the \verb|Spore| type refinement:
 
-\begin{lstlisting}[numbers=none]
+\begin{minted}{scala}
     implicit val evi: ti[Captured] = implicitly[ti[Captured]]
-\end{lstlisting}
+\end{minted}
 \noindent
 The implicit conversion (Section~\ref{sec:basic-usage}) from standard Scala functions to spores is implemented as a macro whose expansion fails if the argument function is not a literal, since in this case it is impossible for the macro to check the spore shape/capturing constraints.
 
@@ -2493,7 +2493,7 @@ In Spark, these patterns are expressed using higher-order functions, like \verb|
 
 The following typical pattern was extracted from a code base used in production:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 class GenericOp(sc: SparkContext, mapping: Map[String, String]) {
   private var cachedSessions: spark.RDD[Session] = ...
 
@@ -2510,7 +2510,7 @@ class GenericOp(sc: SparkContext, mapping: Map[String, String]) {
     cachedSessions.map(mapFun).reduceByKey(reduceFun).collectAsMap
   }
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 The \verb|doOp| method performs operations on the RDD \verb|cachedSessions|. \verb|GenericOp| has a parameter of type \verb|SparkContext|, the main entry point for functionality provided by Spark, and a parameter of type \verb|Map[String, String]|. The main computation is a chain of invocations of \verb|map|, \verb|reduceByKey|, and \verb|collectAsMap|. To ensure that the argument closures of \verb|map| and \verb|reduceByKey| are serializable, the code follows two conventions: first, instead of defining \verb|mapFun| and \verb|reduceFun| as methods, they are defined using lambdas stored in local variables. Second, instead of using the \verb|mapping| parameter directly, it is first copied into a local variable \verb|localMapping|. The reason for the first convention is that in Scala converting a method to a function implicitly captures a reference to the enclosing object. However, \verb|GenericOp| is not serializable, since it refers to a \verb|SparkContext|. The reason for the second convention is that using \verb|mapping| directly would result in \verb|mapFun| capturing \verb|this|.
 
@@ -2518,14 +2518,14 @@ The \verb|doOp| method performs operations on the RDD \verb|cachedSessions|. \ve
 
 The above conventions can be enforced by the compiler, avoiding unexpected runtime exceptions, by turning \verb|mapFun| and \verb|reduceFun| into spores:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val mapFun: Spore[Session, (List[String], GenericOpAggregator)] =
   spore { val localMapping = mapping
     (s: Session) => (keyList, new GenericOpAggregator(s, localMapping)) }
 val reduceFun: Spore[(GenericOpAggregator, GenericOpAggregator),
                       GenericOpAggregator] =
   spore { (a, b) => a.merge(b) }
-\end{lstlisting}
+\end{minted}
 \noindent
 The spore shape enforces the use of \verb|localMapping| (moved into \verb|mapFun|). Furthermore, there is no more possibility of accidentally capturing a reference to the enclosing object.
 
@@ -2539,23 +2539,23 @@ Spores with context bounds allow making the use of parallel collections safer by
 
 To ensure that only spores with context bound \verb|Immutable| are passed to data-parallel, higher-order methods such as \verb|map|, we provide a wrapper for \verb|ParIterable[A]|, the supertype of all parallel collections:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 class ImmutWrapper[A](parcoll: ParIterable[A]) {
   def map[B](s: Spore[A, B])(implicit i: Immutable[s.Captured]) =
     new ImmutWrapper(parcoll.map(s))
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 Thanks to the implicit parameter, an invocation of \verb|map| only type-checks if an implicit of type \verb|Immutable[s.Captured]| is in scope; this is the case, if there is an implicit value of type \verb|Immutable[T]| in scope for each captured type \verb|T| of spore \verb|s|. This wrapper is then used as follows (assuming an \verb|import safe.{immutableProp, collections}|):
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val m: Map[Int, String] = ...
 val pcoll = myColl.par
 (new ImmutWrapper(pcoll)).map { elem =>
   if (m.apply(elem)) transform1(elem)  // OK, m is immutable!
   else transform2(elem)
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 In the above example, capturing a mutable object (or, in fact, any object of type \verb|T| that does not have an implicit value of type \verb|Immutable[T]|) would lead to a compile-time error, thus preventing a potential data race.
 }

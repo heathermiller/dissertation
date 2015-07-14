@@ -19,7 +19,8 @@
 %\newcommand{\todolist}[1]{\begin{boiteepaisseavecuntitre}{TO DO in this chapter} #1 \end{boiteepaisseavecuntitre}}  % creates a little box
 % %\newcommand{\todolist}[1]{}  % to be used when to do is not to be printed
 
-\usepackage{listings}
+\usepackage{minted}
+% \usepackage{listings}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{bcprules}
@@ -34,9 +35,15 @@
 \usepackage{enumitem}
 \usepackage{cite}
 \usepackage{natbib}
+% \usepackage{fontspec} % to customize monospace font...
+\usepackage{cprotect}
+
+% \setmainfont{Utopia Std}
+% \setmonofont[Scale=1.0,BoldFont={Consolas Bold}]{Consolas}
 
 % use citep instead of cite
 \let\cite\citep
+
 
 % shorthands
 \newcommand{\selfassembly}{\texttt{self-assembly~}}
@@ -180,19 +187,46 @@
 \newmdtheoremenv[hidealllines=true,topline=true,bottomline=true,skipabove=\baselineskip,skipbelow=\baselineskip]{prop}{Property}[section]
 
 
-% listings settings
-\lstdefinelanguage{Scala}%
-{morekeywords={abstract,case,catch,char,class,%
-    def,else,extends,final,%
-    if,import,%
-    match,module,new,null,object,override,package,private,protected,%
-    public,return,super,this,throw,trait,try,type,val,var,with,implicit,%
-    macro,sealed,%
-  },%
-  sensitive,%
-  morecomment=[l]//,%
-  morecomment=[s]{/*}{*/},%
-  morestring=[b]",%
-  morestring=[b]',%
-  showstringspaces=false%
-}[keywords,comments,strings]%
+% % listings settings
+% \lstdefinelanguage{Scala}%
+% {morekeywords={abstract,case,catch,char,class,%
+%     def,else,extends,final,%
+%     if,import,%
+%     match,module,new,null,object,override,package,private,protected,%
+%     public,return,super,this,throw,trait,try,type,val,var,with,implicit,%
+%     macro,sealed,%
+%   },%
+%   sensitive,%
+%   morecomment=[l]//,%
+%   morecomment=[s]{/*}{*/},%
+%   morestring=[b]",%
+%   morestring=[b]',%
+%   showstringspaces=false%
+% }[keywords,comments,strings]%
+
+% \lstset{language=Scala,%
+%   mathescape=true,%
+%   columns=[c]fixed,%
+%   numbers=left, numberstyle=\scriptsize\color{gray}\ttfamily,
+%   basewidth={0.5em, 0.40em},%
+%   basicstyle=\tt,%
+%   xleftmargin=0.0cm
+% }
+%
+% \lstset{tabsize=2,
+%   basicstyle=\ttfamily\fontsize{10pt}{1em}\selectfont,
+%   keywordstyle=\ttfamily\bfseries,
+%   commentstyle=\itshape\ttfamily,
+%   numbers=none,
+%   %numbers=left,
+%   %numberstyle=\scriptsize\color{gray}\ttfamily,
+%   language=scala,
+%   moredelim=[il][\sffamily]{?},
+%   mathescape=false,
+%   showspaces=false,
+%   showstringspaces=false,
+%   xleftmargin=15pt,
+%   escapechar=@,
+%   classoffset=0,
+%   belowskip=\smallskipamount
+% }

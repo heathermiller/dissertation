@@ -539,11 +539,11 @@ a silo containing a list of \verb|Person| records, the following application
 of \verb|map| defines a (not-yet-materialized) silo containing only the
 records of adults (graphically shown in Figure~\ref{fig:bigger-dag}, part 1):
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val persons: SiloRef[List[Person]] = ...
 val adults =
   persons.map(spore { ps => ps.filter(p => p.age >= 18) })
-\end{lstlisting}
+\end{minted}
 
 \paragraph{flatMap} \texttt{def flatMap[S](s: Spore[T, SiloRef[S]]): SiloRef[S]}
 \newline Like \verb|map|, the \verb|flatMap| method takes a spore that is to
@@ -560,7 +560,7 @@ found in the \verb|adults| silo. In the following, \verb|flatMap| is used to
 create a silo of \verb|(Person, Vehicle)| pairs where the names of person and
 vehicle owner match (graphically shown in Figure~\ref{fig:bigger-dag}, part 2):
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val vehicles: SiloRef[List[Vehicle]] = ...
 // adults that own a vehicle
 val owners = adults.flatMap(spore {
@@ -577,7 +577,7 @@ val owners = adults.flatMap(spore {
         )
     })
 })
-\end{lstlisting}
+\end{minted}
 \noindent
 Note that the spore passed to \verb|flatMap| declares the capturing of the
 \verb|vehicles| SiloRef in its so-called ``spore header.'' The spore header
@@ -634,13 +634,13 @@ gretting, and then ``kicks-off'' remote computation by calling \verb|cache|
 and caching the result in remote memory (graphically shown in Figure~\ref{fig:bigger-dag},
 part 3 and 4):
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val sorted =
   adults.map(spore { ps => ps.sortWith(p => p.age) })
 val labels =
   sorted.map(spore { ps => ps.map(p => "Welcome, " + p.name) })
 labels.cache()
-\end{lstlisting}
+\end{minted}
 \noindent
 Assuming we would also cache the \verb|owners| SiloRef from the previous
 example, the resulting lineage graph would look as illustrated in
@@ -674,13 +674,13 @@ singleton object (Scala's form of modules). The singleton object provides
 factory methods for obtaining SiloRefs referring to silos populated with some
 initial data:\footnote{For clarity, only method signatures are shown.}
 
-\begin{lstlisting}
+\begin{minted}{scala}
 object SiloRef {
   def fromTextFile(host: Host)(file: File): SiloRef[List[String]]
   def fromFun[T](host: Host)(s: Spore[Unit, T]): SiloRef[T]
   def fromLineage[T](host: Host)(s: SiloRef[T]): SiloRef[T]
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 Each of the factory methods has a \verb|host| parameter that specifies the
 target host (address/port) on which to create the silo. Note that the
@@ -699,7 +699,7 @@ complete; the silo originally hosting \verb|s| might already have failed.
 creating silos, it is possible to express \verb|map| in terms of
 \verb|flatMap|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def map[S](s: Spore[T, S]): SiloRef[S] =
   this.flatMap(spore {
     val localSpore = s
@@ -710,7 +710,7 @@ def map[S](s: Spore[T, S]): SiloRef[S] =
         () => localRes
       })
   })
-\end{lstlisting}
+\end{minted}
 \noindent
 This should come as no surprise, given that \verb|flatMap| is the monadic bind
 operation on SiloRefs, and \verb|SiloRef.fromFun| is the monadic return
@@ -721,13 +721,13 @@ based on operation fusion.
 \paragraph{Expressing \texttt{cache}} The \verb|cache| operation can be
 expressed using \verb|flatMap| and \verb|send|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def cache(): Future[Unit] = this.flatMap(spore {
  val localDoneSiloRef = DoneSiloRef
  res => localDoneSiloRef
 }).send()
 
-\end{lstlisting}
+\end{minted}
 \noindent
 Here, we first use \verb|flatMap| to create a new silo that will be completed
 with the trivial value of the \verb|DoneSiloRef| singleton object (\eg
@@ -741,13 +741,13 @@ materialized in memory.
 
 % The type \verb|SiloRef[T]| has the following main operations:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % trait SiloRef[T] {
 %   def map[S](s: Spore[T, S]): SiloRef[S]
 %   def flatMap[S](s: Spore[T, SiloRef[S]]): SiloRef[S]
 %   def send(): Future[T]
 % }
-% \end{lstlisting}
+% \end{minted}
 
 
 \subsection{Fault Handling}
@@ -765,7 +765,7 @@ the lineage of a SiloRef is extended. For this purpose, the introduced
 \verb|map| and \verb|flatMap| primitives are overloaded. For example,
 consider our previous example, but extended with a fault handler:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val persons: SiloRef[List[Person]] = ...
 val vehicles: SiloRef[List[Vehicle]] = ...
 // copy of `vehicles` on different host `h`
@@ -787,7 +787,7 @@ def computeOwners(v: SiloRef[List[Vehicle]]) =
 val owners: SiloRef[List[(Person, Vehicle)]] =
   adults.flatMap(computeOwners(vehicles),
                  computeOwners(vehicles2))
-\end{lstlisting}
+\end{minted}
 
 Importantly, in the \verb|flatMap| call on the last line, in addition to
 \verb|computeOwners(vehicles)|, the regular spore argument of \verb|flatMap|,
@@ -838,45 +838,45 @@ peer-to-peer patterns that are still fault-tolerant.
 
 \paragraph{join} Suppose we are given two silos with the following types:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val silo1: SiloRef[List[A]]
 val silo2: SiloRef[List[B]]
-\end{lstlisting}
+\end{minted}
 \noindent
 as well as two hash functions computing hashes (of type \verb|K|) for elements of
 type \verb|A| and type \verb|B|, respectively:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val hashA: A => K = ...
 val hashB: B => K = ...
-\end{lstlisting}
+\end{minted}
 \noindent
 The goal is to compute the hash-join of \verb|silo1| and \verb|silo2| using
 a higher-order operation \verb|hashJoin|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def hashJoin[A, B, K](s1: SiloRef[List[A]],
                       s2: SiloRef[List[B]],
                       f: A => K,
                       g: B => K)
   : SiloRef[List[(K, (A, B))]] = ???
-\end{lstlisting}
+\end{minted}
 \noindent
 To implement \verb|hashJoin| in terms of silos, the types of the two silos first have to be
 made equal, through initial \verb|map| invocations:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val s12: SiloRef[List[(K, Option[A], Option[B])]] =
   s1.map(spore { l1 => l1.map(x => (f(x), Some(x), None)) })
 val s22: SiloRef[List[(K, Option[A], Option[B])]] =
   s2.map(spore { l2 => l2.map(x => (g(x), None, Some(x))) })
-\end{lstlisting}
+\end{minted}
 \noindent
 
 Then, we can use \verb|flatMap| to create a new silo which contains the
 elements of both silo \verb|s12| and silo \verb|s22|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val combined = s12.flatMap(spore {
   val localS22 = s22
   (triples1: List[(K, Option[A], Option[B])]) =>
@@ -886,7 +886,7 @@ val combined = s12.flatMap(spore {
         localTriples1 ++ triples2
     })
 })
-\end{lstlisting}
+\end{minted}
 \noindent
 The combined silo contains triples of type \verb|(K, Option[A], Option[B])|.
 Using an additional \verb|map|, the collection can be sorted by key, and
@@ -901,9 +901,9 @@ to create multiple result silos, on each node, with ranges of keys supposed to
 be shipped to destination hosts. These destination hosts are determined using
 a partitioning function. Our goal, concretely:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val groupedSilos = groupByKey(silos)
-\end{lstlisting}
+\end{minted}
 \noindent
 Furthermore, we assume that \verb|silos.size| $= N$ where $N$ is the number of
 hosts, with hosts $h_1$, $h_2$, etc. We assume each silo contains an unordered
@@ -935,7 +935,7 @@ example: the local host aggregates some data as soon as two silos
 result is then combined with a silo \verb|info| on local host. The final
 result is written to a distributed file system:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 object Utils {
   def aggregate(vs: SiloRef[List[Vehicle]],
                 ps: SiloRef[List[Person]]): SiloRef[String] = ...
@@ -958,14 +958,14 @@ val done    = info.flatMap(spore {
   combined => Utils.write(combined, captured)
 })
 done.cache() // force computation
-\end{lstlisting}
+\end{minted}
 \noindent
 This program does not tolerate failures of the local host: if it fails before
 the computation is complete, the result is never written to the file. Using
 fault handlers, though, it is easy to introduce a backup host that takes over
 in case the local host fails at any point:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val doCombine = spore {
   val localVehicles = vehicles
   val localPersons  = persons
@@ -998,7 +998,7 @@ val recovered = backup.flatMap(
 )
 done.cache()      // force computation on local host
 recovered.cache() // force computation on backup host
-\end{lstlisting}
+\end{minted}
 \noindent
 First, the local variables \verb|doCombine| and \verb|doWrite| refer to the
 verbatim spores passed to \verb|flatMap| and \verb|map| above. Second,
@@ -1431,17 +1431,17 @@ the lineage of a SiloRef may contain instances of a type Mapped. This generic
 type has four type parameters. The receiver of a freshly unpickled Mapped
 instance typically uses a pattern match:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 case mapped: Mapped[u, t, v, s] =>
-\end{lstlisting}
+\end{minted}
 
 The type arguments \verb|u|, \verb|t|, \verb|v|, and \verb|s| are {\em type
 variables}. While unknown, the static type of \verb|mapped| is still useful
 for type-safety:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val newSilo = new LocalSilo[v, s](mapped.fun(value))
-\end{lstlisting}
+\end{minted}
 
 However, it is impossible to generate type-specific code to unpickle a type
 like \verb|Mapped[u, t, v, s]|. As a solution to this problem we propose what
@@ -1450,19 +1450,19 @@ serialized representation with additional information about how to unpickle.
 The key is to capture the type-specific pickler and unpickler when the fully-concrete
 type of a \verb|Mapped| instance is known:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def doPickle[T](msg: T)
   (implicit pickler: Pickler[T],
                unpickler: Unpickler[T]): Array[Byte] = ...
-\end{lstlisting}
+\end{minted}
 
 Essentially, this means when \verb|doPickle| is called with a concrete type
 \verb|T|, say:\footnote{Note that the type arguments are inferred by the Scala
 compiler; they are only shown for clarity.}
 
-\begin{lstlisting}
+\begin{minted}{scala}
 doPickle[Mapped[Int, List[Int], String, List[String]]](mapped)
-\end{lstlisting}
+\end{minted}
 
 \noindent not only a type-specific implicit pickler (a type class instance) is
 looked up, but also a type-specific implicit unpickler. The \verb|doPickle|
@@ -1470,10 +1470,10 @@ method can then build a self-describing pickle as follows. First, the actual
 message is pickled using the pickler, yielding a byte array. Then, an instance
 of the following simple record-like class is created:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 case class SelfDescribing(blob: Array[Byte],
                           unpicklerClassName: String)
-\end{lstlisting}
+\end{minted}
 
 Besides the just produced byte array, it contains the class name of the type-
 specific unpickler. This enables, using this fully type-specific unpickler,

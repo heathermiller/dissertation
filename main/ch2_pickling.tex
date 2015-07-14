@@ -177,21 +177,21 @@ large-scale distributed applications and frameworks.
 % \paragraph{Macro Annotations.} Unlike macro defs, macro annotations are capable
 % of {\em adding members} to classes which carry their annotation.
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % @withNewToString
 % class D { ... }
-% \end{lstlisting}
+% \end{minted}
 
 % The \verb|withNewToString| annotation is defined using a standard class
 % definition by extending a special \verb|MacroAnnotation| marker trait, and by
 % implementing a special \verb|transform| method as a macro:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % class withNewToString extends MacroAnnotation {
 %   def transform = macro transform_impl
 %   def transform_impl = { ... }
 % }
-% \end{lstlisting}
+% \end{minted}
 
 % The \verb|transform| macro implementation is passed the AST of the annotated class
 % definition (the AST of ``\verb|class D { ... }|''), and returns a possibly changed AST
@@ -207,11 +207,11 @@ Scala/pickling was designed so as to require as little
 boilerplate from the programmer as possible. For that reason, pickling or
 unpickling an object \term{obj} of type \term{Obj} requires simply,
 
-\begin{lstlisting}
+\begin{minted}{scala}
 import scala.pickling._
 val pickle = obj.pickle
 val obj2 = pickle.unpickle[Obj]
-\end{lstlisting}
+\end{minted}
 
 Here, the \term{import} statement imports scala/pickling, the method
 \term{pickle} triggers static pickler generation, and the method
@@ -227,7 +227,7 @@ not they are present in implicit scope. Implicit conversions carry the
 \term{implicit} keyword before their declaration. The \verb|pickle| method is
 provided using the following implicit conversion (slightly simplified):
 
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit def PickleOps[T](picklee: T) =
   new PickleOps[T](picklee)
 
@@ -235,17 +235,17 @@ class PickleOps[T](picklee: T) {
   def pickle: Pickle = ...
   ...
 }
-\end{lstlisting}
+\end{minted}
 
 In a nutshell, the above implicit conversion is implicitly invoked, passing
 object \verb|obj| as an argument, whenever the \verb|pickle| method is invoked
 on \verb|obj|. The above example can be written in a form where all
 invocations of implicit methods are explicit, as follows:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val pickle = PickleOps[Obj](obj).pickle
 val obj2 = pickle.unpickle[Obj]
-\end{lstlisting}
+\end{minted}
 
 
 Optionally, a user can
@@ -271,7 +271,7 @@ also possible to pickle and unpickle subtypes, even if the pickle and unpickle
 methods are called using supertypes of the type to-be-pickled.
 For example,
 
-\begin{lstlisting}
+\begin{minted}{scala}
 abstract class Person {
   def name: String
 }
@@ -282,7 +282,7 @@ case class Firefighter(name: String, since: Int)
 val ff: Person = Firefighter("Jim", 2005)
 val pickle = ff.pickle
 val ff2 = pickle.unpickle[Person]
-\end{lstlisting}
+\end{minted}
 
 In the above example, the runtime type of \term{ff2} will correctly be
 \term{Firefighter}.
@@ -298,12 +298,12 @@ Scala/pickling is also able to unpickle values of static type
 \term{Any}. Scala's pattern-matching syntax can make unpickling on less-specific
 types quite convenient, for example:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 pickle.unpickle[Any] match {
   case Firefighter(n, _) => println(n)
   case _ => println("not a Firefighter")
 }
-\end{lstlisting}
+\end{minted}
 
 Beyond dealing with subtypes, our pickling framework supports
 pickling/unpickling most Scala types, including generics, case classes, and
@@ -343,14 +343,14 @@ fallback on a runtime pickler.
 For example, assume the following class \verb|Person| and its subclass
 \verb|Firefighter| are defined in separately-compiled code.
 
-\begin{lstlisting}
+\begin{minted}{scala}
 // Library code
 @pickleable class Person(val name: String)
 
 // Client code
 class Firefighter(override val name: String, salary: Int)
   extends Person(name)
-\end{lstlisting}
+\end{minted}
 
 Note that class \verb|Person| is annotated with the \verb|@pickleable|
 annotation. \verb|@pickleable| is a {\em macro annotation} which generates
@@ -358,14 +358,14 @@ additional methods for obtaining type-specialized picklers (and unpicklers).
 With the \verb|@pickleable| annotation expanded, the code for class
 \verb|Person| looks roughly as follows:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 class Person(val name: String)
     extends PickleableBase {
   def pickler: SPickler[_] =
     implicitly[SPickler[Person]]
   ...
 }
-\end{lstlisting}
+\end{minted}
 
 First, note that the supertypes of \verb|Person| now additionally include the
 trait \verb|PickleableBase|; it declares the abstract methods that the
@@ -382,9 +382,9 @@ Here, we obtain an instance of \verb|SPickler[Person]| by means of implicits.
 The \verb|implicitly| method, part of Scala's standard library, is defined as
 follows:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def implicitly[T](implicit e: T) = e
-\end{lstlisting}
+\end{minted}
 \noindent
 Annotating the parameter (actually, the parameter list) using the
 \verb|implicit| keyword means that in an invocation of \verb|implicitly|, the
@@ -405,13 +405,13 @@ by the compiler and executed (or expanded) during compilation. A macro is
 defined as if it is a normal method, but it is linked using the \verb|macro|
 keyword to an additional method that operates on abstract syntax trees.
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def assert(x: Boolean, msg: String): Unit =
   macro assert_impl
 def assert_impl(c: Context)
   (x: c.Expr[Boolean], msg: c.Expr[String]):
                             c.Expr[Unit] = ...
-\end{lstlisting}
+\end{minted}
 
 In the above example, the parameters of \verb|assert_impl| are syntax trees,
 which the body of \verb|assert_impl| operates on, itself returning an AST
@@ -423,9 +423,9 @@ note that implicit defs as described above can be implemented as macros.
 Scala/pickling provides an implicit macro def returning picklers for arbitrary
 types. Slightly simplified, it is declared as follows:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit def genPickler[T]: SPickler[T]
-\end{lstlisting}
+\end{minted}
 
 This macro def is expanded when invoking \newline
 \verb|implicitly[SPickler[T]]| if
@@ -506,11 +506,11 @@ In scala/pickling, a {\em static pickler} for some type \verb|T| is an
 instance of trait \verb|SPickler[T]| which has a single abstract method,
 \verb|pickle|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
     trait SPickler[T] {
       def pickle(obj: T, builder: PBuilder): Unit
     }
-\end{lstlisting}
+\end{minted}
 \noindent
 For a concrete type, say, class \verb|Person| from Section~\ref{sec:overview},
 the \verb|pickle| method of an \verb|SPickler[Person]| converts
@@ -521,14 +521,14 @@ specialized type''~\cite{Elsman2005}. The pickled result is not returned
 directly; instead, it can be requested from the \verb|builder| using its
 \verb|result()| method. Example:
 
-\begin{lstlisting}
+\begin{minted}{scala}
     val p = new Person("Jack")
     ...
     val personPickler   = implicitly[SPickler[Person]]
     val builder         = pickleFormat.createBuilder()
     personPickler.pickle(p, builder)
     val pickled: Pickle = builder.result()
-\end{lstlisting}
+\end{minted}
 \noindent
 In the above example, invoking \verb|implicitly[SPickler[Person]]| either
 returns a regular implicit value of type \verb|SPickler[Person]| that is in
@@ -543,27 +543,27 @@ The \verb|pickled| result has type \verb|Pickle| which wraps a concrete
 representation, such as a byte array (\eg for binary formats) or a string (\eg
 for JSON). The abstract \verb|Pickle| trait is defined as follows:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 trait Pickle {
   type ValueType
   type PickleFormatType <: PickleFormat
   val value: ValueType
   ...
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 The type members \verb|ValueType| and \verb|PickleFormatType| abstract from
 the concrete representation type and the pickle format type, respectively.
 For example, scala/pickling defines a \verb|Pickle| subclass for its default binary format
 as follows:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 case class BinaryPickle(value: Array[Byte]) extends Pickle {
   type ValueType = Array[Byte]
   type PickleFormatType = BinaryPickleFormat
   override def toString = ...
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 
 
@@ -571,11 +571,11 @@ Analogous to a pickler, an unpickler for some type \verb|T| is an instance of
 trait \verb|Unpickler[T]| that has a single abstract method \verb|unpickle|;
 its (simplified) definition is as follows:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 trait Unpickler[T] {
   def unpickle(reader: PReader): T
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 
 Similar to a pickler, an unpickler does not access pickled objects directly,
@@ -587,20 +587,20 @@ beforehand, or it can be selected using the \verb|PickleFormatType| member of
 \verb|Pickle|. The pickle format, in turn, has factory methods for creating
 concrete \verb|PReader| instances:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val reader = pickleFormat.createReader(pickled)
-\end{lstlisting}
+\end{minted}
 
 The obtained reader can then be passed to the \verb|unpickle| method of a
 suitable \verb|Unpickler[T]|. Alternatively, a macro def on trait
 \verb|Pickle| can be invoked directly for unpickling:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 trait Pickle {
   ...
   def unpickle[T] = macro ...
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 It is very common for an instance of \verb|SPickler[T]| to also mix in
 \verb|Unpickler[T]|, thereby providing both pickling and unpickling
@@ -631,11 +631,11 @@ flexible, object-oriented form of pickler combinators.
 % abstract class or interface types . Each have an abstract method \verb|pickle| with a single
 % parameter of type $T$ and return type \term{Pickle}:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %     trait DPickler[T] {
 %       def pickle(obj: T): Pickle
 %     }
-% \end{lstlisting}
+% \end{minted}
 
 % \noindent(The type definition of \term{SPickler}$[T]$ differs only in the name of the type;
 % below we define the difference in their contracts.)
@@ -663,9 +663,9 @@ flexible, object-oriented form of pickler combinators.
 % that multiple picklers can output to. The corresponding method has the
 % following signature:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 %    def pickle(obj: T, builder: PickleBuilder): Unit
-% \end{lstlisting}
+% \end{minted}
 
 % \verb|PickleBuilder| has methods to incrementally add elements of an object
 % to-be-pickled to a pickle that is being constructed (see Section
@@ -677,9 +677,9 @@ in the previous section by means of an example. Consider a simple class
 \verb|Position| with a field of type \verb|String| and a field of type \term{Person},
 respectively:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 class Position(val title: String, val person: Person)
-\end{lstlisting}
+\end{minted}
 
 To obtain a pickler for objects of type \verb|Position|, ideally, existing
 picklers for type \verb|String| and for type \verb|Person| could be combined
@@ -753,20 +753,20 @@ For this, it is useful to consider the following scenario. Assume \term{T} is
 declared to be contravariant, as in \term{SPickler[-T]}. Furthermore, assume
 the existence of a public, non-final class \term{C} with a subclass \term{D}:
 
-\begin{lstlisting}
+\begin{minted}{scala}
     class C {...}
     class D extends C {...}
-\end{lstlisting}
+\end{minted}
 
 Initially, we might define a generic pickler for \term{C}:
 
 \pagebreak
 
-\begin{lstlisting}
+\begin{minted}{scala}
     implicit val picklerC = new SPickler[C] {
       def pickle(obj: C): Pickle = { ... }
     }
-\end{lstlisting}
+\end{minted}
 
 Because \term{SPickler}[$T$] is contravariant in its type parameter, instances
 of \term{D} would be pickled using \term{picklerC}. There are several possible
@@ -785,9 +785,9 @@ pickler, since \term{picklerC} does not know how to instantiate class \term{E}
 In both cases it is necessary to add a new, dedicated pickler for either an
 existing subclass (\term{D}) or a new subclass (\term{E}) of \term{C}:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit val picklerD = new SPickler[D] { ... }
-\end{lstlisting}
+\end{minted}
 
 However, when pickling an instance of class \term{D} this new pickler,
 \term{picklerD}, would not get selected, even if the type of the object to-be-pickled
@@ -805,18 +805,18 @@ with type bounds. Assuming invariant picklers, we can define a generic method
 \term{picklerC1} that returns picklers for all subtypes of class \term{C}:
 
 
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit def picklerC1[T <: C] = new SPickler[T] {
   def pickle(obj: T): Pickle = { ... }
 }
-\end{lstlisting}
+\end{minted}
 
 With this pickler in scope, it is still possible to define a more specific
 \term{SPickler[D]} (or \term{SPickler[E]}) as required:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit val picklerD1 = new SPickler[D] { ... }
-\end{lstlisting}
+\end{minted}
 
 \begin{figure}
   \centering
@@ -1203,9 +1203,9 @@ static type $T$, written \itl{erasure(}$T$\itl{)}.
 
 \noindent Two objects \term{obj}$_1$ and \term{obj}$_2$ are structurally equal, written
 
-\begin{lstlisting}[escapechar=\%]
+\begin{minted}{scala}[escapechar=\%]
 obj%$_1$% %$\equiv$% obj%$_2$%
-\end{lstlisting}
+\end{minted}
 
 \noindent if and only if
 
@@ -1224,28 +1224,28 @@ defined as follows.
 
 \noindent Given the following typed objects,
 
-\begin{lstlisting}[escapechar=\%]
+\begin{minted}{scala}[escapechar=\%]
     dp: DPickler[%$T$%]
     sp: SPickler[%$T$%]
    obj: %$T$%
     up: Unpickler[%$U$%] %\textrm{where}% %$T <: U$%
   obj': %$U$%
-\end{lstlisting}
+\end{minted}
 
 \noindent where \term{obj} is the object to-be-pickled, and \term{obj'} is the unpickled
 object. Then,
 
-\begin{lstlisting}[escapechar=\%]
+\begin{minted}{scala}[escapechar=\%]
 up.unpickle(dp.pickle(obj)) %\textrm{evaluates to}% obj'%\vspace{0.15cm}%
 up.unpickle(sp.pickle(obj)) %\textrm{evaluates to}% obj' %\textrm{if}% %\textrm{\textit{dynTypeOf}(}%obj%\textrm{)}% =:= %\textrm{\textit{erasure}(}%T%\textrm{)}%
-\end{lstlisting}
+\end{minted}
 
 \noindent such that,
 
-\begin{lstlisting}[escapechar=\%]
+\begin{minted}{scala}[escapechar=\%]
 obj': U%\vspace{0.15cm}%
 obj' %$\equiv$% obj
-\end{lstlisting}
+\end{minted}
 \end{defn}
 
 Note that \term{SPickler}'s \term{pickle} method has a precondition which
@@ -1385,13 +1385,13 @@ example, the following case class represents $\Upsilon$s:
 
 % \vspace{4em}
 
-\begin{lstlisting}
+\begin{minted}{scala}
 case class ClassIR(
   tpe: Type,
   parent: ClassIR,
   fields: List[FieldIR]
 ) extends PickleIR
-\end{lstlisting}
+\end{minted}
 
 We go on to define a number of useful IR combinators, which form the
 basis of our model of inheritance.
@@ -1492,12 +1492,12 @@ using $\Upsilon = flatten(compose((T, \epsilon, \lbrack \rbrack))$.
 The above IR combinators have direct Scala implementations in scala/pickling.
 For example, function $superIRs$ is implemented as follows:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 private val f3 = (c: C) =>
   c.tpe.baseClasses
        .map(superSym => c.tpe.baseType(superSym))
        .map(tp => ClassIR(tp, null, fields(tp)))
-\end{lstlisting}
+\end{minted}
 \noindent
 Here, method \verb|baseClasses| returns the collection of superclass symbols
 of type \verb|c.tpe| in linearization order. Method \verb|baseType| converts
@@ -1542,10 +1542,10 @@ reader from a pickle:\footnote{In our actual implementation the
 \term{createReader} method takes an additional parameter which is a ``mirror''
 used for runtime reflection; it is omitted here for simplicity.}
 
-\begin{lstlisting}
+\begin{minted}{scala}
     def createBuilder(): PBuilder
     def createReader(pickle: PickleType): PReader
-\end{lstlisting}
+\end{minted}
 
 The \term{createReader} method takes a pickle of a specific \term{PickleType}
 (which is an abstract type member in our implementation); this makes it
@@ -1554,14 +1554,14 @@ erroneously attempted to be unpickled using the JSON pickle format. Moreover,
 pickle builders returned from \verb|createBuilder| are guaranteed to produce
 pickles of the right type.
 
-\begin{lstlisting}
+\begin{minted}{scala}
 class PBuilder {
   def beginEntry(obj: Any): PBuilder
   def putField(n: String, pfun: PBuilder => Unit): PBuilder
   def endEntry(): Unit
   def result(): Pickle
 }
-\end{lstlisting}
+\end{minted}
 
 In the following we're going to show how the \verb|PBuilder| interface is used
 by generated picklers; the \verb|PReader| interface is used by generated
@@ -1582,9 +1582,9 @@ instance.
 The objective of the generation algorithm is to generate the body of
 \term{SPickler}'s \term{pickle} method:
 
-\begin{lstlisting}
+\begin{minted}{scala}
   def pickle(obj: T, builder: PBuilder): Unit = ...
-\end{lstlisting}
+\end{minted}
 
 As mentioned previously, the actual pickling logic is synthesized based on the
 IR. Importantly, the IR determines which fields are pickled and how. A lot of
@@ -1675,7 +1675,7 @@ implicit def provided by the pickling framework which generates a
 \term{DPickler[T]} on-the-fly. The generated dispatch logic has the following
 shape:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val clazz = if (picklee != null) picklee.getClass else null
 val pickler = clazz match {
   case null => implicitly[SPickler[NullTpe]]
@@ -1684,7 +1684,7 @@ val pickler = clazz match {
   case cn if cn == classOf[Sn] => implicitly[SPickler[Sn]]
   case _ => genPickler(clazz)
 }
-\end{lstlisting}
+\end{minted}
 
 The types $S_1, \dots, S_n$ are known subtypes of the picklee's type $T$. If $T$
 is a sealed class or trait with final subclasses, this set of types is always
@@ -1698,14 +1698,14 @@ If the static type $T$ to be pickled is annotated using the
 predefined \verb|PickleableBase| interface trait. Consequently, a more optimal
 dispatch can be generated in this case:
 
-\begin{lstlisting}
+\begin{minted}{scala}
     val pickler =
       if (picklee != null) {
         val pbase = picklee.asInstanceOf[PickleableBase]
         pbase.pickler.asInstanceOf[SPickler[T]]
       }
       else implicitly[SPickler[NullTpe]]
-\end{lstlisting}
+\end{minted}
 
 \subsection{Runtime Picklers}
 \label{sec:runtime-pickler}
@@ -1759,9 +1759,9 @@ can be written to the pickle.
 poses a similar problem to that introduced above in Section \ref{sec:runtime-pickler}.
 For example, consider a generic class \term{C},
 
-\begin{lstlisting}
+\begin{minted}{scala}
     class C[T](val fld: T) { ... }
-\end{lstlisting}
+\end{minted}
 
 A \term{Pickler[C[T]]} will not be able to pickle the field \term{fld} if its
 static type is unknown. To support pickling instances of generic classes, our
@@ -1866,14 +1866,14 @@ allows scala/pickling to traverse sealed class hierarchies.
 
 For example, consider this small class hierarchy:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 final class Position(p: Person, title: String)
 sealed class Person(name: String, age: Int)
 final class Firefighter(name: String, age: Int, salary: Int)
   extends Person(name, age)
 final class Teacher(name: String, age: Int, subject: String)
   extends Person(name, age)
-\end{lstlisting}
+\end{minted}
 
 In this case, upon generating the pickler for class \verb|Position|, it is
 detected that no cycles are possible in the object graphs of instances of type
@@ -1918,11 +1918,11 @@ quasiquoting library for Scala's macros~\cite{Shabalin2013}.
 
 %Example (we show a non-generic class hierarchy for simplicity):
 
-%\begin{lstlisting}
+%\begin{minted}{scala}
 %    abstract class IntTree
 %    class Empty extends IntTree
 %    class Fork(left: IntTree, elem: Int, right: IntTree)
-%\end{lstlisting}
+%\end{minted}
 
 \section{Experimental Evaluation}
 \label{sec:evaluation}

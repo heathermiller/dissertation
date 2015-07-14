@@ -17,8 +17,8 @@
 % designs can co-exist for ensuring that many types get some
 % generic functionality.
 % For example, in Java, every object always has a few
-% methods; \lstinline{toString}, \lstinline{equals},
-% \lstinline{clone}, and \lstinline{hashCode}.
+% methods; \verb|toString|, \verb|equals|,
+% \verb|clone|, and \verb|hashCode|.
 % % Since they're normal methods, they can be overridden by users when the default implementation isn't good enough.
 % These methods provide a simple default implementation, however,
 % it is common to have to override them to achieve desired functionality.
@@ -26,7 +26,7 @@
 % functionality, but unlike the above, Java
 % does not ensure that serialization functionality exists for every type.
 % Instead, serialization in Java is opt-in; if a class
-% implements a \lstinline{Serializable} interface then instances of
+% implements a \verb|Serializable| interface then instances of
 % that class are automatically serializable by the JVM.
 % % While these approaches are convenient in that they require
 % % little or no boilerplate from the user, they're built into the
@@ -51,7 +51,7 @@
 % Retroactive extensibility means that functionality can be implemented
 % \emph{after} the type or class has been defined. This is in contrast
 % with conventional OO programming, where all methods (such as
-% \lstinline{toString} or \lstinline{equals}) should be implemented
+% \verb|toString| or \verb|equals|) should be implemented
 % together with the definition of the class. A major benefit of
 % retroactive extensibility is flexibility and possibility for
 % customizing behavior. As a result, several authors have argued for the
@@ -74,8 +74,8 @@
 % Type classes, on the other hand, while more flexible, require the programmer
 % to define the serialization code for each class manually.
 % One could also imagine mechanisms similar to serialization could also be useful for
-% providing operations such as \lstinline{equals} or
-% \lstinline{toString}. It would be advantageous
+% providing operations such as \verb|equals| or
+% \verb|toString|. It would be advantageous
 % if it were possible to automatically provide sensible implementations
 % of these operations per type!
 
@@ -169,11 +169,11 @@ problem faced by both language designers and normal users.
 One common approach is to provide specialized functionality across
 arbitrary types at the level of the compiler or runtime. For example, in Java,
 every object is synthetically provided with a few methods;
-\lstinline{toString}, \lstinline{equals}, \lstinline{clone}, and
-\lstinline{hashCode}. Serialization, on the other hand, is also an
+\verb|toString|, \verb|equals|, \verb|clone|, and
+\verb|hashCode|. Serialization, on the other hand, is also an
 ubiquitously needed functionality, but unlike the above, Java does not ensure
 that serialization functionality exists for every type. Instead, serialization
-in Java is opt-in; if a class implements a \lstinline{Serializable} interface
+in Java is opt-in; if a class implements a \verb|Serializable| interface
 then instances of that class are automatically serializable by the JVM. While
 compiler/runtime-integrated approaches such as Java's serialization are typically easy to use
 (no boilerplate required), they are inflexible and are often impossible to
@@ -194,7 +194,7 @@ Type classes support \emph{retroactive
 extensibility}~\cite{RetroactiveExtensibility}; functionality can be
 implemented \emph{after} the type or class has been defined. This is in
 contrast with conventional OO programming, where all methods (such as
-\lstinline{toString} or \lstinline{equals}) are implemented together with the
+\verb|toString| or \verb|equals|) are implemented together with the
 definition of the class. Retroactive extensibility enables flexibility and the
 possibility to customize behavior. As a result, several authors have argued
 for the software engineering benefits of using type
@@ -498,10 +498,10 @@ automatically based on type. These capabilities are enabled when using the
 parameter lists may annotate their last parameter list using the
 \term{implicit} keyword.%%\footnote{Example taken from~\cite{Oliveira2010}.}
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def log(msg: String)(implicit o: PrintStream) =
   o.println(msg)
-\end{lstlisting}
+\end{minted}
 
 This means that in an invocation of \term{log}, the implicit argument list may
 be omitted if, for each parameter of that list, there is exactly one value of
@@ -510,10 +510,10 @@ adaptation of the regular variable scope. Imported implicits, or implicits
 declared in an enclosing scope are contained in the implicit scope of a method
 invocation.
 
-\begin{lstlisting}
+\begin{minted}{scala}
     implicit val out = System.out
     log("Does not compute!")
-\end{lstlisting}
+\end{minted}
 
 In the above example, the implicit val \term{out} is in the implicit scope of
 the invocation of \term{log}. Since \term{out} has the right type, it is automatically
@@ -531,12 +531,12 @@ invoked) based upon their type, and whether or not they are present in
 implicit scope. As with implicit parameters, implicit conversions also carry
 the \term{implicit} keyword before their declaration.
 
-\begin{lstlisting}
+\begin{minted}{scala}
  implicit def intWrapper(x: Int): Message =
     new Message {
       def message: String = "secret message!"
     }
-\end{lstlisting}
+\end{minted}
 
 In the example above, assuming there exists an abstract class \term{Message}
 with abstract method \term{message}, the implicit conversion
@@ -595,19 +595,19 @@ for example, for adding a \term{pickle} method to arbitrary objects.
 Type classes are a language mechanism that provide a disciplined
 alternative to ad-hoc polymorphism. They have been popularized by
 Haskell.  Type classes allow functions to be defined over a set of
-types.  If values of a type \lstinline{T} should provide a certain
+types.  If values of a type \verb|T| should provide a certain
 functionality then that functionality can be specified as an
 \emph{instance} of a type class.
 
 \begin{figure}
-\begin{lstlisting}
+\begin{minted}{scala}
 trait Show[T] {def show(visitee : T) : String}
 
 implicit object IntInstance extends Show[Int] {
   def show(o : Int) = o.toString()
 }
-\end{lstlisting}
-\caption{\lstinline{Show} type class and corresponding instance for
+\end{minted}
+\cprotect\caption{\texttt|Show| type class and corresponding instance for
   integers.}
 \label{fig:showtc}
 \end{figure}
@@ -620,32 +620,32 @@ uses general language features to model type classes.
 A type class is simply an interface that provides operations
 over one (or more) generic types. Such interfaces can be modeled
 as traits in Scala. An example of a type class is shown in
-Figure~\ref{fig:showtc}. The trait \lstinline{Show[T]} models a type
+Figure~\ref{fig:showtc}. The trait \verb|Show[T]| models a type
 class that provides pretty printing functionality for some type
-\lstinline{T} via a method \lstinline{show}.
+\verb|T| via a method \verb|show|.
 
 The main conceptual difference between standard OO methods and
 type-class methods is that the later are provided \emph{externally} to
 objects. Suppose that we wanted to add pretty printing
 functionality to integers. To do this we create an instance of
-the type class \lstinline{Show} where the generic type parameter \lstinline{T} is
-instantiated to \lstinline{Int}. The \lstinline{object IntInstance} in
+the type class \verb|Show| where the generic type parameter \verb|T| is
+instantiated to \verb|Int|. The \verb|object IntInstance| in
 Figure~\ref{fig:showtc} models such instance in
-Scala using regular objects. In that object, the \lstinline{show}
-method takes an argument \lstinline{o} of type \lstinline{Int} an
-invokes the \lstinline{toString()} method on \lstinline{o}.
+Scala using regular objects. In that object, the \verb|show|
+method takes an argument \verb|o| of type \verb|Int| an
+invokes the \verb|toString()| method on \verb|o|.
 %%To use the pretty printing functionality in client code we could create
-%%a method \lstinline{eshow}:
+%%a method \verb|eshow|:
 
 %%begin{lstlisting}
 %%// explicitly taking instance argument
 %%def eshow[T](o : T)(showT : Show[T]) = showT.show(o)
-%%\end{lstlisting}
+%%\end{minted}
 
-%%This method takes an object \lstinline{o} of some generic type \lstinline{T} and
-%%an instance \lstinline{showT} of type \lstinline{Show[T]} and applies
-%%the \lstinline{show} method in \lstinline{showT} to \lstinline{o}.
-%%With \lstinline{eshow} we could
+%%This method takes an object \verb|o| of some generic type \verb|T| and
+%%an instance \verb|showT| of type \verb|Show[T]| and applies
+%%the \verb|show| method in \verb|showT| to \verb|o|.
+%%With \verb|eshow| we could
 
 \paragraph{Type-Directed Resolution of Instances} An interesting
 aspect of type classes is that instances can be automatically
@@ -655,61 +655,61 @@ to be used from client code through a mechanism similar to
 overloading. This is achieved in Scala using an implicit
 parameter:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def ishow[T](v : T)(implicit showT : Show[T]) =
   showT.show(v)
-\end{lstlisting}
+\end{minted}
 
-In \lstinline{ishow} the idea is that the method takes two parameters,
-with the last of these (\lstinline{showT}) being implicit. As we have
+In \verb|ishow| the idea is that the method takes two parameters,
+with the last of these (\verb|showT|) being implicit. As we have
 seen in Section~\ref{sec:implicits} this means that the second
 parameter can be automatically determined by the compiler.  For
-example if we wanted to use \lstinline{show} on integers we could
+example if we wanted to use \verb|show| on integers we could
 simply write a program such as:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def test1 = ishow(5)
-\end{lstlisting}
+\end{minted}
 
-Provided that an \lstinline{implicit} value of type
-\lstinline{Show[Int]} is in the implicit scope (for example
-\lstinline{IntInstance} from Figure~\ref{fig:showtc}), the second
+Provided that an \verb|implicit| value of type
+\verb|Show[Int]| is in the implicit scope (for example
+\verb|IntInstance| from Figure~\ref{fig:showtc}), the second
 parameter is automatically inferred by the compiler.
 
 \paragraph{Context Bounds} Type classes are pervasively used in
 Scala. Because of this Scala offers an alternative convinient syntax sugar called
 \emph{context bounds}. Context bounds allows code using type classes to be
 written more compactly and arguably more intuitively. With context
-bounds, instead of writting \lstinline{ishow} we could write:
+bounds, instead of writting \verb|ishow| we could write:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def show[T : Show](v : T) =
   implicitly[Show[T]].show(v)
-\end{lstlisting}
+\end{minted}
 
 The idea of context bounds comes from the fact that type classes can
 also be seen as a generic programming mechanism~\cite{GP}, which allows
 generic parameters to be constrained. In this case the type of
-\lstinline{show} can be read as a generic method where the generic
-type argument must be an instance of \lstinline{Show}.
+\verb|show| can be read as a generic method where the generic
+type argument must be an instance of \verb|Show|.
 A small problem with context bounds there is no parameter name to be used in the
-definition of \lstinline{show}. However, it is possible to
+definition of \verb|show|. However, it is possible to
 \emph{query} the implicit scope for a value of a certain type
-using a simple auxiliary method called \lstinline{implicitly}:
+using a simple auxiliary method called \verb|implicitly|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def implicitly[T](implicit x : T) : T = x
-\end{lstlisting}
+\end{minted}
 
 This precludes the need for having to have the name of the implicit
 argument in hand in order to use it.
-From the client perspective, using \lstinline{show} is similar to
-using \lstinline{ishow}.
+From the client perspective, using \verb|show| is similar to
+using \verb|ishow|.
 
 \subsection{Pretty Printing Complex Structures}\label{sec:pretty-printing-complex}
 
 \begin{figure}
-\begin{lstlisting}
+\begin{minted}{scala}
 sealed trait Tree
 case class Fork(left : Tree, right : Tree)
   extends Tree
@@ -721,8 +721,8 @@ implicit object TreeInst extends Show[Tree] {
     "Fork(" + show(l) + ", " + show(r) + ")"
    case Leaf(x) => "Leaf(" + x.toString() + ")"
  }}
-\end{lstlisting}
-\caption{Trees of integers and corresponding \lstinline{Show}
+\end{minted}
+\cprotect\caption{Trees of integers and corresponding \verb|Show|
   instance.}
 \label{fig:trees}
 \end{figure}
@@ -731,43 +731,43 @@ Of course it is also possible to apply type classes to more complex
 structures. For example consider a simple type of binary trees with
 integers at the leafs. Figure~\ref{fig:trees} shows how to model such
 trees in Scala using \emph{case classes}~\cite{Match} and \emph{sealed
-  traits}. The keyword \lstinline{sealed} in Scala means that the
+  traits}. The keyword \verb|sealed| in Scala means that the
 trait can only be implemented by definitions in the existing
 compilation unit.
 Together with case classes this allows modeling \emph{algebraic
   datatypes}, which are a well-know concept from functional programming.
-The \lstinline{Tree} trait is the type of trees. The case class
-\lstinline{Fork} models the binary nodes of the tree, wheres the case
-class \lstinline{Leaf} models the leafs containing an integer value.
+The \verb|Tree| trait is the type of trees. The case class
+\verb|Fork| models the binary nodes of the tree, wheres the case
+class \verb|Leaf| models the leafs containing an integer value.
 
-To define pretty printing for \lstinline{Tree} using the
-\lstinline{Show} type class we create an \lstinline{object TreeInst}.
+To define pretty printing for \verb|Tree| using the
+\verb|Show| type class we create an \verb|object TreeInst|.
 This object provides a definition for the
-\lstinline{show} method that pattern matches on the
-two tree constructors (cases) of \lstinline{Tree}. The implementation
+\verb|show| method that pattern matches on the
+two tree constructors (cases) of \verb|Tree|. The implementation
 of the two cases is unremarcable: both cases print the
 constructors names and the arguments.
 
-A simple test program illustrating the use of \lstinline{TreeInst}
-is shown next. The value \lstinline{tree} defines a simple tree and the
-definition \lstinline{test3} pretty prints that tree.
+A simple test program illustrating the use of \verb|TreeInst|
+is shown next. The value \verb|tree| defines a simple tree and the
+definition \verb|test3| pretty prints that tree.
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val tree : Tree = Fork(Fork(Leaf(3),Leaf(4)),Leaf(5))
 def test3 = show(tree)
-\end{lstlisting}
+\end{minted}
 
 \paragraph{Recursive Resolution and Compositionality of Instances}
 Another interesting aspect of type classes is that they provide a
 highly compositional way to define instances.
 Lets consider a variant of trees, shown in Figure~\ref{fig:ptrees}, which is
-parametrized by some element type \lstinline{A}. The type these trees
-is \lstinline{PTree[A]} and there are two types of nodes:
-\lstinline{Branch} nodes with an element of type \lstinline{A}
-and two branches; and \lstinline{Empty} nodes with no content.
+parametrized by some element type \verb|A|. The type these trees
+is \verb|PTree[A]| and there are two types of nodes:
+\verb|Branch| nodes with an element of type \verb|A|
+and two branches; and \verb|Empty| nodes with no content.
 
 \begin{figure}
-\begin{lstlisting}
+\begin{minted}{scala}
 sealed trait PTree[A]
 case class Branch[A](x: A, l: PTree[A], r: PTree[A])
   extends PTree[A]
@@ -781,41 +781,41 @@ implicit def PTreeInst[A : Show] : Show[PTree[A]] =
         ", " + show(l) + ", " + show(r) + ")"
       case Empty() => "Empty()"
   }}
-\end{lstlisting}
-\caption{Parametrized trees and corresponding \lstinline{Show}
+\end{minted}
+\cprotect\caption{Parametrized trees and corresponding \verb|Show|
   instance.}
 \label{fig:ptrees}
 \end{figure}
 
-Like other types it is possible to define an instance (\lstinline{PTreeInst})
-for the type \lstinline{PTree[A]}. However in order to pretty print
+Like other types it is possible to define an instance (\verb|PTreeInst|)
+for the type \verb|PTree[A]|. However in order to pretty print
 such trees it is necessary to know how to print the elements of type
-\lstinline{A} as well. To accomplish this we require that the
-generic type parameter \lstinline{A} has a \lstinline{Show} instance
+\verb|A| as well. To accomplish this we require that the
+generic type parameter \verb|A| has a \verb|Show| instance
 using a context bound.  To print the elements in the
-\lstinline{Branch} case, the instance can be retrieved from the implicit
-scope using \lstinline{implicitly} and then used to print the element.
+\verb|Branch| case, the instance can be retrieved from the implicit
+scope using \verb|implicitly| and then used to print the element.
 With this instance it is possible to print trees with integer elements, such as:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val ptree : PTree[Int] = Branch(5,Empty,Empty)
 def test4 = show(ptree)
-\end{lstlisting}
+\end{minted}
 
 However, more interestingly, it is also possible to print trees where
-for any element type that has a \lstinline{Show} instance. For example:
+for any element type that has a \verb|Show| instance. For example:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val ptree2 : PTree[PTree[Tree]] =
   Branch(Branch(tree,Empty,Empty),Empty,Empty)
 def test5 = show(ptree2)
-\end{lstlisting}
+\end{minted}
 
-\noindent Here \lstinline{ptree2} has elements of type
-\lstinline{PTree[Tree]}. To print \lstinline{ptree2} the instance for
-\lstinline{PTree} is used twice: once for values of type
-\lstinline{PTree[PTree[Tree]]}; and another time for values of
-type \lstinline{PTree[Tree]}. In fact it is possible to use
+\noindent Here \verb|ptree2| has elements of type
+\verb|PTree[Tree]|. To print \verb|ptree2| the instance for
+\verb|PTree| is used twice: once for values of type
+\verb|PTree[PTree[Tree]]|; and another time for values of
+type \verb|PTree[Tree]|. In fact it is possible to use
 arbitrarely many instances of the various types (possible multiple
 times) during type-directed resolution, which makes the process very
 compositional. This is possible because the type-directed resolution
@@ -832,12 +832,12 @@ printed. Therefore code tends to be quite similar across instances. This
 code can be viewed as a form of boilerplate since we could hope that
 it could be mechanically generated.
 
-%Both \lstinline{ishow} and \lstinline{show}
+%Both \verb|ishow| and \verb|show|
 %provide a convenient way for some client code to invoke the pretty
-%printing functionality on some values of type \lstinline{T}.
+%printing functionality on some values of type \verb|T|.
 
 
-%\begin{lstlisting}
+%\begin{minted}{scala}
 %// Adding a show method to an arbitrary
 %// object of a certain type
 %trait Showable {
@@ -850,7 +850,7 @@ it could be mechanically generated.
 % }
 %
 %def test2 = 5.show()
-%\end{lstlisting}
+%\end{minted}
 
 
 % \begin{comment}
@@ -869,13 +869,13 @@ the compiler and executed (or expanded) during compilation. A macro is defined
 like any normal method, but it is linked using the \verb|macro| keyword to an
 additional method that provides its implementation, which operates on
 expression trees.
-\begin{lstlisting}
+\begin{minted}{scala}
 def assert(x: Boolean, msg: String): Unit =
   macro assert_impl
 def assert_impl(c: Context)
   (x: c.Expr[Boolean], msg: c.Expr[String]):
                             c.Expr[Unit] = ...
-\end{lstlisting}
+\end{minted}
 \noindent
 In the above example, the parameters of \verb|assert_impl| are typed
 expression trees, which the body of \verb|assert_impl| operates on, itself
@@ -888,12 +888,12 @@ Note that expression trees are typed, \ie \verb|assert|'s parameter of type
 
 In the type-safe subset of macros that we consider in this paper,
 expression trees are built using \verb|reify|/\verb|splice|:
-\begin{lstlisting}
+\begin{minted}{scala}
 val expr: c.Expr[Boolean] = reify {
   if (x.splice > 10) x.splice
   else true
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 Here, the body of \verb|reify| consists of regular Scala code. Expressions in
 the enclosing scope are spliced into the result expression using the
@@ -920,12 +920,12 @@ generated expressions are always re-type-checked after expansion.
 % An alternative to working with \verb|reify|/\verb|splice| are quasiquotes.
 % Quasiquotes simplify working with expression trees. They allow splicing trees
 % similar to Scala's standard string interpolation:
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % def assert_impl(c: Context)
 %   (x: c.Expr[Boolean], msg: c.Expr[String]):
 %                             c.Expr[Unit] =
 %   c.Expr[Unit](q"if (!$x) error($msg)")
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % Quasiquotes are type-checked after they are expanded.
 
@@ -987,21 +987,21 @@ Thus, they cannot introduce new top-level type definitions.
 % \paragraph{Macro Annotations.} Unlike macro defs, macro annotations are capable
 % of {\em adding members} to classes which carry their annotation.
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % @withNewToString
 % class D { ... }
-% \end{lstlisting}
+% \end{minted}
 
 % The \verb|withNewToString| annotation is defined using a standard class
 % definition by extending a special \verb|MacroAnnotation| marker trait, and by
 % implementing a special \verb|transform| method as a macro:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % class withNewToString extends MacroAnnotation {
 %   def transform = macro transform_impl
 %   def transform_impl = { ... }
 % }
-% \end{lstlisting}
+% \end{minted}
 
 % The \verb|transform| macro implementation is passed the AST of the annotated class
 % definition (the AST of ``\verb|class D { ... }|''), and returns a possibly changed AST
@@ -1014,7 +1014,7 @@ Thus, they cannot introduce new top-level type definitions.
 
 \begin{figure}
 \centering
-\begin{lstlisting}
+\begin{minted}{scala}
 object Show extends Query[String] {
   def mkTrees[C <: SContext](c: C) = new Trees(c)
 
@@ -1034,8 +1034,8 @@ object Show extends Query[String] {
   implicit def generate[T]: Show[T] =
     macro genQuery[T, this.type]
 }
-\end{lstlisting}
-  \caption{Implementing the \lstinline{Show} type class using \sselfassembly.}
+\end{minted}
+  \cprotect\caption{Implementing the \verb|Show| type class using \sselfassembly.}
   \label{fig:basic-usage}
 \end{figure}
 
@@ -1166,13 +1166,13 @@ companion object means that whenever an instance \verb|Show[S]| is requested,
 Scala's implicit lookup mechanism searches the members of the companion object
 \verb|Show| where it finds the implicit macro:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 object Show extends Query[String] {
   ...
   implicit def generate[T]: Show[T] =
     macro genQuery[T, this.type]
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 Thus, the implicit lookup mechanism inserts an invocation of the macro method
 \verb|genQuery|.
@@ -1183,32 +1183,32 @@ Thus, the implicit lookup mechanism inserts an invocation of the macro method
 Being a macro, \verb|genQuery| returns an abstract syntax
 tree instead of a (runtime) value. It is declared as follows:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def genQuery[T:c.WeakTypeTag, S:c.WeakTypeTag]
     (c: Context): c.Tree = ...
-\end{lstlisting}
+\end{minted}
 \noindent
 Note that in this declaration, the type parameters \verb|T| and \verb|S| are annotated with
 \emph{context bounds} \verb|c.WeakTypeTag|.
 %Context bounds are an
 %alternative way of adding synthetic implicit parameters:
 %
-%\begin{lstlisting}
+%\begin{minted}{scala}
 %def genQuery[T, S](c: Context)
 %  (implicit ev1: c.WeakTypeTag[T],
 %            ev2: c.WeakTypeTag[S]): c.Tree = ...
-%\end{lstlisting}
+%\end{minted}
 %\noindent
 %The evidence parameters \verb|ev1| and \verb|ev2| of type \verb|c.WeakTypeTag[T]| provide
 %access to the full static type information of types \verb|T| and \verb|S|.
 % The \verb|genQuery| macro inspects this type information to generate a value of
 % the following shape:
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % implicit object $instanceName extends Show[T] {
 %   def show(visitee: T): String = $tree
 % }
 % $instanceName
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % As required, the generated value has type \verb|Show[T]|. Hygiene requires the
 % macro to generate a fresh (term) name \verb|$instanceName|. The actual
@@ -1220,7 +1220,7 @@ instance of the user-provided \verb|Trees| class by invoking the
 
 \begin{figure}
 \centering
-\begin{lstlisting}
+\begin{minted}{scala}
 trait Query[R] ... {
   def mkTrees[C <: Context with Singleton](c: C)
     : Trees[C]
@@ -1241,20 +1241,20 @@ trait Query[R] ... {
 
     val trees = mkTrees[c.type](c)
     ...
-\end{lstlisting}
+\end{minted}
   \caption{Macro-based generation: set-up}
   \label{fig:macro-set-up}
 \end{figure}
 
 The body of the type class is generated using:
-\begin{lstlisting}
+\begin{minted}{scala}
 val tpe = weakTypeOf[T] // see Fig. 5
 ...
 val (first, separator, last) =
   trees.delimit(tpe)
 val body = trees.combine(
   fieldsExpr(first, separator), last)
-\end{lstlisting}
+\end{minted}
 
 To create the result expression, the macro utilizes the \verb|trees| instance
 (of type \verb|Trees|) that we initialize in the set-up phase (see
@@ -1265,7 +1265,7 @@ which the macro generates a type class instance. The \verb|fieldsExpr| method
 creates an \verb|Expr[R]| by folding the \verb|Expr[R]|s obtained for each field
 (see below) using the user-overridden \verb|combine| method:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 if (paramFields.size < 2)
   ...
 else
@@ -1273,7 +1273,7 @@ else
     val withSep = trees.combine(acc, separator)
     trees.combine(withSep, fieldValue(sym))
   }
-\end{lstlisting}
+\end{minted}
 
 For example, Figure~\ref{fig:basic-usage} shows that the definition of
 \verb|combine| for \verb|Show| is just string concatenation. As a result, this
@@ -1283,17 +1283,17 @@ code concatenates the string values of all fields separated with
 The expression tree \verb|fieldValue(sym)| is obtained as follows. For
 each field declared in type \verb|tpe|, the following subexpression is
 generated:
-\begin{lstlisting}
+\begin{minted}{scala}
 val symTp = sym.typeSignatureIn(tpe)
 val fieldName = sym.name.toString.trim
 trees.fieldValueExpr(visitee, fieldName,
   symTp, tpeOfTypeClass)
-\end{lstlisting}
+\end{minted}
 
 The invocation of \verb|fieldValueExpr| expands to (a) a nested look-up of a
 type class instance for the field, and (b) an invocation of the type class
 method:
-\begin{lstlisting}
+\begin{minted}{scala}
 def fieldValueExpr(visitee: c.Expr[T], name: String,
   tpe: c.Type, tpeOfTypeClass: c.Type): c.Expr[R] =
 c.Expr[R](
@@ -1301,7 +1301,7 @@ c.Expr[R](
     implicitly[${appliedType(tpeOfTypeClass, tpe)}]
       .apply($visitee.${TermName(name)})
   """)
-\end{lstlisting}
+\end{minted}
 
 The syntax \verb|q"""..."""| indicates the use of a quasiquote to create an
 {\em untyped} tree that is cast to an \verb|Expr[R]|, effectively forming part
@@ -1316,15 +1316,15 @@ type \verb|tpeOfTypeClass|.
 % Figure~\ref{fig:macro-field-value} shows its implementation. The AST
 % returned by \verb|implicitlyTree(tpe, tpeOfTypeClass)| is expanded as follows,
 % obtaining a type class instance for the current field of type \verb|fieldTpe|:
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % val instType = appliedType(tpeOfTypeClass, fieldTpe)
 % q"implicitly[$instType]"
-% \end{lstlisting}
+% \end{minted}
 
 
 % \begin{figure}
 % \centering
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % def fieldValueTree(name: String, tpe: c.Type,
 %                    tpeOfTypeClass: c.Type): c.Tree = {
 %   val instTree   = q"inst"
@@ -1336,7 +1336,7 @@ type \verb|tpeOfTypeClass|.
 %     $invokeTree
 %   """
 % }
-% \end{lstlisting}
+% \end{minted}
 %   \caption{Nested implicit look-ups of instances}
 %   \label{fig:macro-field-value}
 % \end{figure}
@@ -1354,13 +1354,13 @@ The generation technique explained in the previous section produces implicit
 type class pattern introduced in Section~\ref{sec:type-classes}.
 
 Let's say the datatype that we'd like to call \verb|show| on is the
-\lstinline{Tree} type in Figure~\ref{fig:trees}.
-%\begin{lstlisting}
+\verb|Tree| type in Figure~\ref{fig:trees}.
+%\begin{minted}{scala}
 %sealed trait Tree
 %case class Fork(left: Tree, right: Tree)
 % extends Tree
 %case class Leaf(elem: Int) extends Tree
-%\end{lstlisting}
+%\end{minted}
 %\noindent
 In order to create a type class instance of type
 \verb|Show[Tree]|, we also create type class instances for
@@ -1369,10 +1369,10 @@ In order to create a type class instance of type
 \verb|Fork| and \verb|Leaf| are case classes with the general
 shape:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 case class C(p_1: D_1, ..., p_n: D_n)
   extends E_1 with ... with E_m { ... }
-\end{lstlisting}
+\end{minted}
 % \begin{math}
 % \texttt{case class}~C(p_1: D_1, \ldots, p_n: D_n)~\{~\bar{m}~\} \\
 % \texttt{~~~~~extends}~E_1~\texttt{with}~ \ldots ~\texttt{with}~E_m
@@ -1414,22 +1414,22 @@ abstract method, \verb|show|.
 
 % The \verb|Show| type class should look like this:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % trait Show[T] {
 %   def show(visitee: T): String
 % }
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 
 % And let's say the datatype that we'd like to call \verb|show| on is a closed
 % ADT for binary trees, which looks like:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % sealed trait Tree
 % case class Fork(left: Tree, right: Tree)
 %   extends Tree
 % case class Leaf(elem: Int) extends Tree
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % % The goal of the self-assembly pattern is to derive type class instances of a
 % % given type class for all supported datatypes (for now, the types in
@@ -1495,7 +1495,7 @@ abstract method, \verb|show|.
 % % method that has a single parameter of the generic type and some return type
 % % that (a) does not depend on the generic type, and (b) is a monoid.
 
-% % \begin{lstlisting}
+% % \begin{minted}{scala}
 % % implicit object CShowInstance extends Show[C] {
 % %   def show(visitee: C): String = {
 % %     var result = "C("
@@ -1508,7 +1508,7 @@ abstract method, \verb|show|.
 % %     result += ")"
 % %   }
 % % }
-% % \end{lstlisting}
+% % \end{minted}
 % % \noindent
 
 % Given a type class, say \verb|Show[T]|, and a datatype, say \verb|Tree|, the
@@ -1546,20 +1546,20 @@ abstract method, \verb|show|.
 % The first step is the definition of an implicit object extending
 % \verb|Show[C]|:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % implicit object CShowInstance extends Show[C] {
 %   def show(visitee: C): String = ...
 % }
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % We derive an implementation of the \verb|show| method by looking up type class
 % instances for each of the class parameters $p_i$ of $C$. Since type class
 % instances are declared as implicit values in Scala, we can use the following
 % method \verb|implicitly| to look up type class instances:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % def implicitly[T](implicit e: T): T = e
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % Thus, an invocation \verb|implicitly[Show[D_i]]| returns an instance of
 % \verb|Show| for type \verb|D_i|.\footnote{The \texttt{implicitly} method is
@@ -1571,14 +1571,14 @@ abstract method, \verb|show|.
 % \verb|String|. Since \verb|String| is a monoid, we can reduce the results
 % obtained for all parameters into a single \verb|String|:
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % var result: String = ""
 % val inst_1 = implicitly[Show[D_1]]
 % result = result + inst_1.show(visitee.p_1)
 % ...
 % val inst_n = implicitly[Show[D_n]]
 % result = result + inst_n.show(visitee.p_n)
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % Making the \verb|CShowInstance| object \verb|implicit| enables support for
 % \emph{recursive types:} if one of the types $D_i = C$, then the corresponding
@@ -1596,7 +1596,7 @@ abstract method, \verb|show|.
 % based on the runtime classtype of the object that the type class is applied
 % to (\verb|visitee|):
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % implicit object DShowInstance extends Show[D] {
 %   def show(visitee: D): String =
 %     visitee match {
@@ -1608,7 +1608,7 @@ abstract method, \verb|show|.
 %         implicitly[Show[Cn]].show(vn)
 %     }
 % }
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % The classtypes \verb|C1|, ..., \verb|Cn| are all subclasses of trait \verb|D|;
 % since \verb|D| is sealed, there cannot be other subclasses.
@@ -1660,7 +1660,7 @@ defined within the same compilation unit.
 
 \begin{figure}
 \centering
-\begin{lstlisting}
+\begin{minted}{scala}
 // File PersonA.scala:
 abstract class Person {
   def name: String
@@ -1679,7 +1679,7 @@ case class Firefighter(n: String, a: Int, s: Int)
   def age = a
   def since = s
 }
-\end{lstlisting}
+\end{minted}
   \caption{Open class hierarchy}
   \label{fig:class-hierarchy}
 \end{figure}
@@ -1689,7 +1689,7 @@ classes. For example, consider the class hierarchy shown in
 Figure~\ref{fig:class-hierarchy}. The \selfassembly library can automatically generate
 an instance for type \verb|Person|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 val em = Employee("Dave", 35, 80000)
 val ff = Firefighter("Jim", 40, 2004)
 val inst = implicitly[Show[Person]]
@@ -1697,7 +1697,7 @@ println(inst.show(em))
 // prints: Employee(Dave, 35, 80000)
 println(inst.show(ff))
 // prints: Firefighter(Jim, 40, 2004)
-\end{lstlisting}
+\end{minted}
 \noindent
 Note that we are using the same \verb|Show| instance to convert both objects
 to strings.
@@ -1718,7 +1718,7 @@ Figure~\ref{fig:class-hierarchy}, a dynamic dispatch is generated to select a
 specific type class instance based on the runtime classtype of the object that the type
 class is applied to (\verb|visitee|):\footnote{Simplified; handling of \texttt{null} values is omitted for simplicity.}
 
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit object PersonInst extends Show[Person] {
   def show(visitee: Person): String =
     visitee match {
@@ -1728,7 +1728,7 @@ implicit object PersonInst extends Show[Person] {
         implicitly[Show[Firefighter]].show(v2)
     }
 }
-\end{lstlisting}
+\end{minted}
 
 % Concrete instances of this type have subtypes (dynamically) which are case
 % classes (according to our initial simplified view). Therefore, the type class
@@ -1736,7 +1736,7 @@ implicit object PersonInst extends Show[Person] {
 % based on the runtime classtype of the object that the type class is applied
 % to (\verb|visitee|):
 
-% \begin{lstlisting}
+% \begin{minted}{scala}
 % implicit object DShowInstance extends Show[D] {
 %   def show(visitee: D): String =
 %     visitee match {
@@ -1748,7 +1748,7 @@ implicit object PersonInst extends Show[Person] {
 %         implicitly[Show[Cn]].show(vn)
 %     }
 % }
-% \end{lstlisting}
+% \end{minted}
 % \noindent
 % The classtypes \verb|C1|, ..., \verb|Cn| are all subclasses of trait \verb|D|;
 % since \verb|D| is sealed, there cannot be other subclasses.
@@ -1767,14 +1767,14 @@ instance registry can then be shared across separately-compiled modules.
 
 For example, module A could create a registry and populate it with a number of
 instances:
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit val reg = new SimpleRegistry[Show]
 reg.register(classOf[Employee],
              implicitly[Show[Employee]])
 reg.register(classOf[Firefighter],
              implicitly[Show[Firefighter]])
 ...
-\end{lstlisting}
+\end{minted}
 \noindent
 Note that the registry \verb|reg| is defined as an \emph{implicit value;} as we
 explain in the following, this is required to enable registry look-ups when
@@ -1783,12 +1783,12 @@ dispatching to type class instances based on runtime types.
 With the instance registry set up in this way, another separately-compiled
 module B is then able to dispatch to instances registered by module A:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit val localReg = getRegistryFrom(moduleA)
 localReg.register(classOf[Judge],
                   implicitly[Show[Judge]])
 ...
-\end{lstlisting}
+\end{minted}
 \noindent
 Importantly, when module B invokes the \verb|show| method of an instance
 \verb|instP| of type \verb|Show[Person]|, passing an object with dynamic type
@@ -1801,14 +1801,14 @@ registry \verb|localReg|.
 To enable registry look-ups, we augment the dispatch logic with a default
 case:\footnote{Minimally simplified; the actual code also keeps track of object
 identities as discussed further below.}
-\begin{lstlisting}
+\begin{minted}{scala}
 case _ => {
   val reg$1 = implicitly[Registry[Show]]
   val lookup$2: Option[Show[_]] = reg$1.get(clazz)
   lookup$2.get.asInstanceOf[Show[Person]]
               .show(visitee)
 }
-\end{lstlisting}
+\end{minted}
 
 
 \subsection{Object Identity}\label{sec:oo-object-identity}
@@ -1831,11 +1831,11 @@ call stack. With the mechanics introduced so far, this is not possible.
 To enable passing an additional context (the set of visited objects) on the call stack,
 we require type classes to extend \\\verb|Queryable[T, R]|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 trait Queryable[T, R] {
   def apply(visitee: T, visited: Set[Any]): R
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 The \verb|Queryable[T, R]| trait declares an \verb|apply| method with an
 additional \verb|visited| parameter (compared to the trait of the type class),
@@ -1847,20 +1847,20 @@ instances are slightly more verbose to define, although the implementation of
 
 For example, consider the \verb|Show[T]| type class, now extending
 \verb|Queryable[T, String]|:
-\begin{lstlisting}
+\begin{minted}{scala}
 trait Show[T] extends Queryable[T, String] {
   def show(visitee: T): String
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 A type class instance for integers can be implemented as follows:
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit val intHasShow = new Show[Int] {
   def show(visitee: Int): String = "" + x
   def apply(visitee: Int, visited: Set[Any]) =
     show(visitee)
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 Note that the implementation of \verb|apply| is trivial.
 
@@ -1869,14 +1869,14 @@ Note that the implementation of \verb|apply| is trivial.
 To enable the detection of cycles in object graphs it is necessary to
 adapt the implementation of the implicit object as follows.
 
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit object CShowInstance extends Show[C] {
   def show(visitee: C): String =
     apply(visitee, Set[Any]())
   def apply(visitee: C, visited: Set[Any]) =
     ...
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 Note that an invocation of \verb|show| is treated as a \emph{top-level
 invocation} forwarding to \verb|apply| passing an empty set of visited
@@ -1885,7 +1885,7 @@ parameters of \verb|C|, instead of invoking \verb|show| directly, we invoke
 \verb|apply| passing the \verb|visited| set extended with the current object
 (\verb|visitee|).
 
-\begin{lstlisting}
+\begin{minted}{scala}
 var result: String = ""
 if (!visited(visitee.p_1)) {
   val inst_1 = implicitly[Show[D_1]]
@@ -1898,7 +1898,7 @@ if (!visited(visitee.p_n)) {
   result = result +
    inst_n.apply(visitee.p_n, visited + visitee)
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 
 
@@ -1927,16 +1927,16 @@ The \selfassembly library lets us write the ``scale'' function in two steps:
 first, the definition of a suitable type class; second, the implementation of
 a subclass of the library-provided \verb|Transform| class. A suitable type
 class is easily defined:
-\begin{lstlisting}
+\begin{minted}{scala}
 trait Scale[T] extends Queryable[T, T] {
   def scale(visitee: T): T
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 Note that the input and output types of \verb|Queryable| are the same in this
 case, since \verb|scale| transforms any input object into an
 object of the same type. The actual transformation is defined as follows:
-\begin{lstlisting}
+\begin{minted}{scala}
 object Scale extends Transform {
   def mkTrees[C <: SContext](c: C) = new Trees(c)
 
@@ -1946,31 +1946,31 @@ object Scale extends Transform {
   implicit def generate[T]: Scale[T] =
     macro genTransform[T, this.type]
 }
-\end{lstlisting}
+\end{minted}
 \noindent
 This transformation is not very interesting yet: it simply creates a deep
 clone of the input object. To specify how, in our case, integers are scaled,
 it is necessary to define a custom type class instance:
-\begin{lstlisting}
+\begin{minted}{scala}
 def intScale(factor: Int) = new Scale[Int] {
   def scale(x: Int) = x * factor
   def apply(x: Int, visited: Set[Any]) = scale(x)
 }
 implicit val intInst = intScale(myFactor)
-\end{lstlisting}
+\end{minted}
 \noindent
 For convenience, we can introduce a generic \verb|gscale| function:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def gscale[T](obj: T)(implicit inst: Scale[T]): T =
   inst.scale(obj)
-\end{lstlisting}
+\end{minted}
 \noindent
 \verb|gscale| is then invoked as follows:
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit val inst = intScale(10)
 val scaled = gscale(obj)
-\end{lstlisting}
+\end{minted}
 
 
 \paragraph{Transformations in \selfassembly}
@@ -2053,17 +2053,17 @@ Using implicits a unary type relation can be defined in Scala using an arbitrary
 type constructor, say, \verb|TC|. A type \verb|T| can be declared to be an element of this
 relation, by defining an {\em implicit} of type \verb|TC[T]|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit val tct = new TC[T] {}
-\end{lstlisting}
+\end{minted}
 \noindent
 This way, an arbitrary {\em bounded} unary type relation can be defined. The
 membership of a type \verb|U| in the relation \verb|TC| can be checked by requiring evidence
 for it using an implicit parameter:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 def m[U](implicit ev: TC[U]): ...
-\end{lstlisting}
+\end{minted}
 \noindent
 (Classes, and thereby constructors, can also have such implicit parameters.)
 Only if there exists an implicit value of type \verb|TC[U]| can an invocation
@@ -2074,10 +2074,10 @@ relations by returning values of type \verb|TC[V]| for an arbitrary type \verb|V
 given type bounds. For example, the following implicit method declares all types that
 are equal to or subtypes of type \verb|Person| to be elements of relation \verb|TC|:
 
-\begin{lstlisting}
+\begin{minted}{scala}
 implicit def belowPerson[S <: Person]: TC[S] =
   new TC[S] {}
-\end{lstlisting}
+\end{minted}
 \noindent
 However, without meta-programming the domain of the relation can only be
 restricted using type bounds; this is not enough for rich properties such as
@@ -2194,7 +2194,7 @@ implementation of this property is shown in Figure~\ref{fig:immutable}.
 
 \begin{figure}
 \centering
-\begin{lstlisting}
+\begin{minted}{scala}
 trait Immutable[T] {}
 
 object Immutable extends Property[Unit] {
@@ -2240,7 +2240,7 @@ guaranteed to be immutable""")
   implicit val stringIsImm: Immutable[String] =
     new Immutable[String] {}
 }
-\end{lstlisting}
+\end{minted}
   \caption{Deep immutability checking using \selfassembly}
   \label{fig:immutable}
 \end{figure}
@@ -2279,7 +2279,7 @@ not exposed to the implementation discussed in the following.
 
 Let us consider a sketch of \texttt{self-assembly}'s implementation of the simple generic
 \verb|Property| trait used in the previous example:
-\begin{lstlisting}
+\begin{minted}{scala}
 trait Property[R] extends AcyclicQuery[R] {
   abstract class Trees[C <: SContext]
     (override val c: C) extends super.Trees(c) {
@@ -2290,7 +2290,7 @@ trait Property[R] extends AcyclicQuery[R] {
     }
     ...
   } }
-\end{lstlisting}
+\end{minted}
 \noindent
 The trait introduces a new abstract \verb|check| method that must be
 implemented by the library author who wishes to define concrete properties
