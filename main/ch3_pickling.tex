@@ -1,5 +1,26 @@
 \chapter{Pickling}
 
+\begin{itemize}
+  \item Hairier on the JVM than other platforms, {\em objects, mutation, object
+  identity reasons why}
+  \item Applying picklign to Spark and self-describing
+  \item Argue that it's not advisable to enable anything to be serialized and
+  send over the wire, via proxy or actual transport (philosophy in Alice ML.)
+  \item It serializes arbitrary instances
+  \item Future work includes improved error messages -- if something can't be
+  serialized for some reason, the framework fails in inconspicuous ways.
+\end{itemize}
+
+In Scala, we do not treat code as data. \todo{Maybe do a literature study of mobile code?}
+
+Serialization isn't typically associated with network communication. Java
+developed under the auspices of ``serialization that works'' over
+``serialization that's fast''. While that's a fine way to constrain the design
+problem at hand, as more and more applications migrate to or otherwise
+communicate with {\em the cloud}, performance during network communication is
+taking an evermore important role.
+
+
 With the growing trend towards cloud computing and mobile applications,
 distributed programming has entered the mainstream. As more and more
 traditional applications migrate to the cloud, the demand for interoperability between
