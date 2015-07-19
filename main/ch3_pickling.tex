@@ -126,44 +126,6 @@ picklers. Our approach is also general, supporting object graphs with cycles.
 \end{itemize}
 
 
-\subsection{Selected Related Work}
-
-Some OO languages like Java and runtime environments like the JVM or
-.NET provide serialization for arbitrary types, provided entirely by
-the underlying virtual machine. While this approach is very convenient
-for the programmer, there are also several issues: (a) the pickling
-format cannot be exchanged (Java), (b) serialization relies on runtime
-reflection which hits performance, and (c) existing classes that do
-not extend a special marker interface are not serializable, which
-often causes oversights resulting in software engineering costs. In
-functional languages, pickler
-combinators~\cite{Kennedy2004,Elsman2005} can reduce the effort of
-manually writing pickling and unpickling functions to a large
-extent. However, existing approaches do not support object-oriented
-concepts such as subtyping polymorphism. Moreover, it is not clear
-whether local type inference as required in OO languages would yield a
-comparable degree of conciseness, acceptable to programmers used to
-Java-style serialization.  Nonetheless, our approach builds on pickler
-combinators, capitalizing on their powerful composability.
-
-Our approach of retrofitting existing types with pickling support
-builds on implicits in Scala~\cite{Oliveira2010} and is reminiscent of
-other type-class-like mechanisms, such as JavaGI~\cite{Wehr2011} or C++
-Concepts~\cite{ReisS06}.
-
-Additionally, in an effort to further reduce the boilerplate required
-to define or compose picklers using existing picklers, we present a
-framework for automatically generating picklers for compound types
-based on picklers for their component types. Given the close
-relationship of our implicit picklers to type classes, this generation
-mechanism is related to Haskell's {\em deriving}
-mechanism~\cite{MagalhaesDJL10}. One of the main differences is that
-our mechanism is faithful to subtyping. So far, our mechanism is
-specialized for pickling; an extension to a generic mechanism for
-composing type class instances is left for future work.
-
-We discuss other related work in Section \ref{sec:related-work}.
-
 \subsection{Contributions}
 
 This paper makes the following contributions:
@@ -2206,8 +2168,42 @@ our collections micro benchmark.
 
 
 
-\section{Other Related Work}
+\section{Related Work}
 \label{sec:related-work}
+
+Some OO languages like Java and runtime environments like the JVM or
+.NET provide serialization for arbitrary types, provided entirely by
+the underlying virtual machine. While this approach is very convenient
+for the programmer, there are also several issues: (a) the pickling
+format cannot be exchanged (Java), (b) serialization relies on runtime
+reflection which hits performance, and (c) existing classes that do
+not extend a special marker interface are not serializable, which
+often causes oversights resulting in software engineering costs. In
+functional languages, pickler
+combinators~\cite{Kennedy2004,Elsman2005} can reduce the effort of
+manually writing pickling and unpickling functions to a large
+extent. However, existing approaches do not support object-oriented
+concepts such as subtyping polymorphism. Moreover, it is not clear
+whether local type inference as required in OO languages would yield a
+comparable degree of conciseness, acceptable to programmers used to
+Java-style serialization.  Nonetheless, our approach builds on pickler
+combinators, capitalizing on their powerful composability.
+
+Our approach of retrofitting existing types with pickling support
+builds on implicits in Scala~\cite{Oliveira2010} and is reminiscent of
+other type-class-like mechanisms, such as JavaGI~\cite{Wehr2011} or C++
+Concepts~\cite{ReisS06}.
+
+Additionally, in an effort to further reduce the boilerplate required
+to define or compose picklers using existing picklers, we present a
+framework for automatically generating picklers for compound types
+based on picklers for their component types. Given the close
+relationship of our implicit picklers to type classes, this generation
+mechanism is related to Haskell's {\em deriving}
+mechanism~\cite{MagalhaesDJL10}. One of the main differences is that
+our mechanism is faithful to subtyping. So far, our mechanism is
+specialized for pickling; an extension to a generic mechanism for
+composing type class instances is left for future work.
 
 Pickling in programming languages has a long history dating back to
 CLU~\cite{HerlihyL82} and Modula-3~\cite{CardelliDJKN89}. The most
