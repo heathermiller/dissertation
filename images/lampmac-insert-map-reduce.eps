@@ -1,0 +1,1469 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%Creator: MATLAB, The MathWorks, Inc. Version 7.14.0.739 (R2012a). Operating System: Darwin 11.3.0 Darwin Kernel Version 11.3.0: Thu Jan 12 18:47:41 PST 2012; root:xnu-1699.24.23~1/RELEASE_X86_64 x86_64.
+%%Title: /Users/hmiller/Dropbox/git-shared/dataflow-scala/benchmarks/graphs/lampmac-insert-map-reduce.eps
+%%CreationDate: 06/05/2012  13:10:00
+%%DocumentNeededFonts: Times-Roman
+%%+ Helvetica
+%%DocumentProcessColors: Cyan Magenta Yellow Black
+%%LanguageLevel: 2
+%%Pages: 1
+%%BoundingBox:  -413   196  1026   596
+%%EndComments
+
+%%BeginProlog
+% MathWorks dictionary
+/MathWorks 160 dict begin
+% definition operators
+/bdef {bind def} bind def
+/ldef {load def} bind def
+/xdef {exch def} bdef
+/xstore {exch store} bdef
+% operator abbreviations
+/c  /clip ldef
+/cc /concat ldef
+/cp /closepath ldef
+/gr /grestore ldef
+/gs /gsave ldef
+/mt /moveto ldef
+/np /newpath ldef
+/cm /currentmatrix ldef
+/sm /setmatrix ldef
+/rm /rmoveto ldef
+/rl /rlineto ldef
+/s {show newpath} bdef
+/sc {setcmykcolor} bdef
+/sr /setrgbcolor ldef
+/sg /setgray ldef
+/w /setlinewidth ldef
+/j /setlinejoin ldef
+/cap /setlinecap ldef
+/rc {rectclip} bdef
+/rf {rectfill} bdef
+% page state control
+/pgsv () def
+/bpage {/pgsv save def} bdef
+/epage {pgsv restore} bdef
+/bplot /gsave ldef
+/eplot {stroke grestore} bdef
+% orientation switch
+/portraitMode 0 def /landscapeMode 1 def /rotateMode 2 def
+% coordinate system mappings
+/dpi2point 0 def
+% font control
+/FontSize 0 def
+/FMS {/FontSize xstore findfont [FontSize 0 0 FontSize neg 0 0]
+  makefont setfont} bdef
+/reencode {exch dup where {pop load} {pop StandardEncoding} ifelse
+  exch dup 3 1 roll findfont dup length dict begin
+  { 1 index /FID ne {def}{pop pop} ifelse } forall
+  /Encoding exch def currentdict end definefont pop} bdef
+/isroman {findfont /CharStrings get /Agrave known} bdef
+/FMSR {3 1 roll 1 index dup isroman {reencode} {pop pop} ifelse
+  exch FMS} bdef
+/csm {1 dpi2point div -1 dpi2point div scale neg translate
+ dup landscapeMode eq {pop -90 rotate}
+  {rotateMode eq {90 rotate} if} ifelse} bdef
+% line types: solid, dotted, dashed, dotdash
+/SO { [] 0 setdash } bdef
+/DO { [.5 dpi2point mul 4 dpi2point mul] 0 setdash } bdef
+/DA { [6 dpi2point mul] 0 setdash } bdef
+/DD { [.5 dpi2point mul 4 dpi2point mul 6 dpi2point mul 4
+  dpi2point mul] 0 setdash } bdef
+% macros for lines and objects
+/L {lineto stroke} bdef
+/MP {3 1 roll moveto 1 sub {rlineto} repeat} bdef
+/AP {{rlineto} repeat} bdef
+/PDlw -1 def
+/W {/PDlw currentlinewidth def setlinewidth} def
+/PP {closepath eofill} bdef
+/DP {closepath stroke} bdef
+/MR {4 -2 roll moveto dup  0 exch rlineto exch 0 rlineto
+  neg 0 exch rlineto closepath} bdef
+/FR {MR stroke} bdef
+/PR {MR fill} bdef
+/L1i {{currentfile picstr readhexstring pop} image} bdef
+/tMatrix matrix def
+/MakeOval {newpath tMatrix currentmatrix pop translate scale
+0 0 1 0 360 arc tMatrix setmatrix} bdef
+/FO {MakeOval stroke} bdef
+/PO {MakeOval fill} bdef
+/PD {currentlinewidth 2 div 0 360 arc fill
+   PDlw -1 eq not {PDlw w /PDlw -1 def} if} def
+/FA {newpath tMatrix currentmatrix pop translate scale
+  0 0 1 5 -2 roll arc tMatrix setmatrix stroke} bdef
+/PA {newpath tMatrix currentmatrix pop	translate 0 0 moveto scale
+  0 0 1 5 -2 roll arc closepath tMatrix setmatrix fill} bdef
+/FAn {newpath tMatrix currentmatrix pop translate scale
+  0 0 1 5 -2 roll arcn tMatrix setmatrix stroke} bdef
+/PAn {newpath tMatrix currentmatrix pop translate 0 0 moveto scale
+  0 0 1 5 -2 roll arcn closepath tMatrix setmatrix fill} bdef
+/vradius 0 def /hradius 0 def /lry 0 def
+/lrx 0 def /uly 0 def /ulx 0 def /rad 0 def
+/MRR {/vradius xdef /hradius xdef /lry xdef /lrx xdef /uly xdef
+  /ulx xdef newpath tMatrix currentmatrix pop ulx hradius add uly
+  vradius add translate hradius vradius scale 0 0 1 180 270 arc 
+  tMatrix setmatrix lrx hradius sub uly vradius add translate
+  hradius vradius scale 0 0 1 270 360 arc tMatrix setmatrix
+  lrx hradius sub lry vradius sub translate hradius vradius scale
+  0 0 1 0 90 arc tMatrix setmatrix ulx hradius add lry vradius sub
+  translate hradius vradius scale 0 0 1 90 180 arc tMatrix setmatrix
+  closepath} bdef
+/FRR {MRR stroke } bdef
+/PRR {MRR fill } bdef
+/MlrRR {/lry xdef /lrx xdef /uly xdef /ulx xdef /rad lry uly sub 2 div def
+  newpath tMatrix currentmatrix pop ulx rad add uly rad add translate
+  rad rad scale 0 0 1 90 270 arc tMatrix setmatrix lrx rad sub lry rad
+  sub translate rad rad scale 0 0 1 270 90 arc tMatrix setmatrix
+  closepath} bdef
+/FlrRR {MlrRR stroke } bdef
+/PlrRR {MlrRR fill } bdef
+/MtbRR {/lry xdef /lrx xdef /uly xdef /ulx xdef /rad lrx ulx sub 2 div def
+  newpath tMatrix currentmatrix pop ulx rad add uly rad add translate
+  rad rad scale 0 0 1 180 360 arc tMatrix setmatrix lrx rad sub lry rad
+  sub translate rad rad scale 0 0 1 0 180 arc tMatrix setmatrix
+  closepath} bdef
+/FtbRR {MtbRR stroke } bdef
+/PtbRR {MtbRR fill } bdef
+/stri 6 array def /dtri 6 array def
+/smat 6 array def /dmat 6 array def
+/tmat1 6 array def /tmat2 6 array def /dif 3 array def
+/asub {/ind2 exch def /ind1 exch def dup dup
+  ind1 get exch ind2 get sub exch } bdef
+/tri_to_matrix {
+  2 0 asub 3 1 asub 4 0 asub 5 1 asub
+  dup 0 get exch 1 get 7 -1 roll astore } bdef
+/compute_transform {
+  dmat dtri tri_to_matrix tmat1 invertmatrix 
+  smat stri tri_to_matrix tmat2 concatmatrix } bdef
+/ds {stri astore pop} bdef
+/dt {dtri astore pop} bdef
+/db {2 copy /cols xdef /rows xdef mul dup 3 mul string
+  currentfile 
+  3 index 0 eq {/ASCIIHexDecode filter}
+  {/ASCII85Decode filter 3 index 2 eq {/RunLengthDecode filter} if }
+  ifelse exch readstring pop
+  dup 0 3 index getinterval /rbmap xdef
+  dup 2 index dup getinterval /gbmap xdef
+  1 index dup 2 mul exch getinterval /bbmap xdef pop pop}bdef
+/it {gs np dtri aload pop moveto lineto lineto cp c
+  cols rows 8 compute_transform 
+  rbmap gbmap bbmap true 3 colorimage gr}bdef
+/il {newpath moveto lineto stroke}bdef
+currentdict end def
+%%EndProlog
+
+%%BeginSetup
+MathWorks begin
+
+0 cap
+
+end
+%%EndSetup
+
+%%Page: 1 1
+%%BeginPageSetup
+%%PageBoundingBox:  -413   196  1026   596
+MathWorks begin
+bpage
+%%EndPageSetup
+
+%%BeginObject: obj1
+bplot
+
+/dpi2point 12 def
+portraitMode -4956 7152 csm
+
+    0     0 17279  4793 rc
+88 dict begin %Colortable dictionary
+/c0 { 0.000000 0.000000 0.000000 sr} bdef
+/c1 { 1.000000 1.000000 1.000000 sr} bdef
+/c2 { 0.900000 0.000000 0.000000 sr} bdef
+/c3 { 0.000000 0.820000 0.000000 sr} bdef
+/c4 { 0.000000 0.000000 0.800000 sr} bdef
+/c5 { 0.910000 0.820000 0.320000 sr} bdef
+/c6 { 1.000000 0.260000 0.820000 sr} bdef
+/c7 { 0.000000 0.820000 0.820000 sr} bdef
+c0
+1 j
+1 sg
+%   0    0 17280 4794 rf
+6 w
+4 w
+DO
+0 sg
+2246 4266 mt 2246  399 L
+2246  399 mt 2246  399 L
+3475 4266 mt 3475  399 L
+3475  399 mt 3475  399 L
+4704 4266 mt 4704  399 L
+4704  399 mt 4704  399 L
+5934 4266 mt 5934  399 L
+5934  399 mt 5934  399 L
+2246 4266 mt 5934 4266 L
+5934 4266 mt 5934 4266 L
+2246 2977 mt 5934 2977 L
+5934 2977 mt 5934 2977 L
+2246 1688 mt 5934 1688 L
+5934 1688 mt 5934 1688 L
+2246  399 mt 5934  399 L
+5934  399 mt 5934  399 L
+SO
+6 w
+2246 4266 mt 5934 4266 L
+2246 4266 mt 2246  399 L
+2246 4266 mt 2246 4227 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+2186 4515 mt 
+(1) s
+3475 4266 mt 3475 4227 L
+3415 4515 mt 
+(2) s
+4704 4266 mt 4704 4227 L
+4644 4515 mt 
+(4) s
+5934 4266 mt 5934 4227 L
+5874 4515 mt 
+(8) s
+2246 4266 mt 2265 4266 L
+DO
+2246 4266 mt 5934 4266 L
+5934 4266 mt 5934 4266 L
+SO
+2246 4266 mt 2284 4266 L
+1891 4352 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+2131 4209 mt 
+(1) s
+2246 3877 mt 2265 3877 L
+DO
+2246 3877 mt 5934 3877 L
+5934 3877 mt 5934 3877 L
+SO
+2246 3650 mt 2265 3650 L
+DO
+2246 3650 mt 5934 3650 L
+5934 3650 mt 5934 3650 L
+SO
+2246 3489 mt 2265 3489 L
+DO
+2246 3489 mt 5934 3489 L
+5934 3489 mt 5934 3489 L
+SO
+2246 3365 mt 2265 3365 L
+DO
+2246 3365 mt 5934 3365 L
+5934 3365 mt 5934 3365 L
+SO
+2246 3262 mt 2265 3262 L
+DO
+2246 3262 mt 5934 3262 L
+5934 3262 mt 5934 3262 L
+SO
+2246 3176 mt 2265 3176 L
+DO
+2246 3176 mt 5934 3176 L
+5934 3176 mt 5934 3176 L
+SO
+2246 3101 mt 2265 3101 L
+DO
+2246 3101 mt 5934 3101 L
+5934 3101 mt 5934 3101 L
+SO
+2246 3035 mt 2265 3035 L
+DO
+2246 3035 mt 5934 3035 L
+5934 3035 mt 5934 3035 L
+SO
+2246 2977 mt 2265 2977 L
+DO
+2246 2977 mt 5934 2977 L
+5934 2977 mt 5934 2977 L
+SO
+2246 2977 mt 2284 2977 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+1891 3063 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+2131 2920 mt 
+(2) s
+2246 2588 mt 2265 2588 L
+DO
+2246 2588 mt 5934 2588 L
+5934 2588 mt 5934 2588 L
+SO
+2246 2361 mt 2265 2361 L
+DO
+2246 2361 mt 5934 2361 L
+5934 2361 mt 5934 2361 L
+SO
+2246 2200 mt 2265 2200 L
+DO
+2246 2200 mt 5934 2200 L
+5934 2200 mt 5934 2200 L
+SO
+2246 2076 mt 2265 2076 L
+DO
+2246 2076 mt 5934 2076 L
+5934 2076 mt 5934 2076 L
+SO
+2246 1973 mt 2265 1973 L
+DO
+2246 1973 mt 5934 1973 L
+5934 1973 mt 5934 1973 L
+SO
+2246 1887 mt 2265 1887 L
+DO
+2246 1887 mt 5934 1887 L
+5934 1887 mt 5934 1887 L
+SO
+2246 1812 mt 2265 1812 L
+DO
+2246 1812 mt 5934 1812 L
+5934 1812 mt 5934 1812 L
+SO
+2246 1746 mt 2265 1746 L
+DO
+2246 1746 mt 5934 1746 L
+5934 1746 mt 5934 1746 L
+SO
+2246 1688 mt 2265 1688 L
+DO
+2246 1688 mt 5934 1688 L
+5934 1688 mt 5934 1688 L
+SO
+2246 1688 mt 2284 1688 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+1891 1774 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+2131 1631 mt 
+(3) s
+2246 1299 mt 2265 1299 L
+DO
+2246 1299 mt 5934 1299 L
+5934 1299 mt 5934 1299 L
+SO
+2246 1072 mt 2265 1072 L
+DO
+2246 1072 mt 5934 1072 L
+5934 1072 mt 5934 1072 L
+SO
+2246  911 mt 2265  911 L
+DO
+2246  911 mt 5934  911 L
+5934  911 mt 5934  911 L
+SO
+2246  787 mt 2265  787 L
+DO
+2246  787 mt 5934  787 L
+5934  787 mt 5934  787 L
+SO
+2246  684 mt 2265  684 L
+DO
+2246  684 mt 5934  684 L
+5934  684 mt 5934  684 L
+SO
+2246  598 mt 2265  598 L
+DO
+2246  598 mt 5934  598 L
+5934  598 mt 5934  598 L
+SO
+2246  523 mt 2265  523 L
+DO
+2246  523 mt 5934  523 L
+5934  523 mt 5934  523 L
+SO
+2246  457 mt 2265  457 L
+DO
+2246  457 mt 5934  457 L
+5934  457 mt 5934  457 L
+SO
+2246  399 mt 2265  399 L
+DO
+2246  399 mt 5934  399 L
+5934  399 mt 5934  399 L
+SO
+2246  399 mt 2284  399 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+1891  485 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+2131  342 mt 
+(4) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+3816  215 mt 
+(Insert) s
+1784 3345 mt  -90 rotate
+(Execution Time [ms]) s
+90 rotate
+gs 2246 399 3689 3868 rc
+DA
+24 w
+0.3 sg
+1230 -43 1229 -140 1229 -685 2246 3026 4 MP stroke
+gr
+
+24 w
+0.3 sg
+DA
+gs 2100 2012 3981 1161 rc
+SO
+0 j
+0 -94 -94 0 0 94 94 0 2199 2979 5 MP
+gs
+PP
+gr
+0 sg
+DP
+0 -94 -94 0 0 94 94 0 3428 2294 5 MP
+0.3 sg
+gs
+PP
+gr
+0 sg
+DP
+0 -94 -94 0 0 94 94 0 4657 2154 5 MP
+0.3 sg
+gs
+PP
+gr
+0 sg
+DP
+0 -94 -94 0 0 94 94 0 5887 2111 5 MP
+0.3 sg
+gs
+PP
+gr
+0 sg
+DP
+DA
+gr
+
+0 sg
+gs 2246 399 3689 3868 rc
+SO
+0.7 sg
+1230 -23 1229 -127 1229 -709 2246 3036 4 MP stroke
+gr
+
+0.7 sg
+SO
+gs 2100 2031 3981 1152 rc
+  60   60 2246 3036 PO
+  60   60 3475 2327 PO
+  60   60 4704 2200 PO
+  60   60 5934 2177 PO
+0 sg
+  60   60 2246 3036 FO
+  60   60 3475 2327 FO
+  60   60 4704 2200 FO
+  60   60 5934 2177 FO
+gr
+
+0 sg
+gs 2246 399 3689 3868 rc
+0.5 sg
+1230 -248 1229 -349 1229 -671 2246 2928 4 MP stroke
+gr
+
+0.5 sg
+gs 2100 1514 3981 1561 rc
+0 sg
+2204 2886 mt 2288 2970 L
+2288 2886 mt 2204 2970 L
+3433 2215 mt 3517 2299 L
+3517 2215 mt 3433 2299 L
+4662 1866 mt 4746 1950 L
+4746 1866 mt 4662 1950 L
+5892 1618 mt 5976 1702 L
+5976 1618 mt 5892 1702 L
+gr
+
+0 sg
+gs 2246 399 3689 3868 rc
+1230 177 1229 309 1229 357 2246 2487 4 MP stroke
+gr
+
+gs 2100 2341 3981 1136 rc
+0 j
+60 79 -60 79 -60 -79 60 -79 2246 2566 5 MP
+gs
+PP
+gr
+DP
+60 79 -60 79 -60 -79 60 -79 3475 2923 5 MP
+gs
+PP
+gr
+DP
+60 79 -60 79 -60 -79 60 -79 4704 3232 5 MP
+gs
+PP
+gr
+DP
+60 79 -60 79 -60 -79 60 -79 5934 3409 5 MP
+gs
+PP
+gr
+DP
+gr
+
+gs 2246 399 3689 3868 rc
+gr
+
+%%IncludeResource: font Helvetica
+/Helvetica /ISOLatin1Encoding 120 FMSR
+
+2229 4309 mt 
+( ) s
+5918  441 mt 
+( ) s
+6 w
+1 sg
+0 714 1754 0 0 -714 4120 1173 4 MP
+PP
+-1754 0 0 714 1754 0 0 -714 4120 1173 5 MP stroke
+4 w
+DO
+SO
+6 w
+0 sg
+4120 1173 mt 5874 1173 L
+4120  459 mt 5874  459 L
+4120 1173 mt 4120  459 L
+5874 1173 mt 5874  459 L
+4120 1173 mt 5874 1173 L
+4120 1173 mt 4120  459 L
+4120 1173 mt 5874 1173 L
+4120  459 mt 5874  459 L
+4120 1173 mt 4120  459 L
+5874 1173 mt 5874  459 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 144 FMSR
+
+4583  610 mt 
+(Java LTQ) s
+gs 4120 459 1755 715 rc
+DA
+24 w
+0.3 sg
+356 0 4191 561 2 MP stroke
+SO
+gr
+
+24 w
+0.3 sg
+gs 4223 415 293 293 rc
+0 j
+0 -94 -94 0 0 94 94 0 4322 514 5 MP
+gs
+PP
+gr
+0 sg
+DP
+gr
+
+0 sg
+gs 4120 459 1755 715 rc
+gr
+
+4583  780 mt 
+(Java CLQ) s
+gs 4120 459 1755 715 rc
+0.7 sg
+356 0 4191 731 2 MP stroke
+gs 4223 585 293 293 rc
+  60   60 4369  731 PO
+0 sg
+  60   60 4369  731 FO
+gr
+
+0 sg
+gr
+
+4583  951 mt 
+(SingleLane FlowPool) s
+gs 4120 459 1755 715 rc
+0.5 sg
+356 0 4191 900 2 MP stroke
+gs 4223 754 293 293 rc
+0 sg
+4327  858 mt 4411  942 L
+4411  858 mt 4327  942 L
+gr
+
+0 sg
+gr
+
+4583 1121 mt 
+(MultiLane FlowPool) s
+gs 4120 459 1755 715 rc
+356 0 4191 1070 2 MP stroke
+gr
+
+gs 4223 924 293 293 rc
+0 j
+60 79 -60 79 -60 -79 60 -79 4369 1149 5 MP
+gs
+PP
+gr
+DP
+gr
+
+gs 4120 459 1755 715 rc
+6 w
+gr
+
+6 w
+4 w
+DO
+7098 4266 mt 7098  399 L
+7098  399 mt 7098  399 L
+8327 4266 mt 8327  399 L
+8327  399 mt 8327  399 L
+9556 4266 mt 9556  399 L
+9556  399 mt 9556  399 L
+10786 4266 mt 10786  399 L
+10786  399 mt 10786  399 L
+7098 4266 mt 10786 4266 L
+10786 4266 mt 10786 4266 L
+7098 2977 mt 10786 2977 L
+10786 2977 mt 10786 2977 L
+7098 1688 mt 10786 1688 L
+10786 1688 mt 10786 1688 L
+7098  399 mt 10786  399 L
+10786  399 mt 10786  399 L
+SO
+6 w
+7098 4266 mt 10786 4266 L
+7098 4266 mt 7098  399 L
+7098 4266 mt 7098 4227 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+7038 4515 mt 
+(1) s
+8327 4266 mt 8327 4227 L
+8267 4515 mt 
+(2) s
+9556 4266 mt 9556 4227 L
+9496 4515 mt 
+(4) s
+10786 4266 mt 10786 4227 L
+10726 4515 mt 
+(8) s
+7098 4266 mt 7117 4266 L
+DO
+7098 4266 mt 10786 4266 L
+10786 4266 mt 10786 4266 L
+SO
+7098 4266 mt 7136 4266 L
+6743 4352 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+6983 4209 mt 
+(1) s
+7098 3877 mt 7117 3877 L
+DO
+7098 3877 mt 10786 3877 L
+10786 3877 mt 10786 3877 L
+SO
+7098 3650 mt 7117 3650 L
+DO
+7098 3650 mt 10786 3650 L
+10786 3650 mt 10786 3650 L
+SO
+7098 3489 mt 7117 3489 L
+DO
+7098 3489 mt 10786 3489 L
+10786 3489 mt 10786 3489 L
+SO
+7098 3365 mt 7117 3365 L
+DO
+7098 3365 mt 10786 3365 L
+10786 3365 mt 10786 3365 L
+SO
+7098 3262 mt 7117 3262 L
+DO
+7098 3262 mt 10786 3262 L
+10786 3262 mt 10786 3262 L
+SO
+7098 3176 mt 7117 3176 L
+DO
+7098 3176 mt 10786 3176 L
+10786 3176 mt 10786 3176 L
+SO
+7098 3101 mt 7117 3101 L
+DO
+7098 3101 mt 10786 3101 L
+10786 3101 mt 10786 3101 L
+SO
+7098 3035 mt 7117 3035 L
+DO
+7098 3035 mt 10786 3035 L
+10786 3035 mt 10786 3035 L
+SO
+7098 2977 mt 7117 2977 L
+DO
+7098 2977 mt 10786 2977 L
+10786 2977 mt 10786 2977 L
+SO
+7098 2977 mt 7136 2977 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+6743 3063 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+6983 2920 mt 
+(2) s
+7098 2588 mt 7117 2588 L
+DO
+7098 2588 mt 10786 2588 L
+10786 2588 mt 10786 2588 L
+SO
+7098 2361 mt 7117 2361 L
+DO
+7098 2361 mt 10786 2361 L
+10786 2361 mt 10786 2361 L
+SO
+7098 2200 mt 7117 2200 L
+DO
+7098 2200 mt 10786 2200 L
+10786 2200 mt 10786 2200 L
+SO
+7098 2076 mt 7117 2076 L
+DO
+7098 2076 mt 10786 2076 L
+10786 2076 mt 10786 2076 L
+SO
+7098 1973 mt 7117 1973 L
+DO
+7098 1973 mt 10786 1973 L
+10786 1973 mt 10786 1973 L
+SO
+7098 1887 mt 7117 1887 L
+DO
+7098 1887 mt 10786 1887 L
+10786 1887 mt 10786 1887 L
+SO
+7098 1812 mt 7117 1812 L
+DO
+7098 1812 mt 10786 1812 L
+10786 1812 mt 10786 1812 L
+SO
+7098 1746 mt 7117 1746 L
+DO
+7098 1746 mt 10786 1746 L
+10786 1746 mt 10786 1746 L
+SO
+7098 1688 mt 7117 1688 L
+DO
+7098 1688 mt 10786 1688 L
+10786 1688 mt 10786 1688 L
+SO
+7098 1688 mt 7136 1688 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+6743 1774 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+6983 1631 mt 
+(3) s
+7098 1299 mt 7117 1299 L
+DO
+7098 1299 mt 10786 1299 L
+10786 1299 mt 10786 1299 L
+SO
+7098 1072 mt 7117 1072 L
+DO
+7098 1072 mt 10786 1072 L
+10786 1072 mt 10786 1072 L
+SO
+7098  911 mt 7117  911 L
+DO
+7098  911 mt 10786  911 L
+10786  911 mt 10786  911 L
+SO
+7098  787 mt 7117  787 L
+DO
+7098  787 mt 10786  787 L
+10786  787 mt 10786  787 L
+SO
+7098  684 mt 7117  684 L
+DO
+7098  684 mt 10786  684 L
+10786  684 mt 10786  684 L
+SO
+7098  598 mt 7117  598 L
+DO
+7098  598 mt 10786  598 L
+10786  598 mt 10786  598 L
+SO
+7098  523 mt 7117  523 L
+DO
+7098  523 mt 10786  523 L
+10786  523 mt 10786  523 L
+SO
+7098  457 mt 7117  457 L
+DO
+7098  457 mt 10786  457 L
+10786  457 mt 10786  457 L
+SO
+7098  399 mt 7117  399 L
+DO
+7098  399 mt 10786  399 L
+10786  399 mt 10786  399 L
+SO
+7098  399 mt 7136  399 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+6743  485 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+6983  342 mt 
+(4) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+8721  215 mt 
+(Map) s
+8108 4732 mt 
+(Number of CPUs) s
+gs 7098 399 3689 3868 rc
+DA
+24 w
+0.3 sg
+1230 -28 1229 27 1229 114 7098 2013 4 MP stroke
+gr
+
+24 w
+0.3 sg
+DA
+gs 6952 1867 3981 434 rc
+SO
+0 j
+0 -94 -94 0 0 94 94 0 7051 1966 5 MP
+gs
+PP
+gr
+0 sg
+DP
+0 -94 -94 0 0 94 94 0 8280 2080 5 MP
+0.3 sg
+gs
+PP
+gr
+0 sg
+DP
+0 -94 -94 0 0 94 94 0 9509 2107 5 MP
+0.3 sg
+gs
+PP
+gr
+0 sg
+DP
+0 -94 -94 0 0 94 94 0 10739 2079 5 MP
+0.3 sg
+gs
+PP
+gr
+0 sg
+DP
+DA
+gr
+
+0 sg
+gs 7098 399 3689 3868 rc
+SO
+0.5 sg
+1230 -260 1229 -365 1229 -507 7098 2678 4 MP stroke
+gr
+
+0.5 sg
+SO
+gs 6952 1400 3981 1425 rc
+0 sg
+7056 2636 mt 7140 2720 L
+7140 2636 mt 7056 2720 L
+8285 2129 mt 8369 2213 L
+8369 2129 mt 8285 2213 L
+9514 1764 mt 9598 1848 L
+9598 1764 mt 9514 1848 L
+10744 1504 mt 10828 1588 L
+10828 1504 mt 10744 1588 L
+gr
+
+0 sg
+gs 7098 399 3689 3868 rc
+1230 11 1229 155 1229 3 7098 2481 4 MP stroke
+gr
+
+gs 6952 2335 3981 462 rc
+0 j
+60 79 -60 79 -60 -79 60 -79 7098 2560 5 MP
+gs
+PP
+gr
+DP
+60 79 -60 79 -60 -79 60 -79 8327 2563 5 MP
+gs
+PP
+gr
+DP
+60 79 -60 79 -60 -79 60 -79 9556 2718 5 MP
+gs
+PP
+gr
+DP
+60 79 -60 79 -60 -79 60 -79 10786 2729 5 MP
+gs
+PP
+gr
+DP
+gr
+
+gs 7098 399 3689 3868 rc
+gr
+
+%%IncludeResource: font Helvetica
+/Helvetica /ISOLatin1Encoding 120 FMSR
+
+7081 4309 mt 
+( ) s
+10770  441 mt 
+( ) s
+6 w
+1 sg
+0 546 1754 0 0 -546 8972 1005 4 MP
+PP
+-1754 0 0 546 1754 0 0 -546 8972 1005 5 MP stroke
+4 w
+DO
+SO
+6 w
+0 sg
+8972 1005 mt 10726 1005 L
+8972  459 mt 10726  459 L
+8972 1005 mt 8972  459 L
+10726 1005 mt 10726  459 L
+8972 1005 mt 10726 1005 L
+8972 1005 mt 8972  459 L
+8972 1005 mt 10726 1005 L
+8972  459 mt 10726  459 L
+8972 1005 mt 8972  459 L
+10726 1005 mt 10726  459 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 144 FMSR
+
+9435  611 mt 
+(Java LTQ) s
+gs 8972 459 1755 547 rc
+DA
+24 w
+0.3 sg
+356 0 9043 561 2 MP stroke
+SO
+gr
+
+24 w
+0.3 sg
+gs 9075 415 293 293 rc
+0 j
+0 -94 -94 0 0 94 94 0 9174 514 5 MP
+gs
+PP
+gr
+0 sg
+DP
+gr
+
+0 sg
+gs 8972 459 1755 547 rc
+gr
+
+9435  782 mt 
+(SingleLane FlowPool) s
+gs 8972 459 1755 547 rc
+0.5 sg
+356 0 9043 732 2 MP stroke
+gs 9075 586 293 293 rc
+0 sg
+9179  690 mt 9263  774 L
+9263  690 mt 9179  774 L
+gr
+
+0 sg
+gr
+
+9435  952 mt 
+(MultiLane FlowPool) s
+gs 8972 459 1755 547 rc
+356 0 9043 902 2 MP stroke
+gr
+
+gs 9075 756 293 293 rc
+0 j
+60 79 -60 79 -60 -79 60 -79 9221 981 5 MP
+gs
+PP
+gr
+DP
+gr
+
+gs 8972 459 1755 547 rc
+6 w
+gr
+
+6 w
+4 w
+DO
+11950 4266 mt 11950  399 L
+11950  399 mt 11950  399 L
+13179 4266 mt 13179  399 L
+13179  399 mt 13179  399 L
+14408 4266 mt 14408  399 L
+14408  399 mt 14408  399 L
+15637 4266 mt 15637  399 L
+15637  399 mt 15637  399 L
+11950 4266 mt 15637 4266 L
+15637 4266 mt 15637 4266 L
+11950 2977 mt 15637 2977 L
+15637 2977 mt 15637 2977 L
+11950 1688 mt 15637 1688 L
+15637 1688 mt 15637 1688 L
+11950  399 mt 15637  399 L
+15637  399 mt 15637  399 L
+SO
+6 w
+11950 4266 mt 15637 4266 L
+11950 4266 mt 11950  399 L
+11950 4266 mt 11950 4227 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+11890 4515 mt 
+(1) s
+13179 4266 mt 13179 4227 L
+13119 4515 mt 
+(2) s
+14408 4266 mt 14408 4227 L
+14348 4515 mt 
+(4) s
+15637 4266 mt 15637 4227 L
+15577 4515 mt 
+(8) s
+11950 4266 mt 11969 4266 L
+DO
+11950 4266 mt 15637 4266 L
+15637 4266 mt 15637 4266 L
+SO
+11950 4266 mt 11988 4266 L
+11595 4352 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+11835 4209 mt 
+(1) s
+11950 3877 mt 11969 3877 L
+DO
+11950 3877 mt 15637 3877 L
+15637 3877 mt 15637 3877 L
+SO
+11950 3650 mt 11969 3650 L
+DO
+11950 3650 mt 15637 3650 L
+15637 3650 mt 15637 3650 L
+SO
+11950 3489 mt 11969 3489 L
+DO
+11950 3489 mt 15637 3489 L
+15637 3489 mt 15637 3489 L
+SO
+11950 3365 mt 11969 3365 L
+DO
+11950 3365 mt 15637 3365 L
+15637 3365 mt 15637 3365 L
+SO
+11950 3262 mt 11969 3262 L
+DO
+11950 3262 mt 15637 3262 L
+15637 3262 mt 15637 3262 L
+SO
+11950 3176 mt 11969 3176 L
+DO
+11950 3176 mt 15637 3176 L
+15637 3176 mt 15637 3176 L
+SO
+11950 3101 mt 11969 3101 L
+DO
+11950 3101 mt 15637 3101 L
+15637 3101 mt 15637 3101 L
+SO
+11950 3035 mt 11969 3035 L
+DO
+11950 3035 mt 15637 3035 L
+15637 3035 mt 15637 3035 L
+SO
+11950 2977 mt 11969 2977 L
+DO
+11950 2977 mt 15637 2977 L
+15637 2977 mt 15637 2977 L
+SO
+11950 2977 mt 11988 2977 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+11595 3063 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+11835 2920 mt 
+(2) s
+11950 2588 mt 11969 2588 L
+DO
+11950 2588 mt 15637 2588 L
+15637 2588 mt 15637 2588 L
+SO
+11950 2361 mt 11969 2361 L
+DO
+11950 2361 mt 15637 2361 L
+15637 2361 mt 15637 2361 L
+SO
+11950 2200 mt 11969 2200 L
+DO
+11950 2200 mt 15637 2200 L
+15637 2200 mt 15637 2200 L
+SO
+11950 2076 mt 11969 2076 L
+DO
+11950 2076 mt 15637 2076 L
+15637 2076 mt 15637 2076 L
+SO
+11950 1973 mt 11969 1973 L
+DO
+11950 1973 mt 15637 1973 L
+15637 1973 mt 15637 1973 L
+SO
+11950 1887 mt 11969 1887 L
+DO
+11950 1887 mt 15637 1887 L
+15637 1887 mt 15637 1887 L
+SO
+11950 1812 mt 11969 1812 L
+DO
+11950 1812 mt 15637 1812 L
+15637 1812 mt 15637 1812 L
+SO
+11950 1746 mt 11969 1746 L
+DO
+11950 1746 mt 15637 1746 L
+15637 1746 mt 15637 1746 L
+SO
+11950 1688 mt 11969 1688 L
+DO
+11950 1688 mt 15637 1688 L
+15637 1688 mt 15637 1688 L
+SO
+11950 1688 mt 11988 1688 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+11595 1774 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+11835 1631 mt 
+(3) s
+11950 1299 mt 11969 1299 L
+DO
+11950 1299 mt 15637 1299 L
+15637 1299 mt 15637 1299 L
+SO
+11950 1072 mt 11969 1072 L
+DO
+11950 1072 mt 15637 1072 L
+15637 1072 mt 15637 1072 L
+SO
+11950  911 mt 11969  911 L
+DO
+11950  911 mt 15637  911 L
+15637  911 mt 15637  911 L
+SO
+11950  787 mt 11969  787 L
+DO
+11950  787 mt 15637  787 L
+15637  787 mt 15637  787 L
+SO
+11950  684 mt 11969  684 L
+DO
+11950  684 mt 15637  684 L
+15637  684 mt 15637  684 L
+SO
+11950  598 mt 11969  598 L
+DO
+11950  598 mt 15637  598 L
+15637  598 mt 15637  598 L
+SO
+11950  523 mt 11969  523 L
+DO
+11950  523 mt 15637  523 L
+15637  523 mt 15637  523 L
+SO
+11950  457 mt 11969  457 L
+DO
+11950  457 mt 15637  457 L
+15637  457 mt 15637  457 L
+SO
+11950  399 mt 11969  399 L
+DO
+11950  399 mt 15637  399 L
+15637  399 mt 15637  399 L
+SO
+11950  399 mt 11988  399 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+11595  485 mt 
+(10) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 160 FMSR
+
+11835  342 mt 
+(4) s
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 240 FMSR
+
+13433  215 mt 
+(Reduce) s
+gs 11950 399 3688 3868 rc
+DA
+24 w
+0.3 sg
+1229 -29 1229 31 1229 106 11950 2019 4 MP stroke
+gr
+
+24 w
+0.3 sg
+DA
+gs 11804 1873 3980 430 rc
+SO
+0 j
+0 -94 -94 0 0 94 94 0 11903 1972 5 MP
+gs
+PP
+gr
+0 sg
+DP
+0 -94 -94 0 0 94 94 0 13132 2078 5 MP
+0.3 sg
+gs
+PP
+gr
+0 sg
+DP
+0 -94 -94 0 0 94 94 0 14361 2109 5 MP
+0.3 sg
+gs
+PP
+gr
+0 sg
+DP
+0 -94 -94 0 0 94 94 0 15590 2080 5 MP
+0.3 sg
+gs
+PP
+gr
+0 sg
+DP
+DA
+gr
+
+0 sg
+gs 11950 399 3688 3868 rc
+SO
+0.5 sg
+1229 -256 1229 -365 1229 -508 11950 2674 4 MP stroke
+gr
+
+0.5 sg
+SO
+gs 11804 1399 3980 1422 rc
+0 sg
+11908 2632 mt 11992 2716 L
+11992 2632 mt 11908 2716 L
+13137 2124 mt 13221 2208 L
+13221 2124 mt 13137 2208 L
+14366 1759 mt 14450 1843 L
+14450 1759 mt 14366 1843 L
+15595 1503 mt 15679 1587 L
+15679 1503 mt 15595 1587 L
+gr
+
+0 sg
+gs 11950 399 3688 3868 rc
+1229 50 1229 180 1229 277 11950 2414 4 MP stroke
+gr
+
+gs 11804 2268 3980 800 rc
+0 j
+60 79 -60 79 -60 -79 60 -79 11950 2493 5 MP
+gs
+PP
+gr
+DP
+60 79 -60 79 -60 -79 60 -79 13179 2770 5 MP
+gs
+PP
+gr
+DP
+60 79 -60 79 -60 -79 60 -79 14408 2950 5 MP
+gs
+PP
+gr
+DP
+60 79 -60 79 -60 -79 60 -79 15637 3000 5 MP
+gs
+PP
+gr
+DP
+gr
+
+gs 11950 399 3688 3868 rc
+gr
+
+%%IncludeResource: font Helvetica
+/Helvetica /ISOLatin1Encoding 120 FMSR
+
+11933 4309 mt 
+( ) s
+15621  441 mt 
+( ) s
+6 w
+1 sg
+0 546 1754 0 0 -546 13823 1005 4 MP
+PP
+-1754 0 0 546 1754 0 0 -546 13823 1005 5 MP stroke
+4 w
+DO
+SO
+6 w
+0 sg
+13823 1005 mt 15577 1005 L
+13823  459 mt 15577  459 L
+13823 1005 mt 13823  459 L
+15577 1005 mt 15577  459 L
+13823 1005 mt 15577 1005 L
+13823 1005 mt 13823  459 L
+13823 1005 mt 15577 1005 L
+13823  459 mt 15577  459 L
+13823 1005 mt 13823  459 L
+15577 1005 mt 15577  459 L
+%%IncludeResource: font Times-Roman
+/Times-Roman /ISOLatin1Encoding 144 FMSR
+
+14286  611 mt 
+(Java LTQ) s
+gs 13823 459 1755 547 rc
+DA
+24 w
+0.3 sg
+356 0 13894 561 2 MP stroke
+SO
+gr
+
+24 w
+0.3 sg
+gs 13926 415 293 293 rc
+0 j
+0 -94 -94 0 0 94 94 0 14025 514 5 MP
+gs
+PP
+gr
+0 sg
+DP
+gr
+
+0 sg
+gs 13823 459 1755 547 rc
+gr
+
+14286  782 mt 
+(SingleLane FlowPool) s
+gs 13823 459 1755 547 rc
+0.5 sg
+356 0 13894 732 2 MP stroke
+gs 13926 586 293 293 rc
+0 sg
+14030  690 mt 14114  774 L
+14114  690 mt 14030  774 L
+gr
+
+0 sg
+gr
+
+14286  952 mt 
+(MultiLane FlowPool) s
+gs 13823 459 1755 547 rc
+356 0 13894 902 2 MP stroke
+gr
+
+gs 13926 756 293 293 rc
+0 j
+60 79 -60 79 -60 -79 60 -79 14072 981 5 MP
+gs
+PP
+gr
+DP
+gr
+
+gs 13823 459 1755 547 rc
+6 w
+gr
+
+6 w
+
+end %%Color Dict
+
+eplot
+%%EndObject
+
+epage
+end
+
+showpage
+
+%%Trailer
+%%EOF

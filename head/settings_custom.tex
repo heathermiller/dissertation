@@ -41,6 +41,8 @@
 % \renewcommand*\familydefault{\ttdefault} %% Only if the base font of the document is to be typewriter style
 \usepackage[T1]{fontenc}
 \usepackage{cprotect}
+\usepackage{alltt}
+\usepackage{lineno}
 
 % \setmainfont{Utopia Std}
 % \setmonofont[Scale=1.0,BoldFont={Consolas Bold}]{Consolas}
@@ -76,6 +78,10 @@
 \newcommand{\commadots}{\comma \ldots \comma}
 \newcommand{\semi}{;\mbox{;};}
 \newcommand{\semidots}{\semi \ldots \semi}
+
+% brackets
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\sbs}[1]{\lquote #1 \rquote}
 
 % spacing
 \newcommand{\gap}{\quad\quad}
