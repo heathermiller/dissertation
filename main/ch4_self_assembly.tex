@@ -2069,7 +2069,7 @@ extend the existing syntax or change Scala's existing type-checking. Instead,
 they can be thought of as pluggable type system
 extensions~\cite{PluggableTypes} in that without changing the existing
 typechecker, additional properties can be checked. As a result, our approach
-supports extensions such as (transitive) type-based immutability checking,
+supports added checking such as (transitive) type-based immutability checking,
 which goes beyond standard DGP.
 
 % refine existing typechecking
@@ -2547,15 +2547,15 @@ extensions to the host language.
 % \vspace{-2mm}
 \section{Conclusion}
 
-This chapter detailed a general mechanism, called \sselfassembly, for
-lightweight language extensions. This mechanism has the extensibility
+This chapter detailed a general mechanism, called \sselfassembly, for defining
+generic operations or properties that operate over a large class of types with
+little boilerplate and good performance, and for defining additional lightweight
+static typechecking via generic properties This mechanism has the extensibility
 and customization advantages of type classes; and it has the automatic
-implementation advantages of mechanisms like Java's serialization
-mechanism.  The key idea is to provide
-automatic implementations of type classes using type-safe macros.
-This allows programmers to define their own generic
-functionality, such as serialization, pretty printing, or equality;
-and it also allows the definition of generic properties such as
-immutability checking. To demonstrate the usefulness of \selfassembly
-in practice, we implemented an industry-ready
-serialization framework for Scala.
+implementation advantages of mechanisms like Java's serialization mechanism.
+The key idea is to provide automatic implementations of type classes using
+type-safe macros. This allows programmers to define their own generic
+functionality, such as serialization, pretty printing, or equality; and it also
+allows the definition of generic properties such as immutability checking. To
+demonstrate the usefulness of \selfassembly in practice, we implemented an
+industry-ready serialization framework for Scala.
