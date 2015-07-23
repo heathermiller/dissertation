@@ -536,7 +536,7 @@ instances automatically from that code.
 \subsection{Implicits}
 \label{sec:implicits}
 
-In Scala, it is possible to select values
+{\bf Implicit Parameters.} In Scala, it is possible to select values
 automatically based on type. These capabilities are enabled when using the
 \term{implicit} keyword. For example, a method \term{log} with multiple
 parameter lists may annotate their last parameter list using the
@@ -643,7 +643,7 @@ types.  If values of a type \verb|T| should provide a certain
 functionality then that functionality can be specified as an
 \emph{instance} of a type class.
 
-\begin{figure}
+\begin{figure}[h!]
 \begin{minted}{scala}
 trait Show[T] {def show(visitee : T) : String}
 
@@ -949,7 +949,7 @@ of the high-level user-written code.
 Due to limitations in the reify API, we use quasiquotes (typechecked during
 macro expansion) to circumvent the above type-checking in a small trusted core
 of \sselfassembly, shielded from users. However, we never lose soundness,
-since, unlike \\MetaML~\cite{MetaML}, all splicing is done at compile time, and
+since, unlike MetaML~\cite{MetaML}, all splicing is done at compile time, and
 generated expressions are always re-type-checked after expansion.
 
 % However, the use of \verb|reify| is not
@@ -1093,16 +1093,16 @@ object Show extends Query[String] {
 
 Section~\ref{sec:background} showed how to write type classes like \verb|Show[T]|
 manually, pointing out a source of significant boilerplate code. In
-section~\ref{sec:basic-usage}, we outline the basic usage of the
+section~\ref{sec:self-assembly-basic-usage}, we outline the basic usage of the
 \selfassembly library, which allows defining type classes desired in a way
-where the required boilerplate is automatically generated.
+where the required boilerplate for defining such type classes is automatically generated.
 Section~\ref{sec:basic-generation} explains the mechanics of the automatic
 type class generation implemented in the \selfassembly library.
 Section~\ref{sec:customization} outlines how one can customize the generation
 of type classes for specific types.
 
 \subsection{Basic Usage}
-\label{sec:basic-usage}
+\label{sec:self-assembly-basic-usage}
 
 The \selfassembly library allows implementing type classes instances automatically on
 demand at compile time. This main idea is introduced using the simple \verb|Show| type class
@@ -1200,6 +1200,7 @@ We structure our treatment into three distinct steps:
 %      them to the type class pattern introduced in Section~\ref{sec:type-classes}
 %\end{enumerate}
 
+\vspace{-0.2cm}
 \subsubsection{Triggering Generation}
 \label{sec:triggering-generation}
 
@@ -1210,6 +1211,7 @@ companion object means that whenever an instance \verb|Show[S]| is requested,
 Scala's implicit lookup mechanism searches the members of the companion object
 \verb|Show| where it finds the implicit macro:
 
+\vspace{-0.4cm}
 \begin{minted}{scala}
 object Show extends Query[String] {
   ...
@@ -1291,15 +1293,19 @@ trait Query[R] ... {
 \end{figure}
 
 The body of the type class is generated using:
-\begin{minted}{scala}
-val tpe = weakTypeOf[T] // see Fig. 5
-...
-val (first, separator, last) =
-  trees.delimit(tpe)
-val body = trees.combine(
-  fieldsExpr(first, separator), last)
-\end{minted}
+\begin{mdframed}[linecolor=black, topline=false, bottomline=false,
+  leftline=false, rightline=false]
+  \begin{minted}{scala}
+  val tpe = weakTypeOf[T] // see Fig. 5
+  ...
+  val (first, separator, last) =
+    trees.delimit(tpe)
+  val body = trees.combine(
+    fieldsExpr(first, separator), last)
+  \end{minted}
+\end{mdframed}
 
+\vspace{-0.4cm}
 To create the result expression, the macro utilizes the \verb|trees| instance
 (of type \verb|Trees|) that we initialize in the set-up phase (see
 Figure~\ref{fig:macro-set-up}). Calling \verb|delimit| returns three expressions
@@ -1309,6 +1315,7 @@ which the macro generates a type class instance. The \verb|fieldsExpr| method
 creates an \verb|Expr[R]| by folding the \verb|Expr[R]|s obtained for each field
 (see below) using the user-overridden \verb|combine| method:
 
+\vspace{-0.4cm}
 \begin{minted}{scala}
 if (paramFields.size < 2)
   ...
@@ -1318,6 +1325,7 @@ else
     trees.combine(withSep, fieldValue(sym))
   }
 \end{minted}
+\vspace{-0.4cm}
 
 For example, Figure~\ref{fig:basic-usage} shows that the definition of
 \verb|combine| for \verb|Show| is just string concatenation. As a result, this
@@ -1327,6 +1335,7 @@ code concatenates the string values of all fields separated with
 The expression tree \verb|fieldValue(sym)| is obtained as follows. For
 each field declared in type \verb|tpe|, the following subexpression is
 generated:
+\vspace{-0.2cm}
 \begin{minted}{scala}
 val symTp = sym.typeSignatureIn(tpe)
 val fieldName = sym.name.toString.trim
@@ -1334,18 +1343,22 @@ trees.fieldValueExpr(visitee, fieldName,
   symTp, tpeOfTypeClass)
 \end{minted}
 
+\vspace{-0.2cm}
 The invocation of \verb|fieldValueExpr| expands to (a) a nested look-up of a
 type class instance for the field, and (b) an invocation of the type class
 method:
-\begin{minted}{scala}
-def fieldValueExpr(visitee: c.Expr[T], name: String,
-  tpe: c.Type, tpeOfTypeClass: c.Type): c.Expr[R] =
-c.Expr[R](
-  q"""
-    implicitly[${appliedType(tpeOfTypeClass, tpe)}]
-      .apply($visitee.${TermName(name)})
-  """)
-\end{minted}
+\begin{mdframed}[linecolor=black, topline=false, bottomline=false,
+  leftline=false, rightline=false]
+  \begin{minted}{scala}
+  def fieldValueExpr(visitee: c.Expr[T], name: String,
+    tpe: c.Type, tpeOfTypeClass: c.Type): c.Expr[R] =
+  c.Expr[R](
+    q"""
+      implicitly[${appliedType(tpeOfTypeClass, tpe)}]
+        .apply($visitee.${TermName(name)})
+    """)
+  \end{minted}
+\end{mdframed}
 
 The syntax \verb|q"""..."""| indicates the use of a quasiquote to create an
 {\em untyped} tree that is cast to an \verb|Expr[R]|, effectively forming part
@@ -1425,7 +1438,7 @@ case class C(p_1: D_1, ..., p_n: D_n)
 
 \begin{figure}
 \centering
-\includegraphics[width=0.87\columnwidth]{basic-generation.pdf}
+\includegraphics[width=0.6\columnwidth]{basic-generation.pdf}
 \caption{Basic generation of type classes.}
 \label{fig:basic-generation}
 \end{figure}
@@ -1684,7 +1697,7 @@ and separate compilation (Section~\ref{sec:oo-sub-sep}). In Section~\ref{sec:oo-
 we discuss how \selfassembly handles cyclic object graphs, which are easily created
 using mutable objects with identity.
 
-
+\vspace{-0.4cm}
 \subsection{Subtyping}\label{sec:oo-sub}
 
 Object-oriented languages like Java or Scala enable the definition of a
@@ -1694,14 +1707,15 @@ account for \emph{subtyping polymorphism}. In addition, we provide mechanisms
 that enable the object-oriented features even in a setting where
 modules/packages are separately compiled.
 
+\vspace{-0.4cm}
 \subsubsection{Open Hierarchies}\label{sec:oo-sub-open}
-
 Classes defined in languages like Java are by default ``open,'' which means
 that they can have an unbounded number of subclasses spread across several
 compilation units. By contrast, \emph{final classes} cannot have subclasses at
 all. In addition, \emph{sealed classes} in Scala can only have subclasses
 defined within the same compilation unit.
 
+\vspace{-0.4cm}
 \begin{figure}
 \centering
 \begin{minted}{scala}
@@ -1762,17 +1776,19 @@ Figure~\ref{fig:class-hierarchy}, a dynamic dispatch is generated to select a
 specific type class instance based on the runtime classtype of the object that the type
 class is applied to (\verb|visitee|):\footnote{Simplified; handling of \texttt{null} values is omitted for simplicity.}
 
-\begin{minted}{scala}
-implicit object PersonInst extends Show[Person] {
-  def show(visitee: Person): String =
-    visitee match {
-      case v1: Employee =>
-        implicitly[Show[Employee]].show(v1)
-      case v2: Firefighter =>
-        implicitly[Show[Firefighter]].show(v2)
-    }
-}
-\end{minted}
+\begin{figure*}
+  \begin{minted}{scala}
+  implicit object PersonInst extends Show[Person] {
+    def show(visitee: Person): String =
+      visitee match {
+        case v1: Employee =>
+          implicitly[Show[Employee]].show(v1)
+        case v2: Firefighter =>
+          implicitly[Show[Firefighter]].show(v2)
+      }
+  }
+  \end{minted}
+\end{figure*}
 
 % Concrete instances of this type have subtypes (dynamically) which are case
 % classes (according to our initial simplified view). Therefore, the type class
@@ -2025,14 +2041,14 @@ Scala/Pickling~\cite{ScalaPickling}). Interestingly, the implementations of quer
 transformations share a substantial number of generic building blocks.
 
 
-\section{Generic Properties: Lightweight Pluggable Type System Extensions}
+\section{Generic Properties: Custom Lightweight Static Checks}
 \label{sec:language-extensions}
 
-In this section we show how our approach supports the definition of
-lightweight pluggable type system extensions that go beyond object-oriented DGP as
-discussed in the previous sections. In particular, the \selfassembly library
-allows defining generic type-based properties that can be checked by the
-existing Scala type checker.
+In this section we show how our approach supports the definition of custom
+lightweight static checking, similar to pluggable type system extensions, that
+go beyond object-oriented DGP as discussed in the previous sections. In
+particular, the \selfassembly library allows defining generic type-based
+properties that can be checked by the existing Scala type checker.
 
 % An important characteristic of the self-assembly pattern and library is that
 % it is a {\em compile-time} generic programming pattern. In addition to having
@@ -2048,7 +2064,7 @@ the library, users also have (a) access to full static type information and
 (b) Scala's meta-programming API, enabling one to generatively define such
 generic type properties.
 
-The enabled language extensions are lightweight in the sense that they cannot
+The enabled static checks are lightweight in the sense that they cannot
 extend the existing syntax or change Scala's existing type-checking. Instead,
 they can be thought of as pluggable type system
 extensions~\cite{PluggableTypes} in that without changing the existing
@@ -2087,7 +2103,7 @@ type bounds. Our approach builds on Oliveira et al.'s foundation, and extends
 it to deep structural type information using type-safe meta-programming.
 
 In the following, we summarize the definition of type relations using
-implicits and present a high-level overview of our extensions. We then show
+implicits and present a high-level overview of our added lightweight static checks. We then show
 how \selfassembly is augmented with meta-programming facilities in order to
 enable the definition of deeper structural properties.
 
@@ -2361,12 +2377,11 @@ by the library. The library is comprised of $\approx1,150$ LOC.
 
 \paragraph{Case Study: Scala Pickling}
 
-To evaluate both expressivity and performance, we have ported an industrial-
-strength serialization framework, called Scala/Pickling~\cite{ScalaPickling}, to
+To evaluate both expressivity and performance, we have ported the pickling framework presented in the previous chapter, Scala/Pickling~\cite{ScalaPickling}, to
 \sselfassembly\footnote{\url{https://github.com/phaller/selfassembly/tree/master/src/main/scala/selfassembly/examples/pickling}}.
 
 Scala/Pickling is a popular open-source project; on the social code
-hosting platform GitHub, the project has more than 360 ``stars''.
+hosting platform GitHub, the project has more than 630 ``stars''.
 To achieve its high performance, Scala/Pickling leverages macros for compile-time code
 generation. Our port of Scala/Pickling to \selfassembly supports
 already about 90\% of the features of the original; notably, subtyping, object
