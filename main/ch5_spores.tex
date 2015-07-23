@@ -104,6 +104,8 @@ especially in an object-oriented language.
 For example, consider the following use of a distributed collection in Scala
 with higher-order functions \verb|map| and \verb|reduce| (using Spark):
 
+\noindent%
+\begin{minipage}{\linewidth}
 \begin{minted}{scala}
 class MyCoolRddApp {
   val log = new Log(...)
@@ -114,6 +116,7 @@ class MyCoolRddApp {
   }
 }
 \end{minted}
+\end{minipage}
 \noindent
 In this example, the closure \verb|(x => x + shift(x))| is passed to the
 \verb|map| method of the distributed collection \verb|rdd| which requires
@@ -157,7 +160,7 @@ leading to a potentially wide array of new frameworks.
 % , such as for concurrent and
 % distributed functional reactive programming.
 
-This paper takes a step towards more principled {\em function-passing style}
+This chapter takes a step towards more principled {\em function-passing style}
 by introducing a type-based foundation for closures, called {\em spores}.
 Spores are a closure-like abstraction and type system which is designed to
 avoid typical hazards of closures. By including type information of captured
@@ -223,64 +226,13 @@ their users.
 \end{itemize}
 
 
-\subsection{Selected Related Work}\label{sec:sel-rel-work}
+% \subsection{Selected Related Work}\label{sec:sel-rel-work}
 
-Cloud Haskell~\cite{CloudHaskell} provides statically guaranteed-serializable
-closures by either rejecting environments outright, or by allowing manual
-capturing, requiring the user to explicitly specify and pre-serialize the
-environment in combination with top-level functions (enforced using a new
-\verb|Static| type constructor). That is, in Cloud Haskell, to create a
-serializable closure, one must explicitly pass the serialized environment as a
-parameter to the function -- this requires users to have to refactor closures
-they wish to be made serializable. In contrast, spores
-do not require users to manually factor out, manage, and serialize their
-environment; spores require only that {\em what} is captured is specified, not
-{\em how}. Furthermore, spores are more general than Cloud Haskell's
-serializable closures; user-defined type constraints enable spores to
-express more properties than just serializability, like thread-safety,
-immutability, or any other user-defined property. In addition, spores allow
-restricting captured types in a way that is integrated with object-oriented
-concerns, such as subtyping and open class hierarchies.
-
-% In industry, a number of languages have adopted or proposed pragmatic
-% solutions to allow control over the environment of closures.
-
-C++11~\cite{CplusplusLambas} has introduced syntactic rules for explicit
-capture specifications that indicate which variables are captured and how (by
-reference or by copy). Since the capturing semantics is purely
-syntactic, a capture specification is only enforced at closure creation time.
-Thus, when composing two closures, the capture semantics is not preserved.
-Spores, on the other hand, capture such specifications at the level of types,
-enabling composability. Furthermore, spores' type constraints enable more
-general type-directed control over capturing than capture-by-value or
-capture-by-reference alone.
-
-A preliminary proposal for closures in the Rust
-language~\cite{RustFunctions} allows describing the closed-over variables
-in the environment using closure bounds, requiring captured types to implement
-certain traits. Closure bounds are limited to a small set of built-in
-traits to enforce properties like sendability. Spores on the other hand enable
-user-defined property definition, allowing for greater customizability of
-closure capturing semantics. Furthermore, unlike spores, the environment of a
-closure in Rust must always be allocated on the stack (although not necessarily the
-top-most stack frame).
-
-{Java 8}~\cite{JavaLambdas} introduces a limited type of
-closure which is only permitted to capture variables that are
-effectively-final. Like with Scala's standard closures, variable capture is
-implicit, which can lead to accidental captures that spores are designed to
-avoid. Although serializability can be requested at the level of the type
-system using newly-introduced intersection types in \mbox{Java 8}, there is no
-guarantee about the absence of runtime exceptions, as there is for spores.
-Finally, spores additionally allow specifying type-based constraints for
-captured variables that are more general than serializability alone.
-
-We discuss other related work in Section~\ref{sec:related-work}.
 
 \vspace{2mm}
 \subsection{Contributions}
 
-This paper makes the following contributions:
+This chapter outlines the following contributions:
 % \vspace{-2mm}
 \begin{itemize}
 \item We introduce a closure-like abstraction and type system,  called
@@ -721,13 +673,12 @@ customize what types a spore can capture.
 \setlength{\belowcaptionskip}{-6pt}
 \begin{figure}[t!]
 \centering
-\includegraphics[width=7.4cm]{spore-shape.pdf}
+\includegraphics[width=0.6\columnwidth]{spore-shape.pdf}
 % \vspace{-0.4cm}
 \caption{The syntactic shape of a spore.}
 \label{fig:spore-shape}
-\vspace{-5mm}
 \end{figure}
-\setlength{\belowcaptionskip}{0pt}
+% \setlength{\belowcaptionskip}{0pt}
 
 % \vspace{-5mm}
 A spore is a closure with a specific shape that dictates how the environment
@@ -814,7 +765,7 @@ systems such as Spark in an effort to avoid problems with accidentally
 captured references, such as \verb|this|. However, in systems like Spark, the
 above shape is merely a convention that is not enforced.
 
-\vspace{2mm}
+
 \subsection{The \texttt{Spore} Type}
 \label{sec:spore-type}
 % \vspace{1mm}
@@ -933,7 +884,6 @@ represented by the \verb|Captured| type member in the spore's type.
 \caption{An example of the \texttt{Captured} type member. \\\textit{Note: we omit the
 \texttt{Excluded} type member for simplicity; we detail it later in Section~\ref{sec:excluded-types}.}}
 \label{fig:captured-ex}
-\vspace{-5mm}
 \end{figure}
 
 \subsubsection{Using Spores in APIs}
@@ -1088,7 +1038,7 @@ compose, as we will see in later subsections.
 
 % \todo{because these things are recorded in the type, they compose! That means that excluded types cannot be forgotten upon composition -- instead the resulting spore excludes the composition of the excluded types from the composed spores.}
 
-Throughout this paper, we use as a motivating example hazards that arise in
+Throughout this chapter, we use as a motivating example hazards that arise in
 concurrent or distributed settings. However, note that the system of type
 constraints described henceforth is general, and can be applied to very
 different applications and sets of types.
@@ -1315,9 +1265,9 @@ respectively.)
 % \vspace{-5mm}
 \begin{enumerate}
 
-\item $Captured(res.type) = Captured(s1.type), Captured(s2.type)$
+\item {\em Captured(res.type) = Captured(s1.type), Captured(s2.type)}
 
-\item $Excluded(res.type) = \{ T \in Excluded(s1.type) \cup Excluded(s2.type) ~|~ T \notin Captured(s1.type), Captured(s2.type) \}$
+\item {\em Excluded(res.type) = \{ T $\in$ Excluded(s1.type) $\cup$ Excluded(s2.type) ~|~ T $\notin$ Captured(s1.type), Captured(s2.type) \} }
 
 \end{enumerate}
 
@@ -1336,7 +1286,6 @@ Spore[Int, String] {
   type Excluded = No[Actor]
 }
   \end{minted}
-  \vspace{-4mm}
   \caption{Type of spore \texttt{s1}.}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
@@ -1347,7 +1296,7 @@ Spore[String, Int] {
   type Excluded = No[Actor] with No[Util]
 }
   \end{minted}
-  \vspace{-4mm}
+  % \vspace{-4mm}
   \caption{Type of spore \texttt{s2}.}
 \end{subfigure}%
 \label{fig:spore-composition}
@@ -1862,7 +1811,6 @@ Rule \textsc{S-SporeFun} expresses the fact that spore types are refinements of 
 \end{mathpar}
   \caption{Typing rules}
   \label{fig:typing-rules}
-  \vspace{-5mm}
 \end{figure*}
 
 Typing derivations use a judgement of the form $\Gamma ; \Delta \vdash t : T$. Besides the standard variable environment $\Gamma$ we use a property environment $\Delta$ which is a sequence of property names that have been imported using \verb|import| expressions in enclosing scopes of term $t$. The property environment is reminiscent of the implicit parameter context used in the original work on implicit parameters~\cite{Lewis2000}; it is an environment for names whose definition sites ``just happen to be far removed from their usages.''
@@ -1873,7 +1821,6 @@ In the typing rules we assume the existence of a global property mapping $P$ fro
 \emph{(Behavioral subtyping of property mapping)}
 \label{def:beh-subtyping}
 If $T <: T'$ and $T' \in P(pn)$, then $T \in P(pn)$
-\vspace{-2.5mm}
 \end{definition}
 
 The typing rules are standard except for rules \textsc{T-Imp}, \textsc{T-Spore}, and \textsc{T-Comp}, which are new. Only these three type rules inspect or modify the property environment $\Delta$. Note that there is no rule for spore application, since there is a subtyping relationship between spores and functions (see Section~\ref{sec:subtyping}). Using the subsumption rule \textsc{T-Sub} spore application is expressed using the standard rule for function application (\textsc{T-App}).
@@ -1888,7 +1835,6 @@ Rule \textsc{T-Comp} derives a result type for the composition of two spores. It
 
 \begin{figure*}[t!]
   \centering
-\vspace{-7mm}
 \begin{mathpar}
 % \inferrule[\textsc{E-Let1}]
 % { t_1 \rightarrow t'_1
@@ -1947,7 +1893,6 @@ Rule \textsc{T-Comp} derives a result type for the composition of two spores. It
 { \texttt{spore}~\{~\seq{x : T = v}, x_k : T_k = t_k, \seq{x' : T' = t'}~; (x: T) \Rightarrow t~\} \rightarrow \\ \texttt{spore}~\{~\seq{x : T = v}, x_k : T_k = t'_k, \seq{x' : T' = t'}~; (x: T) \Rightarrow t~\}
 }
 
-\vspace{-0.3cm}
 
 \inferrule[\textsc{E-Imp}]
 { \texttt{import}~pn~\texttt{in}~t \rightarrow insert(pn, t)
@@ -1961,15 +1906,12 @@ Rule \textsc{T-Comp} derives a result type for the composition of two spores. It
 { t_1~\texttt{compose}~t_2\rightarrow t_1'~\texttt{compose}~t_2
 }
 
-\vspace{-0.3cm}
 
 \inferrule[\textsc{E-Comp2}]
 { t_2 \rightarrow t_2'
 }
 { v_1~\texttt{compose}~t_2\rightarrow v_1~\texttt{compose}~t_2'
 }
-
-\vspace{-0.3cm}
 
 \inferrule[\textsc{E-Comp3}]
 { \Delta = \{ p~|~p \in \seq{pn},\seq{qn}.~\seq{T} \subseteq P(p) \land \seq{S} \subseteq P(p)\}
@@ -1980,7 +1922,6 @@ Rule \textsc{T-Comp} derives a result type for the composition of two spores. It
   % \vspace{-3mm}
   \caption[Operational Semantics]{Operational Semantics\footnotemark}
   \label{fig:opsem}
-  \vspace{-3mm}
 \end{figure*}
 
 \footnotetext{For the sake of brevity, here we omit the standard evaluation rules. The complete set of evaluation rules can be found in the accompanying technical report~\cite{SporesFormally}}
@@ -2005,7 +1946,6 @@ Rule \textsc{T-Comp} derives a result type for the composition of two spores. It
 \texttt{spore}~\{~\seq{x:T=v};\seq{pn}, pn;(x':T)\Rightarrow t'~\}
 }
 
-\vspace{-0.3cm}
 
 \inferrule[\textsc{H-InsApp}]
 { insert(pn, t_1~t_2) = insert(pn, t_1)~insert(pn, t_2)
@@ -2020,7 +1960,6 @@ Rule \textsc{T-Comp} derives a result type for the composition of two spores. It
   % \vspace{-2.5mm}
   \caption{Helper function $insert$}
   \label{fig:helper}
-  \vspace{-5mm}
 \end{figure*}
 
 Figure~\ref{fig:opsem} shows the evaluation rules of a small-step operational semantics for our core language. The only non-standard rules are \textsc{E-AppSpore}, \textsc{E-Spore}, \textsc{E-Imp}, and \textsc{E-Comp3}. Rule \textsc{E-AppSpore} applies a spore literal to an argument. The differences to regular function application (\textsc{E-AppAbs}) are (a) that the types in the spore header must satisfy the properties of the spore dynamically, and (b) that the variables in the spore header must be replaced by their values in the body of the spore's closure. Rule \textsc{E-Spore} is a congruence rule. Rule \textsc{E-Imp} is a computation rule that is always enabled. It adds property name $pn$ to all spore terms within the body $t$. The $insert$ helper function is defined in Figure~\ref{fig:helper} (we omit rules for \verb|compose| and \verb|let|; they are analogous to rules \textsc{H-InsApp} and \textsc{H-InsSel}).
@@ -2053,7 +1992,6 @@ This section presents a soundness proof of the spore type system. The proof is b
 \emph{(Progress)}
 \label{th:progress}
 Suppose $t$ is a closed, well-typed term (that is, $\vdash t : T$ for some $T$). Then either $t$ is a value or else there is some $t'$ with $t \rightarrow t'$.
-\vspace{-2.5mm}
 \end{theorem}
 \begin{proof}
 By induction on a derivation of $\vdash t : T$. The only three interesting cases are the ones for spore creation, application, and spore composition.
@@ -2064,7 +2002,6 @@ By induction on a derivation of $\vdash t : T$. The only three interesting cases
 \emph{(Preservation of types under import)}
 \label{lem:pres-import}
 If $\Gamma ; \Delta, pn \vdash t : T$ then $\Gamma ; \Delta \vdash insert(pn, t) : T$
-\vspace{-2.5mm}
 \end{lemma}
 \begin{proof}
 By induction on a derivation of $\Gamma ; \Delta, pn \vdash t : T$.
@@ -2075,7 +2012,6 @@ By induction on a derivation of $\Gamma ; \Delta, pn \vdash t : T$.
 \emph{(Preservation of types under substitution)}
 \label{lem:substitution}
 If $\Gamma, x : S ; \Delta \vdash t : T$ and $\Gamma ; \Delta \vdash s : S$, then $\Gamma ; \Delta \vdash [x \mapsto s]t : T$
-\vspace{-2.5mm}
 \end{lemma}
 \begin{proof}
 By induction on a derivation of $\Gamma, x : S ; \Delta \vdash t : T$.
@@ -2086,7 +2022,6 @@ By induction on a derivation of $\Gamma, x : S ; \Delta \vdash t : T$.
 \emph{(Weakening)}
 \label{lem:weak}
 If $\Gamma ; \Delta \vdash t : T$ and $x \notin dom(\Gamma)$, then $\Gamma, x : S ; \Delta \vdash t : T$.
-\vspace{-2.5mm}
 \end{lemma}
 \begin{proof}
 By induction on a derivation of $\Gamma ; \Delta \vdash t : T$.
@@ -2097,7 +2032,6 @@ By induction on a derivation of $\Gamma ; \Delta \vdash t : T$.
 \emph{(Preservation)}
 \label{th:pres}
 If $\Gamma ; \Delta \vdash t : T$ and $t \rightarrow t'$, then $\Gamma ; \Delta \vdash t' : T$.
-\vspace{-2.5mm}
 \end{theorem}
 \begin{proof}
 By induction on a derivation of $\Gamma ; \Delta \vdash t : T$.
@@ -2144,7 +2078,6 @@ v ::=     ...                               & \mbox{values}
   \vspace{2mm}
   \caption{Core language syntax extensions}
   \label{fig:syntax-ext}
-  \vspace{-4mm}
 \end{figure*}
 
 
@@ -2169,7 +2102,6 @@ v ::=     ...                               & \mbox{values}
   % \vspace{-6mm}
   \caption{Subtyping extensions}
   \label{fig:subtyping-ext}
-  \vspace{-4mm}
 \end{figure*}
 % \vspace{2mm}
 
@@ -2198,7 +2130,6 @@ v ::=     ...                               & \mbox{values}
   % \vspace{-4mm}
   \caption{Operational semantics extensions}
   \label{fig:opsem-ext}
-  \vspace{-6mm}
 \end{figure*}
 
 \subsection{Excluded types}
@@ -2239,7 +2170,6 @@ Figure~\ref{fig:typing-ext} shows the extensions to the typing rules. Rule \text
   % \vspace{-4mm}
   \caption{Typing extensions}
   \label{fig:typing-ext}
-  \vspace{-7mm}
 \end{figure*}
 % \vspace{2mm}
 
@@ -2271,7 +2201,6 @@ The implicit conversion (Section~\ref{sec:basic-usage}) from standard Scala func
 \includegraphics[width=\textwidth]{evaluation.pdf}
 \caption{Evaluating the practicality of using spores in place of normal closures}
 \label{fig:spore-eval}
-\vspace{-5mm}
 \end{figure}
 
 % program        | LOC | #closures | #converted | LOC changed | #captured vars
@@ -2366,7 +2295,6 @@ effort, even if the used APIs do not use spore types.
 
 
 \begin{figure}[t!]
-\vspace{-5mm}
 % \onecolumn
 % \setlength\LTleft{10pt}            % default: \parindent
 % \setlength\LTright{10pt}           % default: \fill
@@ -2405,10 +2333,9 @@ effort, even if the used APIs do not use spore types.
 \bottomrule
 
 \end{longtable}
-\vspace{2mm}
+\vspace{6mm}
 \caption{Evaluating the impact and overhead of spores on real distributed applications. Each project listed is an active and noteworthy open-source project hosted on GitHub that is based on Apache Spark. \protect\stars~represents the number of ``stars'' (or interest) a repository has on GitHub, and \protect\contribs~represents the number of contributors to the project.}
 \label{fig:spark-apps-stats}
-\vspace{-5mm}
 \end{figure}
 
 
@@ -2484,7 +2411,6 @@ enforce the safety of all those closures.
 
 \section{Case Study}
 \label{sec:case-studies}
-\vspace{-1mm}
 
 %\subsection{More Robust Distribution of Closures}
 
@@ -2495,6 +2421,8 @@ In Spark, these patterns are expressed using higher-order functions, like \verb|
 
 The following typical pattern was extracted from a code base used in production:
 
+\noindent%
+\begin{minipage}{\linewidth}
 \begin{minted}{scala}
 class GenericOp(sc: SparkContext, mapping: Map[String, String]) {
   private var cachedSessions: spark.RDD[Session] = ...
@@ -2513,6 +2441,9 @@ class GenericOp(sc: SparkContext, mapping: Map[String, String]) {
   }
 }
 \end{minted}
+\end{minipage}
+
+
 \noindent
 The \verb|doOp| method performs operations on the RDD \verb|cachedSessions|. \verb|GenericOp| has a parameter of type \verb|SparkContext|, the main entry point for functionality provided by Spark, and a parameter of type \verb|Map[String, String]|. The main computation is a chain of invocations of \verb|map|, \verb|reduceByKey|, and \verb|collectAsMap|. To ensure that the argument closures of \verb|map| and \verb|reduceByKey| are serializable, the code follows two conventions: first, instead of defining \verb|mapFun| and \verb|reduceFun| as methods, they are defined using lambdas stored in local variables. Second, instead of using the \verb|mapping| parameter directly, it is first copied into a local variable \verb|localMapping|. The reason for the first convention is that in Scala converting a method to a function implicitly captures a reference to the enclosing object. However, \verb|GenericOp| is not serializable, since it refers to a \verb|SparkContext|. The reason for the second convention is that using \verb|mapping| directly would result in \verb|mapFun| capturing \verb|this|.
 
@@ -2580,9 +2511,59 @@ In the above example, capturing a mutable object (or, in fact, any object of typ
 % \item Distributed pipelines / distributed streams
 % \end{itemize}
 
-\section{Other Related Work}
+\section{Related Work}
 \label{sec:related-work}
-\vspace{-1mm}
+% \vspace{-1mm}
+
+Cloud Haskell~\cite{CloudHaskell} provides statically guaranteed-serializable
+closures by either rejecting environments outright, or by allowing manual
+capturing, requiring the user to explicitly specify and pre-serialize the
+environment in combination with top-level functions (enforced using a new
+\verb|Static| type constructor). That is, in Cloud Haskell, to create a
+serializable closure, one must explicitly pass the serialized environment as a
+parameter to the function -- this requires users to have to refactor closures
+they wish to be made serializable. In contrast, spores
+do not require users to manually factor out, manage, and serialize their
+environment; spores require only that {\em what} is captured is specified, not
+{\em how}. Furthermore, spores are more general than Cloud Haskell's
+serializable closures; user-defined type constraints enable spores to
+express more properties than just serializability, like thread-safety,
+immutability, or any other user-defined property. In addition, spores allow
+restricting captured types in a way that is integrated with object-oriented
+concerns, such as subtyping and open class hierarchies.
+
+% In industry, a number of languages have adopted or proposed pragmatic
+% solutions to allow control over the environment of closures.
+
+C++11~\cite{CplusplusLambas} has introduced syntactic rules for explicit
+capture specifications that indicate which variables are captured and how (by
+reference or by copy). Since the capturing semantics is purely
+syntactic, a capture specification is only enforced at closure creation time.
+Thus, when composing two closures, the capture semantics is not preserved.
+Spores, on the other hand, capture such specifications at the level of types,
+enabling composability. Furthermore, spores' type constraints enable more
+general type-directed control over capturing than capture-by-value or
+capture-by-reference alone.
+
+A preliminary proposal for closures in the Rust
+language~\cite{RustFunctions} allows describing the closed-over variables
+in the environment using closure bounds, requiring captured types to implement
+certain traits. Closure bounds are limited to a small set of built-in
+traits to enforce properties like sendability. Spores on the other hand enable
+user-defined property definition, allowing for greater customizability of
+closure capturing semantics. Furthermore, unlike spores, the environment of a
+closure in Rust must always be allocated on the stack (although not necessarily the
+top-most stack frame).
+
+{Java 8}~\cite{JavaLambdas} introduces a limited type of
+closure which is only permitted to capture variables that are
+effectively-final. Like with Scala's standard closures, variable capture is
+implicit, which can lead to accidental captures that spores are designed to
+avoid. Although serializability can be requested at the level of the type
+system using newly-introduced intersection types in \mbox{Java 8}, there is no
+guarantee about the absence of runtime exceptions, as there is for spores.
+Finally, spores additionally allow specifying type-based constraints for
+captured variables that are more general than serializability alone.
 
 Parallel closures~\cite{ParallelClosures} are a variation of closures that
 make data in the environment available using read-only references using a type
@@ -2641,14 +2622,13 @@ support for functions and closures, but without constraints.
 
 \section{Conclusion}
 \label{sec:conclusion}
-\vspace{-1mm}
 
-We've presented a type-based foundation for closures, called spores, designed
-to avoid various hazards that arise particularly in concurrent or distributed
-settings. We have presented a flexible type system for spores which enables
-composability of differently-constrained spores as well as custom user-defined
-type constraints. We formalize and present a full soundness proof, as well as
-an implementation of our approach in Scala.
+This chapter presented a type-based foundation for closures, called spores,
+designed to avoid various hazards that arise particularly in concurrent or
+distributed settings. We have presented a flexible type system for spores which
+enables composability of differently-constrained spores as well as custom
+user-defined type constraints. We formalize and present a full soundness proof,
+as well as an implementation of our approach in Scala.
 
 A key takeaway of our approach is that including type information of captured
 variables in the type of the spore enables a number of previously impossible
