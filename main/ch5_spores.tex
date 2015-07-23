@@ -1254,11 +1254,11 @@ context bounds, we present generalized composition rules for the types of
 spores with such constraints.
 
 To precisely describe the composition rules, we introduce the following
-notation: the function $Excluded$ returns, for a given refinement type, the
-set of types that are excluded; the function $Captured$ returns, for a given
+notation: the function {\em Excluded} returns, for a given refinement type, the
+set of types that are excluded; the function {\em Captured} returns, for a given
 refinement type, the list of types that are captured. Using these two
 mathematical functions, we can precisely specify how the type members of the
-resulting spore refinement type are computed. (We use the syntax $.type$
+resulting spore refinement type are computed. (We use the syntax {\em.type}
 to refer to the singleton types of the argument spores and the result,
 respectively.)
 
@@ -2046,7 +2046,7 @@ The type soundness proof (see Section~\ref{sec:soundness}) guarantees several im
 
 \item Application of spores: for each property name $pn$, it is ensured that the dynamic types of all captured variables are contained in the type family $pn$ maps to ($P(pn)$).
 
-\item Dynamically, a spore only accesses its parameter and the variables in its header.
+\item Dynamically, a spore only accesses its parameter(s) and the variables in its header.
 
 \item The properties computed for a composition of two spores is a safe approximation of the properties that are dynamically required.
 
@@ -2419,10 +2419,10 @@ using well-known map/reduce computation patterns.
 
 In Spark, these patterns are expressed using higher-order functions, like \verb|map|, applied to the ``resilient distributed dataset'' (RDD) abstraction. However, to avoid unexpected runtime exceptions due to unserializable closures when passing closures to RDDs, programmers must adopt conventions that are subtle and unchecked by the Scala compiler.
 
-The following typical pattern was extracted from a code base used in production:
+The pattern shown in Figure~\ref{fig:typical-pattern-in-production} is a common
+pattern that was extracted from a code base used in production.
 
-\noindent%
-\begin{minipage}{\linewidth}
+\begin{figure}[ht!]
 \begin{minted}{scala}
 class GenericOp(sc: SparkContext, mapping: Map[String, String]) {
   private var cachedSessions: spark.RDD[Session] = ...
@@ -2441,11 +2441,25 @@ class GenericOp(sc: SparkContext, mapping: Map[String, String]) {
   }
 }
 \end{minted}
-\end{minipage}
+\caption{Conventions used in production to avoid serialization errors.}
+\label{fig:typical-pattern-in-production}
+\end{figure}
 
-
-\noindent
-The \verb|doOp| method performs operations on the RDD \verb|cachedSessions|. \verb|GenericOp| has a parameter of type \verb|SparkContext|, the main entry point for functionality provided by Spark, and a parameter of type \verb|Map[String, String]|. The main computation is a chain of invocations of \verb|map|, \verb|reduceByKey|, and \verb|collectAsMap|. To ensure that the argument closures of \verb|map| and \verb|reduceByKey| are serializable, the code follows two conventions: first, instead of defining \verb|mapFun| and \verb|reduceFun| as methods, they are defined using lambdas stored in local variables. Second, instead of using the \verb|mapping| parameter directly, it is first copied into a local variable \verb|localMapping|. The reason for the first convention is that in Scala converting a method to a function implicitly captures a reference to the enclosing object. However, \verb|GenericOp| is not serializable, since it refers to a \verb|SparkContext|. The reason for the second convention is that using \verb|mapping| directly would result in \verb|mapFun| capturing \verb|this|.
+Here, the \verb|doOp| method performs operations on the RDD
+\verb|cachedSessions|. \verb|GenericOp| has a parameter of type
+\verb|SparkContext|, the main entry point for functionality provided by Spark,
+and a parameter of type \verb|Map[String, String]|. The main computation is a
+chain of invocations of \verb|map|, \verb|reduceByKey|, and \verb|collectAsMap|.
+To ensure that the argument closures of \verb|map| and \verb|reduceByKey| are
+serializable, the code follows two conventions: first, instead of defining
+\verb|mapFun| and \verb|reduceFun| as methods, they are defined using lambdas
+stored in local variables. Second, instead of using the \verb|mapping| parameter
+directly, it is first copied into a local variable \verb|localMapping|. The
+reason for the first convention is that in Scala converting a method to a
+function implicitly captures a reference to the enclosing object. However,
+\verb|GenericOp| is not serializable, since it refers to a \verb|SparkContext|.
+The reason for the second convention is that using \verb|mapping| directly would
+result in \verb|mapFun| capturing \verb|this|.
 
 \subsubsection{Applying Spores}
 
@@ -2594,7 +2608,7 @@ HdpH~\cite{HDPH} generalizes Cloud Haskell's closures in several aspects:
 first, closures can be transformed without eliminating them. Second,
 unnecessary serialization is avoided, e.g., when applying a closure
 immediately after creation. Otherwise, the discussion of Cloud Haskell in
-Section~\ref{sec:sel-rel-work} also applies to HdpH. Delimited
+above also applies to HdpH. Delimited
 continuations~\cite{DelimitedContinuations} represent a way to serialize
 behavior in Scala, but don't resolve any of the problems of normal Scala
 closures when it comes to accidental capture, as spores do.
