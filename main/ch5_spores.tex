@@ -927,10 +927,12 @@ information (and later, constraints) of spores when they are composed.
 
 For example, assume we are given two spores \verb|s1| and \verb|s2| with types:
 
+\begin{minipage}{\linewidth}
 \begin{minted}{scala}
     s1: Spore[Int, String] { type Captured = (String, Int) }
     s2: Spore[String, Int] { type Captured = Nothing }
 \end{minted}
+\end{minipage}
 
 \noindent The fact that the \verb|Captured| type in \verb|s2| is defined to be
 \verb|Nothing| means that the spore does not capture anything (\verb|Nothing|
@@ -1166,7 +1168,7 @@ Spores allow expressing such a requirement using a notion of implicit {\em
 properties}. The idea is that if there is an implicit value\footnote{An implicit value is a value in \textit{implicit scope} that is statically selected based on its type.}
 of type \verb|Property[Pickler]| in scope at the
 point where a spore is created, then it is enforced that all captured types in
-the spore header have an instance of the \verb|Pickler| type class
+the spore header have an instance of the \verb|Pickler| type class:
 % \footnote{A type class is a combination of a generic trait and a set of implicit values that provide type-specialized implementations of that trait. It's an alternative for providing implementations of generic interfaces and a way to automatically dispatch to them.}:
 
 \begin{minted}{scala}
@@ -1235,6 +1237,7 @@ object safe {
 \noindent
 The next step is to mark selected types as immutable by defining an implicit object extending the desired list of types, each type wrapped in the \verb|Immutable| type constructor:
 
+\begin{minipage}{\linewidth}
 \begin{minted}{scala}
 object safe {
   ...
@@ -1243,6 +1246,7 @@ object safe {
     Immutable[Set[_]] with Immutable[Seq[_]] with ...
 }
 \end{minted}
+\end{minipage}
 
 \noindent
 The above definitions allow us to create spores that are guaranteed to capture
@@ -1389,7 +1393,7 @@ Transitive properties expressed using known techniques, \eg generics (Zibin
 etal's OIGJ system~\cite{Zibin2010} for transitive immutability) or annotated types, can be
 enforced for captured types using custom spore properties. Instead of merely
 tagging types, implicit macros can generate type class instances for all types
-satisfying a predicate. For example, using OIGJ we can define an implicit macro
+satisfying a predicate. For example, using OIGJ we can define an implicit macro:
 
 \begin{minted}{scala}
 implicit def isImmutable[T: TypeTag]: Immutable[T]
