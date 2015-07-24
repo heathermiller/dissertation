@@ -542,10 +542,6 @@ defines the spore header of the result spore, as well as its properties. The
 properties of the result spore are restricted to those that are satisfied by the
 captured variables of both argument spores.
 
-\footnotetext{For the sake of brevity, here we omit the standard evaluation
-rules. The complete set of evaluation rules can be found in the accompanying
-technical report~\cite{SporesFormally}}
-
 \begin{figure*}[ht!]
   \centering
 \begin{mathpar}
@@ -578,13 +574,12 @@ technical report~\cite{SporesFormally}}
 \subsection{Soundness}\label{appdx:soundness}
 
 This section presents a soundness proof of the spore type system. The proof is
-based on a pair of progress and preservation theorems~\cite{WrightF94}. A
-complete proof of soundness appears in the companion technical
-report~\cite{SporesFormally}. In addition to standard lemmas, such as
-Lemma~\ref{appdx:lem:substitution} and Lemma~\ref{appdx:lem:weak}, we also prove a lemma
-specific to our type system, namely Lemma~\ref{appdx:lem:pres-import}, which ensures
-types are preserved under property import. Soundness of the type system follows
-from Theorem~\ref{appdx:th:progress} and Theorem~\ref{appdx:th:pres}.
+based on a pair of progress and preservation theorems~\cite{WrightF94}. In
+addition to standard lemmas, such as Lemma~\ref{appdx:lem:substitution} and
+Lemma~\ref{appdx:lem:weak}, we also prove a lemma specific to our type system,
+namely Lemma~\ref{appdx:lem:pres-import}, which ensures types are preserved
+under property import. Soundness of the type system follows from
+Theorem~\ref{appdx:th:progress} and Theorem~\ref{appdx:th:pres}.
 
 \begin{lemma}
 \emph{(Canonical forms)}

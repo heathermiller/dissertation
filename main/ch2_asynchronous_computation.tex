@@ -1,12 +1,38 @@
-\chapter{Asynchronous Computation}
+\chapter{Asynchronous Parallelism}
 
-A non-numbered chapter\dots
+Now a days, providing a modest experience on a mobile app, or even rendering
+simple web pages typically requires the collaboration of dozens of network
+services each speaking many different languages or protocols to one another.
+Such systems are one of many flavors of a {\em distributed system}, and as such
+must coordinate between many network requests to, as quickly and reliably as
+possible, piece together an interface or some other user experience.
+
+Responsiveness is a requirement. Yet providing a responsive experience is at
+odds with the need to piece together the results from many calls over the
+network to other services. Synchronously making a request to a remote service
+and blocking, or waiting, until that request is fulfilled in order to move on to
+the next request is slow -- roundtrip network communication is known to be
+1,000,000 to 10,000,000 times slower than roundtrips to main
+memory~\cite{LatencyNumbersEveryProgrammerShouldKnow}.
+
+Asynchronous programming solves this problem by separating the execution of
+individual tasks (\eg calls to network services) from the main program flow.
+This reduces blocking because rather than stopping a thread to stop and wait on
+the completion of another task. Instead, a separate task is simply scheduled to
+proceed when the resource its waiting for becomes available. Thus freeing up the
+thread that would otherwise be waiting to do more meaningful work, typically in
+parallel.
+% That is, Unlike conventional parallelism, asynchronous parallelism
+
+In this chapter, we will see two abstractions for asynchronous programming;
+functionally-inspired {\em futures and promises} in Scala~\cite{Futures} in
+Section~\ref{sec:futures} and a generalization of futures to a pool or
+multiset-type data structure called {\em FlowPools}~\cite{FlowPools} in
+Section~\ref{sec:flowpools}.
 
 \section{Motivation}
-\section{Futures}
-\section{FlowPools}
 
-\section{Introduction}
+Asynchronous computation, \eg managing requests.
 
 Multicore architectures have become ubiquitous-- even most mobile devices now
 ship with multiple core processors. Yet parallel programming has yet to enter
@@ -25,10 +51,18 @@ control dependencies. This allows one to reason sequentially about the
 intended behavior of their program, meanwhile enabling the underlying
 framework to effectively extract parallelism.
 
-In this paper, we present the design and implementation of FlowPools, a
-fundamental dataflow collections abstraction which can be used as a building
-block for larger and more complex \textit{deterministic} and parallel
-dataflow programs. Our FlowPool abstraction is backed by an efficient
+\section{Futures}
+\label{sec:futures}
+
+A fundamental building block of dataflow is the notion of {\em futures and
+promises}.
+
+\section{FlowPools}
+\label{sec:flowpools}
+
+{\em FlowPools} are a  fundamental dataflow collections abstraction which can be
+used as a building block for larger and more complex \textit{deterministic} and
+parallel dataflow programs. Our FlowPool abstraction is backed by an efficient
 non-blocking data structure.
 %, which we go on to prove is lock-free. ---> no need to say this twice, see end of paragraph
 As a result, our data structure benefits from the increased robustness
