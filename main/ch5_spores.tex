@@ -10,7 +10,7 @@ and serialized.
 
 \section{Introduction}
 
-Scala is not homoiconic. We cannot not treat code as data.
+% Scala is not homoiconic. We cannot not treat code as data.
 
 % The traditional view of software development as being focused on a program running
 % on a single machine, interacting directly with the user, has become largely
@@ -22,20 +22,20 @@ Scala is not homoiconic. We cannot not treat code as data.
 % interact in typically asynchronous, reactive ways with other clients or
 % services.
 
-With the growing trend towards cloud computing, mobile applications, and big data,
-distributed programming has entered the mainstream. Popular paradigms in software
-engineering such as software as a service (SaaS), RESTful services, or the rise
-of a multitude of systems for big data processing and interactive
-analytics, evidence this trend.
+With the rise of big data analytics, and our ongoing migration to mobile
+applications and ``the cloud'', distributed programming has entered the
+mainstream. Popular paradigms in software engineering such as software as a
+service (SaaS), RESTful services, or the rise of a multitude of systems for big
+data processing and interactive analytics evidence this trend.
 
-Meanwhile, at the same time, functional programming has been undeniably
-gaining traction in recent years, as is evidenced by the ongoing trend of
-traditionally object-oriented or imperative languages being extended with
-functional features, such as lambdas in \mbox{Java 8}~\cite{JavaLambdas},
-C++11~\cite{CplusplusLambas}, and Visual Basic 9~\cite{Meijer}, the perceived
-importance of functional programming in general empirical studies on software
-developers~\cite{PLAdoption}, and the popularity of functional
-programming massively online open courses (MOOCs)~\cite{Miller2014}.
+At the same time, functional programming has also been gaining traction, as is
+evidenced by the ongoing trend of traditionally object-oriented or imperative
+languages being extended with functional features, such as lambdas in \mbox{Java
+8}~\cite{JavaLambdas}, C++11~\cite{CplusplusLambas}, and Visual Basic
+9~\cite{Meijer}, the perceived importance of functional programming in general
+empirical studies on software developers~\cite{PLAdoption}, and the popularity
+of functional programming massively online open courses
+(MOOCs)~\cite{Miller2014}.
 
 % , where the
 % fundamental idea is to distribute data across nodes/threads and to perform the
@@ -46,13 +46,14 @@ features within object-oriented communities is the basic philosophy of
 transforming immutable data by applying first-class functions, and the
 observation that this functional style simplifies reasoning about data in
 parallel, concurrent, and distributed code. A popular and well-understood
-example of this style of programming for which many popular frameworks have
-come to fruition is functional data-parallel programming.
-Examples across functional and object-oriented paradigms include \mbox{Java
-8}'s monadic-style optionally parallel collections~\cite{JavaLambdas}, Scala's
+example of this style of programming for which many popular frameworks have come
+to fruition is functional data-parallel programming (FDP). Examples of FDP
+across functional and object-oriented paradigms include \mbox{Java 8}'s
+monadic-style optionally parallel collections~\cite{JavaLambdas}, Scala's
 parallel~\cite{ScalaParColls} and concurrent dataflow~\cite{FlowPools}
-collections, Data Parallel Haskell~\cite{DataParallelHaskell}, CnC~\cite{CnC}, Nova~\cite{Nova}, and Haskell's \verb|Par|
-monad~\cite{HaskellPar} to name a few.
+collections, Data Parallel Haskell~\cite{DataParallelHaskell}, CnC~\cite{CnC},
+Nova~\cite{Nova}, and Haskell's \verb|Par| monad~\cite{HaskellPar} to name a
+few.
 
 % Data-parallel programming has been established as a particularly successful
 % and well-understood form of parallel programming across both programming
@@ -63,12 +64,11 @@ monad~\cite{HaskellPar} to name a few.
 % safety, and verification opportunities~\cite{Nova}.
 
 In the context of distributed programming, data-parallel frameworks like
-MapReduce~\cite{MapReduce} and Spark~\cite{Spark} are designed
-around functional patterns where closures are
-transmitted across cluster nodes to large-scale persistent datasets. As a result of the ``big data'' revolution,
-these frameworks have become very popular, in turn further highlighting the
-need to be able to reliably and safely serialize and transmit closures over
-the network.
+MapReduce~\cite{MapReduce} and Spark~\cite{Spark} are designed around functional
+patterns where closures are transmitted across cluster nodes to large-scale
+persistent datasets. As a result of the ``big data'' revolution, these
+frameworks have become very popular, in turn further highlighting the need to be
+able to reliably and safely serialize and transmit closures over the network.
 
 % making the robust distribution of computations and % closures
 % essential.
