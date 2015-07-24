@@ -33,15 +33,16 @@ to provide high-level, declarative APIs.
 %  -- the declarative, data-centric interface offered by such
 % systems is a boon for mathematically-oriented data analytics.
 
-However, these frameworks are built atop of tall stacks of typically
-imperative and untyped code, losing most of the benefits enjoyed by the users
-of their high-level APIs. Consequently, concerns central to distributed
-systems such as concurrency and fault tolerance become more difficult to
-reason about and realize in practice. Some language features, like closures,
-are not able to be reliably distributed. Yet other problems manifest themselves
-in all layers of the stack, surprising users and impacting ease-of-use,
-complicating maintenance, and losing opportunities for optimization. Some such
-problems include:
+% However, these frameworks are built atop of tall stacks of typically
+% imperative and untyped code, losing most of the benefits enjoyed by the users
+% of their high-level APIs. Consequently, concerns central to distributed
+% systems such as concurrency and fault tolerance become more difficult to
+% reason about and realize in practice. Some language features, like closures,
+% are not able to be reliably distributed.
+
+Yet problems manifest themselves throughout all layers of the stack of such
+systems, surprising users and impacting ease-of-use, complicating maintenance,
+and losing opportunities for optimization. Some such problems include:
 
 \begin{itemize}
 
@@ -51,7 +52,7 @@ designed with distribution in mind, often confronting users with hard-to-debug
 runtime errors. A common example is unsafe closure
 serialization~\cite{Spores}.
 
-\item {\bf Complicated Maintenance} Typically, only high-level user-facing
+\item {\bf Complicated Maintenance} Often, only high-level user-facing
 abstractions are statically typed.  The absence of static types in lower
 layers of the system makes maintenance tasks, such as code refactorings, more
 difficult.
@@ -66,7 +67,7 @@ on the high overhead of serialization in widely-used runtime environments such
 as the JVM. This overhead is so important in practice that popular systems,
 like Spark~\cite{Spark} and Akka~\cite{Akka}, leverage alternative
 serialization frameworks such as Protocol Buffers~\cite{Protobuf}, Apache
-Avro~\cite{Avro}, or Kryo~\cite{Kryo}.
+Avro~\cite{Avro}, or Kryo~\cite{Kryo} to meet their performance requirements.
 
 \end{itemize}
 
@@ -147,10 +148,9 @@ a deterministic layer and a concurrent/distributed layer. Importantly,
 reasoning techniques for sequential programs are not invalidated by the
 distributed layer.
 
-\item {\bf\em A distributed implementation of the programming model} in and
-for Scala. We present experiments that show some of the benefits of the
-proposed design, and we report on a validation of spores in the context of
-distributed programming.
+\item {\bf\em An implementation of the programming model} in and for Scala. We
+present experiments that show some of the benefits of the proposed design, and
+we report on a validation of spores in the context of distributed programming.
 
 % \item {\bf\em A small experimental evaluation} to show the benefits of some of  the
 % proposed design decisions, and a validation of spores in the context of
@@ -342,11 +342,11 @@ directed acyclic graph (DAG) of transformations on distributed data.
 
 Importantly, since this DAG of computations is a persistent data structure
 itself, it is safe to exchange (copies of) subgraphs of a DAG between remote
-nodes. This enables a robust and easy-to-reason-about model of fault
-tolerance. We call subgraphs of a DAG lineages; lineages enable restoring the
-data of failed nodes through re-applying the transformations represented by
-their DAG. This sequence of applications must begin with data available from
-stable storage.
+nodes. This enables a robust and easy-to-reason-about model of fault tolerance.
+We call subgraphs of a DAG {\em lineages}; lineages enable restoring the data of
+failed nodes through re-applying the transformations represented by their DAG.
+This sequence of applications must begin with data available from stable
+storage.
 
 Central to our model is the careful use of laziness. Computations on
 distributed data are typically not executed eagerly; instead, applying a
@@ -426,7 +426,7 @@ to ensure that types being captured have certain properties.
 
 \vspace{-1mm}
 \begin{figure}[h!]
-\centering\includegraphics[width=0.75\columnwidth]{spore-shape.pdf}
+\centering\includegraphics[width=0.6\columnwidth]{spore-shape.pdf}
 \end{figure}
 \vspace{-1mm}
 
@@ -451,22 +451,23 @@ ensure that the \verb|map| method on \verb|RDD|s in Spark (a distributed
 collection) accepts only spores which do not capture \verb|SparkContext| (a
 non-serializable internal framework class).
 
-For a deeper understanding of spores, see
+For a deeper understanding of spores, see Chapter~\ref{ch:spores}.
 % either Appendix~\ref{appendix:spores} which covers the semantics of spores or
-the corresponding publication~\cite{Spores}.
+% the corresponding publication~\cite{Spores}.
 
 \begin{figure}[t!]
-\centering\includegraphics[width=0.8\columnwidth]{basic-diagram.pdf}
+\centering\includegraphics[width=0.6\columnwidth]{basic-diagram.pdf}
 \caption{Basic F-P model.}\label{fig:basic-diagram}
 \end{figure}
 
 \subsection{Basic Usage}
 
 We begin with a simple visual example to provide a feeling for the basics of the F-P
-model.\footnote{We also feel that, to visually illustrate a system evolving in
-both space and time, nothing beats a video animation. So, we've produced a
-short animation to provide visual intuition of the F-P model:
-\url{https://vimeo.com/120415626}}
+model.
+% \footnote{We also feel that, to visually illustrate a system evolving in
+% both space and time, nothing beats a video animation. So, we've produced a
+% short animation to provide visual intuition of the F-P model:
+% \url{https://vimeo.com/120415626}}
 
 The only way to interact with distributed data stored in silos is through the
 use of SiloRefs. A SiloRef can be thought of as an immutable handle to the
@@ -499,8 +500,8 @@ of the primitive operations available on SiloRefs and their semantics. We
 describe these in the following section.
 
 
-\begin{figure}[t!]
-\centering\includegraphics[width=\columnwidth]{bigger-dag.pdf}
+\begin{figure}[!htb]
+\centering\includegraphics[width=0.67\columnwidth]{bigger-dag.pdf}
 \caption{A simple DAG in the F-P model.}\label{fig:bigger-dag}
 \end{figure}
 
@@ -560,6 +561,7 @@ found in the \verb|adults| silo. In the following, \verb|flatMap| is used to
 create a silo of \verb|(Person, Vehicle)| pairs where the names of person and
 vehicle owner match (graphically shown in Figure~\ref{fig:bigger-dag}, part 2):
 
+\begin{figure*}
 \begin{minted}{scala}
 val vehicles: SiloRef[List[Vehicle]] = ...
 // adults that own a vehicle
@@ -578,6 +580,8 @@ val owners = adults.flatMap(spore {
     })
 })
 \end{minted}
+\end{figure*}
+
 \noindent
 Note that the spore passed to \verb|flatMap| declares the capturing of the
 \verb|vehicles| SiloRef in its so-called ``spore header.'' The spore header
@@ -765,6 +769,7 @@ the lineage of a SiloRef is extended. For this purpose, the introduced
 \verb|map| and \verb|flatMap| primitives are overloaded. For example,
 consider our previous example, but extended with a fault handler:
 
+\begin{figure*}
 \begin{minted}{scala}
 val persons: SiloRef[List[Person]] = ...
 val vehicles: SiloRef[List[Vehicle]] = ...
@@ -788,6 +793,7 @@ val owners: SiloRef[List[(Person, Vehicle)]] =
   adults.flatMap(computeOwners(vehicles),
                  computeOwners(vehicles2))
 \end{minted}
+\end{figure*}
 
 Importantly, in the \verb|flatMap| call on the last line, in addition to
 \verb|computeOwners(vehicles)|, the regular spore argument of \verb|flatMap|,
@@ -876,6 +882,7 @@ val s22: SiloRef[List[(K, Option[A], Option[B])]] =
 Then, we can use \verb|flatMap| to create a new silo which contains the
 elements of both silo \verb|s12| and silo \verb|s22|:
 
+\begin{figure*}
 \begin{minted}{scala}
 val combined = s12.flatMap(spore {
   val localS22 = s22
@@ -887,6 +894,7 @@ val combined = s12.flatMap(spore {
     })
 })
 \end{minted}
+\end{figure*}
 \noindent
 The combined silo contains triples of type \verb|(K, Option[A], Option[B])|.
 Using an additional \verb|map|, the collection can be sorted by key, and
@@ -919,6 +927,7 @@ yielding $N$ (local) silos.
 same range can be combined and materialized on the right destination host.
 \end{itemize}
 
+
 Using just the primitives introduced earlier, applying the partitioning
 function in this way would require $N$ \verb|map| invocations per silo. Thus,
 the performance of \verb|groupByKey| could be increased significantly using a
@@ -926,15 +935,7 @@ specialized combinator, say, ``mapPartition'' that would apply a given
 partitioning function to each key-value pair, simultaneously populating $N$
 silos (where $N$ is the number of ``buckets'' of the partitioning function).
 
-
-\subsection{Peer-to-Peer Patterns}\label{sec:decentral}
-
-To illustrate the decentralized nature of our model, consider the following
-example: the local host aggregates some data as soon as two silos
-\verb|vehicles| and \verb|persons| have been materialized. The aggregation
-result is then combined with a silo \verb|info| on local host. The final
-result is written to a distributed file system:
-
+\begin{figure}[!t]
 \begin{minted}{scala}
 object Utils {
   def aggregate(vs: SiloRef[List[Vehicle]],
@@ -959,12 +960,26 @@ val done    = info.flatMap(spore {
 })
 done.cache() // force computation
 \end{minted}
+\caption{Example of peer-to-peer style processing in F-P.}
+\label{fig:p2p}
+\end{figure}
+
+
+\subsection{Peer-to-Peer Patterns}\label{sec:decentral}
+
+To illustrate the decentralized nature of our model, consider the following
+example: the local host aggregates some data as soon as two silos
+\verb|vehicles| and \verb|persons| have been materialized. The aggregation
+result is then combined with a silo \verb|info| on local host. The final result
+is written to a distributed file system, shown in Figure~\ref{fig:p2p}.
+
 \noindent
 This program does not tolerate failures of the local host: if it fails before
 the computation is complete, the result is never written to the file. Using
 fault handlers, though, it is easy to introduce a backup host that takes over
-in case the local host fails at any point:
+in case the local host fails at any point, as shown in Figure~\ref{fig:backup-host}
 
+\begin{figure}[!ht]
 \begin{minted}{scala}
 val doCombine = spore {
   val localVehicles = vehicles
@@ -999,6 +1014,10 @@ val recovered = backup.flatMap(
 done.cache()      // force computation on local host
 recovered.cache() // force computation on backup host
 \end{minted}
+\caption{Using fault handlers to introduce a backup host in F-P.}
+\label{fig:backup-host}
+\end{figure}
+
 \noindent
 First, the local variables \verb|doCombine| and \verb|doWrite| refer to the
 verbatim spores passed to \verb|flatMap| and \verb|map| above. Second,
@@ -1188,24 +1207,79 @@ In the following we give a small-step operational semantics of the primitives of
   % \vspace{-3mm}
 \end{figure*}
 
-\paragraph{Notation and conventions.} We write $S' = S + (\iota \mapsto v)$ to express the fact that $S'$ maps $\iota$ to $v$ and otherwise agrees with $S$. We write $S(\iota) = \text{Some}(v)$ to express the fact that $S$ maps $\iota$ to $v$. We write $S(\iota) = \text{None}$ if $S$ does not have a mapping for $\iota$. Reduction is defined using reduction contexts~\cite{TAPL}. We omit the definition of reduction contexts, since they are completely standard.
+\paragraph{Notation and conventions.} We write $S' = S + (\iota \mapsto v)$ to
+express the fact that $S'$ maps $\iota$ to $v$ and otherwise agrees with $S$. We
+write $S(\iota) = \text{Some}(v)$ to express the fact that $S$ maps $\iota$ to
+$v$. We write $S(\iota) = \text{None}$ if $S$ does not have a mapping for
+$\iota$. Reduction is defined using reduction contexts~\cite{TAPL}. We omit the
+definition of reduction contexts, since they are completely standard.
 
-\paragraph{Configurations.} The reduction rules of the deterministic layer define transitions of \emph{host configurations} $(t, E, S)^h$ of host $h$ where $t$ is a term, $E$ is a message queue, and $S$ is a silo store. The reduction rules of the non-deterministic layer define transitions of sets $H$ of host configurations. The reduced host configurations are chosen non-deterministically in order to express concurrency between hosts.
+\paragraph{Configurations.} The reduction rules of the deterministic layer
+define transitions of \emph{host configurations} $(t, E, S)^h$ of host $h$ where
+$t$ is a term, $E$ is a message queue, and $S$ is a silo store. The reduction
+rules of the non-deterministic layer define transitions of sets $H$ of host
+configurations. The reduced host configurations are chosen non-deterministically
+in order to express concurrency between hosts.
 
-\paragraph{Fault handling.} In the interest of clarity we present the reduction rules in two steps. In the first step we explain simplified rules without fault handling semantics (Sections~\ref{sec:det-layer} and~\ref{sec:nondet-layer}). In the second step we explain how these simplified rules have to be refined in order to support the fault handling principles of our model (Section~\ref{sec:faults-opsem}).
+\paragraph{Fault handling.} In the interest of clarity we present the reduction
+rules in two steps. In the first step we explain simplified rules without fault
+handling semantics (Sections~\ref{sec:det-layer} and~\ref{sec:nondet-layer}). In
+the second step we explain how these simplified rules have to be refined in
+order to support the fault handling principles of our model
+(Section~\ref{sec:faults-opsem}).
 
 
 
 \subsubsection{Decentralized identification}
 
-A important property of our programming model is the fact that silos are uniquely identified using \emph{decentralized identifiers}. A decentralized identifier $\iota$ has two components: (a) the identifier of the host $h$ that created $\iota$, and (b) a name $i$ created fresh on $h$ (e.g., an integer value): $\iota = (h, i)$. Decentralized identifiers are important, since they reconcile two conflicting properties central to our model. The first property is building computation DAGs locally, without remote communication. This is possible using decentralized identifiers, since each host can generate new identifiers independently of other remote hosts. The second property is allowing SiloRefs to be freely copied between remote hosts. This is possible, since decentralized identifiers uniquely identify silos without the need for subsequent updates of their information; decentralized identifiers are immutable. This latter property is essential to enable computation DAGs that are \emph{immutable upon construction}. In our programming model, computation DAGs are created using the standard monadic operations of SiloRefs. In particular, the \texttt{flatMap} operation (monadic bind) in general requires that its argument spore captures SiloRefs that are subsequently copied to a remote host. Hence it is essential that SiloRefs and the decentralized identifiers they contain be freely copyable between remote hosts.
+A important property of our programming model is the fact that silos are
+uniquely identified using \emph{decentralized identifiers}. A decentralized
+identifier $\iota$ has two components: (a) the identifier of the host $h$ that
+created $\iota$, and (b) a name $i$ created fresh on $h$ (e.g., an integer
+value): $\iota = (h, i)$. Decentralized identifiers are important, since they
+reconcile two conflicting properties central to our model. The first property is
+building computation DAGs locally, without remote communication. This is
+possible using decentralized identifiers, since each host can generate new
+identifiers independently of other remote hosts. The second property is allowing
+SiloRefs to be freely copied between remote hosts. This is possible, since
+decentralized identifiers uniquely identify silos without the need for
+subsequent updates of their information; decentralized identifiers are
+immutable. This latter property is essential to enable computation DAGs that are
+\emph{immutable upon construction}. In our programming model, computation DAGs
+are created using the standard monadic operations of SiloRefs. In particular,
+the \texttt{flatMap} operation (monadic bind) in general requires that its
+argument spore captures SiloRefs that are subsequently copied to a remote host.
+Hence it is essential that SiloRefs and the decentralized identifiers they
+contain be freely copyable between remote hosts.
 
 
 \subsubsection{Deterministic layer}\label{sec:det-layer}
 
-We first consider the reduction rules of the deterministic layer shown in Figure~\ref{fig:opsem-determ}. The reduction rules for \texttt{map} (\textsc{R-Map}) and \texttt{flatMap} (\textsc{R-FMap}) do not involve communication with other hosts. In each case, a new SiloRef $r'$ is created that is derived from SiloRef $r$. The execution of the actual operation (\texttt{map} or \texttt{flatMap}, respectively) is deferred, and an object representing this derivation is returned. In both cases, the new SiloRef $r'$ refers to a silo created on host $h'$ by applying the spore value $p$ to the value of silo $r$. The first component of the Mapped and FMapped objects, $(h, i)$, is a fresh \emph{location} created by host $h$ to uniquely identify the result silo.
+We first consider the reduction rules of the deterministic layer shown in
+Figure~\ref{fig:opsem-determ}. The reduction rules for \texttt{map}
+(\textsc{R-Map}) and \texttt{flatMap} (\textsc{R-FMap}) do not involve
+communication with other hosts. In each case, a new SiloRef $r'$ is created that
+is derived from SiloRef $r$. The execution of the actual operation (\texttt{map}
+or \texttt{flatMap}, respectively) is deferred, and an object representing this
+derivation is returned. In both cases, the new SiloRef $r'$ refers to a silo
+created on host $h'$ by applying the spore value $p$ to the value of silo $r$.
+The first component of the Mapped and FMapped objects, $(h, i)$, is a fresh
+\emph{location} created by host $h$ to uniquely identify the result silo.
 
-Most reduction rules are enabled when the current redex is an \texttt{await} term. The reduction of a term $\texttt{await}(\iota)$ only continues when store $S$ maps location $\iota$ to value $v$. In all other cases, the current host removes the next message from its message queue $E$. As shown in Figure~\ref{fig:elems-opsem} there are two types of messages: requests (Req) and responses (Res). A response $\text{Res}(\iota, v)$ tells its receiver that the silo at location $\iota$ has value $v$. A request $\text{Req}(h, r, \iota)$ is sent on behalf of host $h$ to request the value of silo $r$ at location $\iota$. The reception of a response $\text{Res}(\iota, v)$ is handled by adding a mapping $(\iota \mapsto v)$ to the store (rule \textsc{R-Res}). The reception of a request $\text{Req}(h', r, \iota'')$ is handled locally if materialization of the requested silo $r$ is deferred and the parent silo $r'$ in $r$'s lineage has not been materialized either. In this case, the host sends a request to materialize $r'$ to itself.
+Most reduction rules are enabled when the current redex is an \texttt{await}
+term. The reduction of a term $\texttt{await}(\iota)$ only continues when store
+$S$ maps location $\iota$ to value $v$. In all other cases, the current host
+removes the next message from its message queue $E$. As shown in
+Figure~\ref{fig:elems-opsem} there are two types of messages: requests (Req) and
+responses (Res). A response $\text{Res}(\iota, v)$ tells its receiver that the
+silo at location $\iota$ has value $v$. A request $\text{Req}(h, r, \iota)$ is
+sent on behalf of host $h$ to request the value of silo $r$ at location $\iota$.
+The reception of a response $\text{Res}(\iota, v)$ is handled by adding a
+mapping $(\iota \mapsto v)$ to the store (rule \textsc{R-Res}). The reception of
+a request $\text{Req}(h', r, \iota'')$ is handled locally if materialization of
+the requested silo $r$ is deferred and the parent silo $r'$ in $r$'s lineage has
+not been materialized either. In this case, the host sends a request to
+materialize $r'$ to itself.
 
 
 \begin{figure*}[ht!]
@@ -1260,9 +1334,18 @@ Most reduction rules are enabled when the current redex is an \texttt{await} ter
 
 \subsubsection{Nondeterministic layer}\label{sec:nondet-layer}
 
-All reduction rules in the nondeterministic layer, shown in Figure~\ref{fig:opsem-nondeterm}, involve communication between two hosts.
+All reduction rules in the nondeterministic layer, shown in
+Figure~\ref{fig:opsem-nondeterm}, involve communication between two hosts.
 
-Reducing a term $\texttt{send}(r)$ appends a request $\text{Req}(h, r, \iota)$ to the message queue of host $h'$ of the requested silo $r$. In this case, host $h$ creates a unique location $\iota = (h, i)$ to identify the silo subsequently. Rules \textsc{R-Req1}, \textsc{R-Req2}, and \textsc{R-Req3} define the handling of request messages that cannot be handled locally. If the request can be serviced immediately (\textsc{R-Req1}), a response with the value $v$ of the requested silo $r$ is appended to the message queue of the requesting host $h'$. Rules \textsc{R-Req2} and \textsc{R-Reg3} handle cases where the requested silo is not already available in materialized form.
+Reducing a term $\texttt{send}(r)$ appends a request $\text{Req}(h, r, \iota)$
+to the message queue of host $h'$ of the requested silo $r$. In this case, host
+$h$ creates a unique location $\iota = (h, i)$ to identify the silo
+subsequently. Rules \textsc{R-Req1}, \textsc{R-Req2}, and \textsc{R-Req3} define
+the handling of request messages that cannot be handled locally. If the request
+can be serviced immediately (\textsc{R-Req1}), a response with the value $v$ of
+the requested silo $r$ is appended to the message queue of the requesting host
+$h'$. Rules \textsc{R-Req2} and \textsc{R-Reg3} handle cases where the requested
+silo is not already available in materialized form.
 
 
 
@@ -1387,7 +1470,7 @@ two main Scala extensions:
 
 \begin{itemize}
 
-\item First, Pickling,\footnote{\url{https://github.com/scala/pickling}} a
+\item First, Scala/Pickling,\footnote{\url{https://github.com/scala/pickling}} a
 type-safe and performant serialization library with an accompanying, optional
 macro extension that is focused on distributed programming. It is used for all
 serialization tasks. Our F-P implementation benefits from the maturity of
@@ -1410,12 +1493,14 @@ such as word count and group-by-join pipelines. Our prototype has also served
 as an experimentation platform for type-based optimizations, which we present
 in more detail below.
 
-Further, we maintain a growing collection of these toy distributed frameworks
-(built on top of F-P) and applications on top of them (such as data analytics)
-at \url{http://lampwww.epfl.ch/~hmiller/f-p/}.\footnote{Review note: this site
-is publicly accessible, has no tracking capabilities, and is linked to in
-talks and from other various webpages meaning it already gets public traffic.
-One may visit it without identity concerns.}
+% Further, we maintain a growing collection of these toy distributed frameworks
+% (built on top of F-P) and applications on top of them (such as data analytics)
+% at \url{http://lampwww.epfl.ch/~hmiller/f-p/}.
+
+% \footnote{Review note: this site
+% is publicly accessible, has no tracking capabilities, and is linked to in
+% talks and from other various webpages meaning it already gets public traffic.
+% One may visit it without identity concerns.}
 
 
 \subsection{Serialization in the presence of existential quantification}
@@ -1627,7 +1712,7 @@ behavior in the form of serializable closures is central to the F-P model.
 % specific world.
 
 
-\section{Conclusion and Future Work}
+\section{Conclusion}
 \label{sec:conclusion-future-work}
 
 We have presented F-P, a new programming model and principled substrate for
@@ -1646,18 +1731,6 @@ as well as numerous applications on top, and have discovered new ways to
 reconcile type-specific serializers with patterns of static typing common in
 distributed systems.
 
-A great deal of future work remains. In the short-term, we aim to continue to
-build different sorts of distributed frameworks and applications atop F-P in
-an effort to work towards a production-ready implementation of our model for
-consumption by the Scala community at large.
-
-In the long-term, we plan to better understand concerns of separate
-compilation in order to evaluate whether our model could be of help in
-coordinating between microservices.\footnote{Microservices are small,
-independent (separately-compiled) services running on different machines which
-communicate with each other to together make up a single and complex
-application. They are a predominant trend in industry amongst rich and
-complicated web-based services.}
 
 
 % Adapt this model for streaming computation. This would take coming up with a
