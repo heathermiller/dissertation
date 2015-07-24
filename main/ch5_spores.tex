@@ -1,8 +1,16 @@
 \chapter{Spores}
 
+In Chapter~\ref{ch:pickling}, we covered {\em object oriented picklers} and
+Scala/Pickling, a framework for automatically generating them. Throughout the
+presentation of Scala/Pickling, it was noted that serializing function closures,
+a first-class language construct in Scala, was beyond its capabilities. In this
+chapter, we see why serializing function closures is nontrivial, and introduce
+{\em spores}, an abstraction which enables closures to be statically analyzed
+and serialized.
+
 \section{Introduction}
 
-In Scala, we do not treat code as data. \todo{Maybe do a literature study of mobile code?}
+Scala is not homoiconic. We cannot not treat code as data.
 
 % The traditional view of software development as being focused on a program running
 % on a single machine, interacting directly with the user, has become largely
@@ -117,6 +125,8 @@ class MyCoolRddApp {
 }
 \end{minted}
 \end{minipage}
+
+
 \noindent
 In this example, the closure \verb|(x => x + shift(x))| is passed to the
 \verb|map| method of the distributed collection \verb|rdd| which requires
@@ -180,6 +190,8 @@ support user-defined type constraints. Finally, we argue that by principle
 of a type-based approach, spores can potentially benefit from optimization, further
 safety via type system extensions, and verification opportunities.
 
+\subsection{Design Constraints}
+
 The design of spores is guided by the following principles:
 
 \begin{itemize}
@@ -229,7 +241,7 @@ their users.
 % \subsection{Selected Related Work}\label{sec:sel-rel-work}
 
 
-\vspace{2mm}
+% \vspace{2mm}
 \subsection{Contributions}
 
 This chapter outlines the following contributions:
