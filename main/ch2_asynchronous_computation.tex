@@ -274,10 +274,11 @@ implementation of Java's ForkJoin pool~\cite{ForkJoin}.
 
 It's also possible to provide a custom \verb|ExecutionContext| to execute code
 which blocks on IO or performs long-running computations. For example one may
-implement a custom \verb|ExecutionContext| by simply importing the underlying
-execution scheme, such as an implementation of an event loop or a Java
-\verb|ExecutorService|, and implementing a few basic methods such as
-\verb|execute| and \verb|reportFailure|.
+implement a custom \verb|ExecutionContext| by simply extending the
+\verb|ExecutionContext| trait and importing the preferred execution scheme, such
+as an implementation of an event loop or a Java \verb|ExecutorService|, and then
+by  implementing a few basic methods such as \verb|execute| and
+\verb|reportFailure|.
 
 The intent of \verb|ExecutionContext| is to lexically scope code execution. That
 is, each method, class, file, package, or application should be the one to
@@ -290,6 +291,47 @@ callback execution can be configured separately.
 
 \subsection{Blocking}
 \label{sec:futures-blocking}
+
+Scala's futures and promises have been designed to be asynchronous in order to
+gain performance by avoiding blocking. Nonetheless, on occasion, the need to
+block in an application does unavoidably arise. Thus we cover the methods our
+framework provides both to manage blocking code, and to accommodate the need to
+block.
+
+As a running example, let's assume that we want to use a hypothetical API to
+fetch a potentially large list of images over the network given a list of URLs.
+Assume that the \verb|download| method for fetching each image is itself a
+blocking operation:
+
+\begin{minted}{scala}
+// Retrieve URLs from somewhere
+val urls: List[String] = ...
+
+// Download image (blocking operation)
+val imagesFuts: List[Future[...]] = urls.map {
+  url => future { blocking { download url } }
+}
+
+// Do something (display) when complete
+val futImages: Future[List[...]] = Future.sequence(imagesFuts)
+Await.result(futImages, 10 seconds).foreach(display)
+\end{minted}
+
+Here, \verb|imagesFuts| uses managed blocking via the method \verb|blocking|.
+\verb|blocking| notifies the thread pool that the block of code passed to it
+contains long-running or blocking operations. This allows the pool to
+temporarily spawn new workers to make sure that it never happens that all of the
+workers are blocked. This is done to prevent starvation in blocking
+applications. Note that the thread pool also knows when the code in a managed
+blocking block is complete--so it will remove the spare worker thread at that
+point, which means that the pool will shrink back down to its expected size.
+
+Later on, the \verb|Await| object used to ensure that \verb|display| is executed
+on the calling thread--\verb|Await.result| simply forces the current thread to
+wait until the future that it is passed is completed. (This uses managed
+blocking internally.) Here, \verb|Await.result| must be used to prevent the
+program's main thread from completing before \verb|imagesFuts| completes.
+
 
 \section{FlowPools}
 \label{sec:flowpools}
