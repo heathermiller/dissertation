@@ -313,84 +313,84 @@ n \in \mathbb{N}
 \caption{Syntax}\label{fig:syntax}
 \end{figure}
 
-\textbf{Determinism.}
-We claim that the FlowPool abstraction is
-\emph{deterministic} in the sense that a program computes the same
-result (which can also be an error) regardless of the interleaving of
-concurrent operations. Here, we give an outline of the determinism
-proof. A complete formal proof can be found in section
-\ref{appendix-determinism}.
-
-The following definitions and the determinism theorem are based on the
-language shown in Figure~\ref{fig:syntax}. The semantics of our core
-language is defined using reduction rules which define transitions
-between \emph{execution states}. An execution state is a pair $T~|~P$
-where $T$ is a set of concurrent threads and $P$ is a set of
-FlowPools. Each thread executes a \emph{term} of the core language
-(typically a sequence of terms).
-State of a thread is represented as the (rest of)
-the term that it still has to execute; this means there is a
-one-to-one mapping between threads and terms.
-For example, the semantics of \verb|append| is defined by the
-following reduction rule (a complete summary of all the rules can be
-found in the appendix):
-
-\infrule[\textsc{Append1}]
-{ t = p << v~;~t' \quad p = (vs, cbs, -1) \quad p' = (\set{v} \cup vs, cbs, -1)
-}
-{ \reduce {t, T} {p, P} {t', T} {p', P}
-}
-\noindent
-Append simply adds the value $v$ to the pool $p$, yielding a modified
-pool $p'$. Note that this rule can only be applied if the pool $p$ is
-not sealed (the seal size is $-1$). The rule for $foreach$ modifies
-the set of callback functions in the pool:
-
-\infrule[\textsc{Foreach2}]
-{ t = p~\texttt{foreach}~f~;~t' \quad p = (vs, cbs, n) \\
-  T' = \set{g(v)~|~g \in \set{f} \cup cbs, v \in vs} \quad p' = (vs, \set{f} \cup cbs, n)
-}
-{ \reduce {t, T} {p, P} {t', T, T'} {p', P}
-}
-\noindent
-This rule only applies if $p$ is sealed at size $n$, meaning that
-no more elements will be appended later. Therefore, an
-invocation of the new callback $f$ is scheduled for each
-element $v$ in the pool. Each invocation creates a new thread in $T'$.
-
-Programs are built by first creating one or more FlowPools using
-\texttt{create}. Concurrent threads can then be started by (a)
-appending an element to a FlowPool, (b) sealing the FlowPool
-and (c) registering callback functions (\texttt{foreach}).
-
-\begin{definitiontwo}[Termination]
-A term $t$ terminates with result $P$ if its reduction ends in
-execution state $\set{t : t = \set{\epsilon}}~|~P$.
-\end{definitiontwo}
-
-\begin{definitiontwo}[Interleaving]
-  Consider the reduction of a term $t$: $T_1~|~P_1 \;\longrightarrow\;
-  T_2~|~P_2 \;\longrightarrow\; \ldots \;\longrightarrow\;
-  \set{t : t = \set{\epsilon}}~|~P_n$. An \emph{interleaving} is a reduction of $t$
-  starting in $T_1~|~P_1$ in which reduction rules are
-  applied in a different order.
-\end{definitiontwo}
-
-%\begin{definitiontwo}[Valid Interleaving]
-%An interleaving $S', c, S''$ of a reduction sequence $S$ is \emph{valid}
-%\emph{iff} for any reduction step $c$ using rule (\textsc{Create}), if
-%$c$ creates pool $p$, $p$ is not used in any reduction step in $S'$.
-%\end{definitiontwo}
-
-\begin{definitiontwo}[Determinism]
-The reduction of a term $t$ is \emph{deterministic} \emph{iff} either
-(a) $t$ does not terminate for any interleaving, or (b) $t$ always
-terminates with the same result for all interleavings.
-\end{definitiontwo}
-
-\begin{theoremtwo}[FlowPool Determinism]
-Reduction of terms $t$ is deterministic.
-\end{theoremtwo}
+% \textbf{Determinism.}
+% We claim that the FlowPool abstraction is
+% \emph{deterministic} in the sense that a program computes the same
+% result (which can also be an error) regardless of the interleaving of
+% concurrent operations. Here, we give an outline of the determinism
+% proof. A complete formal proof can be found in section
+% \ref{appendix-determinism}.
+%
+% The following definitions and the determinism theorem are based on the
+% language shown in Figure~\ref{fig:syntax}. The semantics of our core
+% language is defined using reduction rules which define transitions
+% between \emph{execution states}. An execution state is a pair $T~|~P$
+% where $T$ is a set of concurrent threads and $P$ is a set of
+% FlowPools. Each thread executes a \emph{term} of the core language
+% (typically a sequence of terms).
+% State of a thread is represented as the (rest of)
+% the term that it still has to execute; this means there is a
+% one-to-one mapping between threads and terms.
+% For example, the semantics of \verb|append| is defined by the
+% following reduction rule (a complete summary of all the rules can be
+% found in the appendix):
+%
+% \infrule[\textsc{Append1}]
+% { t = p << v~;~t' \quad p = (vs, cbs, -1) \quad p' = (\set{v} \cup vs, cbs, -1)
+% }
+% { \reduce {t, T} {p, P} {t', T} {p', P}
+% }
+% \noindent
+% Append simply adds the value $v$ to the pool $p$, yielding a modified
+% pool $p'$. Note that this rule can only be applied if the pool $p$ is
+% not sealed (the seal size is $-1$). The rule for $foreach$ modifies
+% the set of callback functions in the pool:
+%
+% \infrule[\textsc{Foreach2}]
+% { t = p~\texttt{foreach}~f~;~t' \quad p = (vs, cbs, n) \\
+%   T' = \set{g(v)~|~g \in \set{f} \cup cbs, v \in vs} \quad p' = (vs, \set{f} \cup cbs, n)
+% }
+% { \reduce {t, T} {p, P} {t', T, T'} {p', P}
+% }
+% \noindent
+% This rule only applies if $p$ is sealed at size $n$, meaning that
+% no more elements will be appended later. Therefore, an
+% invocation of the new callback $f$ is scheduled for each
+% element $v$ in the pool. Each invocation creates a new thread in $T'$.
+%
+% Programs are built by first creating one or more FlowPools using
+% \texttt{create}. Concurrent threads can then be started by (a)
+% appending an element to a FlowPool, (b) sealing the FlowPool
+% and (c) registering callback functions (\texttt{foreach}).
+%
+% \begin{definitiontwo}[Termination]
+% A term $t$ terminates with result $P$ if its reduction ends in
+% execution state $\set{t : t = \set{\epsilon}}~|~P$.
+% \end{definitiontwo}
+%
+% \begin{definitiontwo}[Interleaving]
+%   Consider the reduction of a term $t$: $T_1~|~P_1 \;\longrightarrow\;
+%   T_2~|~P_2 \;\longrightarrow\; \ldots \;\longrightarrow\;
+%   \set{t : t = \set{\epsilon}}~|~P_n$. An \emph{interleaving} is a reduction of $t$
+%   starting in $T_1~|~P_1$ in which reduction rules are
+%   applied in a different order.
+% \end{definitiontwo}
+%
+% %\begin{definitiontwo}[Valid Interleaving]
+% %An interleaving $S', c, S''$ of a reduction sequence $S$ is \emph{valid}
+% %\emph{iff} for any reduction step $c$ using rule (\textsc{Create}), if
+% %$c$ creates pool $p$, $p$ is not used in any reduction step in $S'$.
+% %\end{definitiontwo}
+%
+% \begin{definitiontwo}[Determinism]
+% The reduction of a term $t$ is \emph{deterministic} \emph{iff} either
+% (a) $t$ does not terminate for any interleaving, or (b) $t$ always
+% terminates with the same result for all interleavings.
+% \end{definitiontwo}
+%
+% \begin{theoremtwo}[FlowPool Determinism]
+% Reduction of terms $t$ is deterministic.
+% \end{theoremtwo}
 
 
 \section{Proof of Correctness}
@@ -414,35 +414,39 @@ $term.callbacks$, a set of functions $f \in Elem \Rightarrow Unit$.
 
 We define the following functions:
 
-\begin{eqnarray*}
+\begin{align*}
 following(b: Block) =
 \begin{cases}
 \emptyset & \text{if b.next = null,}
 \\
 b.next \cup following(b.next) & \text{otherwise}
 \end{cases}
-\end{eqnarray*}
+\end{align*}
 
-\begin{eqnarray*}
+\vspace{-1cm}
+\begin{align*}
 reachable(b: Block) = \{ b \} \cup following(b)
-\end{eqnarray*}
+\end{align*}
 
-\begin{eqnarray*}
+\vspace{-1cm}
+\begin{align*}
 last(b: Block) = b' : b' \in reachable(b) \wedge b'.next = null
-\end{eqnarray*}
+\end{align*}
 
-\begin{eqnarray*}
+\vspace{-1cm}
+\begin{align*}
 size(b: Block) = | \{ x : x \in b.array \wedge x \in Elem \} |
-\end{eqnarray*}
+\end{align*}
 
 Based on them we define the following relation:
 
-\begin{eqnarray*}
+\vspace{-0.7cm}
+\begin{align*}
 reachable(b, c) \Leftrightarrow c \in reachable(b)
-\end{eqnarray*}
+\end{align*}
 \end{definitiontwo}
 
-
+\vspace{-1cm}
 \begin{definitiontwo}[FlowPool]
 A \textbf{FlowPool} $pool$ is an object that
 has a reference $pool.start$, to the first block $b_0$ (with $b_0.blockIndex=0$),
@@ -464,37 +468,40 @@ atomic write or CAS instruction that changes the FlowPool state.
 We say that the FlowPool \textbf{has an element} $e$ at some time
 $t_0$ if and only if the relation $hasElem(start, e)$ holds.
 
-\begin{eqnarray*}
+\vspace{-1cm}
+\begin{align*}
 hasElem(start, e) \Leftrightarrow \exists b \in reachable(start), e
 \in b.array
-\end{eqnarray*}
+\end{align*}
 
 We say that the FlowPool \textbf{has a callback} $f$ at some time
 $t_0$ if and only if the relation $hasCallback(start, f)$ holds.
 
-\begin{eqnarray*}
+\vspace{-1cm}
+\begin{align*}
 hasCallback(start, f) &\Leftrightarrow& \forall b = last(start), b.array
 = x^P \cdot t \cdot y^N, x \in Elem, \\
 & & t = Terminal(seal, callbacks), f \in callbacks
-\end{eqnarray*}
+\end{align*}
 
 We say that a callback $f$ in a FlowPool \textbf{will be called} for
 the element $e$ at some time $t_0$ if and only if the relation
 $willBeCalled(start, e, f)$ holds.
 
-\begin{eqnarray*}
+\begin{align*}
 willBeCalled(start, e, f) \Leftrightarrow \exists t_1, \forall t >
 t_1, (f, e) \in futures
-\end{eqnarray*}
+\end{align*}
 
 We say that the FlowPool is \textbf{sealed} at the size $s$ at some
 $t_0$ if and only if the relation $sealedAt(start, s)$ holds.
 
-\begin{eqnarray*}
+\vspace{-1cm}
+\begin{align*}
 sealedAt(start, s) &\Leftrightarrow& s \neq -1 \wedge \forall b = last(start), b.array
 = x^P \cdot t \cdot y^N, \\
 & &x \in Elem, t = Terminal(s, callbacks)
-\end{eqnarray*}
+\end{align*}
 
 \textbf{FlowPool operations} are \verb=append=, \verb=foreach= and
 \verb=seal=, and are defined by pseudocodes in Figure \ref{f-pseudo}.
@@ -549,22 +556,24 @@ We denote this as $\mathbb{A} = op(\mathbb{A}_0)$.
 Abstract pool operation $foreach(f)$ changes the abstract state at $t_0$ from $(elems, callbacks, seal)$
 to $(elems, (f, \emptyset) \cup callbacks, seal)$. Furthermore:
 
-\begin{eqnarray*}
+\vspace{-1cm}
+\begin{align*}
 \exists t_1 \geq t_0, & & \forall t_2 > t_1, \mathbb{P}(t_2) = (elems_2,
 callbacks_2, seal_2) \\
 & & \wedge \forall (f, called_2) \in callbacks_2, elems \subseteq
 called_2 \subseteq elems_2
-\end{eqnarray*}
+\end{align*}
 
 Abstract pool operation $append(e)$ changes the abstract state at $t_0$ from
 $(elems, callbacks, seal)$ to $(\{e\} \cup elems, callbacks, seal)$. Furthermore:
 
-\begin{eqnarray*}
+\vspace{-1cm}
+\begin{align*}
 \exists t_1 \geq t_0, & & \forall t_2 > t_1, \mathbb{P}(t_2) = (elems_2,
 callbacks_2, seal_2) \\
 & & \wedge \forall (f, called_2) \in callbacks_2, (f, called) \in
 callbacks \Rightarrow e \in called_2
-\end{eqnarray*}
+\end{align*}
 
 Abstract pool operation $seal(s)$ changes the abstract state of the
 FlowPool at $t_0$ from $(elems, callbacks, seal)$ to $(elems,
