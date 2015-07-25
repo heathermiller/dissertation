@@ -1,0 +1,106 @@
+% Original author = Kim Marriott
+% Fetched from Martin Odersky, Nov 1993
+% Many revisions and additions, J. Maraist, Nov 1993-
+
+%
+% .sty for math environments
+%       example - examples
+%       lemma   - lemmas
+%       prop    - propositions
+%       theorem - theorems
+%       cor     - corollaries
+%       defn    - definitions
+%	mathitem - general structure of the above.
+%		   Takes one argument, the name of the structure,
+%		   e.g.  \begin{mathitem}{Convention}
+%	namedmathitem - like a mathitem, but with a given name
+%			rather than a number for a label.
+%			e.g.  \begin{namedmathitem}{Theorem}{FD}
+%       proof   - proofs
+% Definitions and proofs are unnumbered,
+% examples have their own counter, and the other environments share a counter.
+%
+
+\newcounter{Example}[section]
+\newcounter{result}[section]
+
+\def\example{
+   \def\theresult{Example~\thesection.\arabic{result}}
+   \refstepcounter{result}
+   \trivlist\item[\hskip
+   \labelsep{\bf \theresult}]}
+\def\endexample{\endtrivlist}
+
+\def\lemmatwo{
+   \def\theresult{Lemma~\thesection.\arabic{result}}
+   \refstepcounter{result}
+   \trivlist\item[\hskip
+   \labelsep{\bf \theresult}]}
+\def\endlemmatwo{\endtrivlist}
+
+\def\proptwo{
+   \def\theresult{Proposition~\thesection.\arabic{result}}
+   \refstepcounter{result}
+    \trivlist\item[\hskip
+   \labelsep{\bf \theresult}]}
+\def\endproptwo{\endtrivlist}
+
+\def\theoremtwo{
+   \def\theresult{Theorem~\thesection.\arabic{result}}
+   \refstepcounter{result}
+   \trivlist\item[\hskip
+   \labelsep{\bf \theresult}]}
+\def\endtheoremtwo{\endtrivlist}
+
+\def\cor{
+   \def\theresult{Corollary~\thesection.\arabic{result}}
+   \refstepcounter{result}
+   \trivlist\item[\hskip
+   \labelsep{\bf \theresult}]}
+\def\endcor{\endtrivlist}
+
+\def\definitiontwo{
+   \def\theresult{Definition~\thesection.\arabic{result}}
+   \refstepcounter{result}
+   \trivlist\item[\hskip
+   \labelsep{\bf \theresult}]}
+\def\enddefinitiontwo{\endtrivlist}
+
+% \def\defntwo{
+%    \trivlist\item[\hskip
+%    \labelsep{\bf Definition.}]}
+% \def\enddef{\endtrivlist}
+% \def\enddefntwo{\endtrivlist}
+
+
+\newenvironment{mathitem}[1]%
+{  \def\theresult{#1~\thesection.\arabic{result}}%
+   \refstepcounter{result}%
+   \trivlist\item[\hskip%
+   \labelsep{\bf\theresult}]%
+}%
+{\endtrivlist}
+
+\newenvironment{namedmathitem}[2]%{Type}{Name}
+{  \def\theresult{#2}%
+   \addtocounter{result}{-1}%
+   \refstepcounter{result}%
+   \trivlist\item[\hskip%
+   \labelsep{\bf #1:\ {\boldmath #2}.}]%
+}%
+{\endtrivlist}
+
+%\def\proof{
+%    \trivlist\item[\hskip
+%    \labelsep{\em Proof:}]}
+%\def\endproof{$\Box$ \endtrivlist}
+
+\def\proofsketch{
+    \trivlist\item[\hskip
+    \labelsep{\em Proof Sketch:}]}
+\def\endproofsketch{$\Box$ \endtrivlist}
+
+%\def\proof{{\em Proof:}}
+%\def\endproof{$\Box$}
+
+\def\DoProof{{\bf To Be Proven}. $\Box$}

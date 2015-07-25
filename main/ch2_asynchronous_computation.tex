@@ -320,7 +320,7 @@ for-comprehensions comes along for free.
 \label{sec:futures-exceptions}
 
 Futures in Scala also come with a number of methods specialized on handling
-failures by providing alternate operations in the event of a failure. 
+failures by providing alternate operations in the event of a failure.
 
 \subsection{Execution Contexts}
 \label{sec:execution-ctx}
@@ -417,7 +417,10 @@ before \verb|imagesFuts| or \verb|futImages| completes.
 \section{FlowPools}
 \label{sec:flowpools}
 
-Futures can be built up into DAGs.
+In our treatment of futures, we focused mainly on applying individual
+asynchronous operations to future values. We alluded to the
+possibility of chaining . Such chaining amounts to buliding up a directed
+acyclic graph (DAG) of computations.
 
 {\em FlowPools} are a  fundamental dataflow collections abstraction which can be
 used as a building block for larger and more complex \textit{deterministic} and

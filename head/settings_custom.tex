@@ -43,6 +43,11 @@
 \usepackage{cprotect}
 \usepackage{alltt}
 \usepackage{lineno}
+\usepackage[normalem]{ulem}
+\usepackage{fleqn}
+\usepackage{math}
+\usepackage{prooftree}
+
 
 % \setmainfont{Utopia Std}
 % \setmonofont[Scale=1.0,BoldFont={Consolas Bold}]{Consolas}
@@ -197,46 +202,9 @@
 \newmdtheoremenv[hidealllines=true,topline=true,bottomline=true,skipabove=\baselineskip,skipbelow=\baselineskip]{prop}{Property}[section]
 
 
-% % listings settings
-% \lstdefinelanguage{Scala}%
-% {morekeywords={abstract,case,catch,char,class,%
-%     def,else,extends,final,%
-%     if,import,%
-%     match,module,new,null,object,override,package,private,protected,%
-%     public,return,super,this,throw,trait,try,type,val,var,with,implicit,%
-%     macro,sealed,%
-%   },%
-%   sensitive,%
-%   morecomment=[l]//,%
-%   morecomment=[s]{/*}{*/},%
-%   morestring=[b]",%
-%   morestring=[b]',%
-%   showstringspaces=false%
-% }[keywords,comments,strings]%
-
-% \lstset{language=Scala,%
-%   mathescape=true,%
-%   columns=[c]fixed,%
-%   numbers=left, numberstyle=\scriptsize\color{gray}\ttfamily,
-%   basewidth={0.5em, 0.40em},%
-%   basicstyle=\tt,%
-%   xleftmargin=0.0cm
-% }
-%
-% \lstset{tabsize=2,
-%   basicstyle=\ttfamily\fontsize{10pt}{1em}\selectfont,
-%   keywordstyle=\ttfamily\bfseries,
-%   commentstyle=\itshape\ttfamily,
-%   numbers=none,
-%   %numbers=left,
-%   %numberstyle=\scriptsize\color{gray}\ttfamily,
-%   language=scala,
-%   moredelim=[il][\sffamily]{?},
-%   mathescape=false,
-%   showspaces=false,
-%   showstringspaces=false,
-%   xleftmargin=15pt,
-%   escapechar=@,
-%   classoffset=0,
-%   belowskip=\smallskipamount
-% }
+\makeatletter
+\newcommand{\customlabel}[2]{%
+   \protected@write \@auxout {}{\string \newlabel {#1}{{#2}{\thepage}{#2}{#1}{}} }%
+   \hypertarget{#1}{#2}
+}
+\makeatother
