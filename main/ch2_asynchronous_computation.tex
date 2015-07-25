@@ -1,4 +1,4 @@
-\chapter{Asynchronous Parallelism}
+\chapter{Asynchronous Programming}
 
 Now a days, providing a modest experience on a mobile app, or even rendering
 simple web pages typically requires the collaboration of dozens of network
@@ -55,10 +55,42 @@ FlowPools}~\cite{FlowPools} in Section~\ref{sec:flowpools}.
 \section{Futures}
 \label{sec:futures}
 
-A fundamental building block of dataflow is the notion of {\em futures and
-promises}.
+{\em Futures and promises} can be thought of as, together, a unified abstraction
+used for synchronization in programming languages with support for concurrency.
+Futures and promises in Scala~\cite{Futures} stand out from their Java
+counterparts in two ways; (a) they are functionally-inspired with monadic
+combinators and are thus composable, and (b) they are fully asynchronous and
+non-blocking by default. A visualization of this blocking difference and
+definition is shown in Figures~\ref{fig:future-promise-blocking}
+and~\ref{fig:future-promise-async}. Here, the central green arrow in each figure
+can be thougth of as the main program thread.
 
-\begin{figure}[ht!]
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.75\textwidth]{images/future-promise-basic-async-blocking}
+% \setlength{\abovecaptionskip}{-10pt}
+% \setlength{\belowcaptionskip}{-20pt}
+\caption{Illustration of blocking futures, as in Java. The central green arrow can be thought of as the main program thread.}
+\label{fig:future-promise-blocking}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.75\textwidth]{images/future-promise-basic-async}
+% \setlength{\abovecaptionskip}{-10pt}
+% \setlength{\belowcaptionskip}{-20pt}
+\caption{Illustration of fully asynchronous, non-blocking futures, as in Scala. The central green arrow can be thought of as the main program thread.}
+\label{fig:future-promise-async}
+\end{figure}
+
+
+A {\em future} can be thought of as a container which represents a value that
+will eventually be computed. They're related to {\em promises} in that a future
+is a read-only window to a single-assignment (write-once) variable called a {\em
+promise}. This relationship is illustrated in
+Figure~\ref{fig:future-promise-basic}.
+
+\begin{figure}[!t]
 \centering
 \includegraphics[width=0.5\textwidth]{images/future-promise-basic}
 % \setlength{\abovecaptionskip}{-10pt}
@@ -67,28 +99,135 @@ promises}.
 \label{fig:future-promise-basic}
 \end{figure}
 
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=0.75\textwidth]{images/future-promise-basic-async-blocking}
-% \setlength{\abovecaptionskip}{-10pt}
-% \setlength{\belowcaptionskip}{-20pt}
-\caption{Illustration of blocking futures, as in Java.}
-\label{fig:future-promise-basic}
-\end{figure}
+Before a future's result is computed, we say that the future is {\em not
+completed}. If the computation representing a future is finished with a value or
+an exception, we say that the future is {\em completed}. Completion can take one
+of two forms: (a) when a future is completed with a value, we say the future was
+{\em successfully completed} with that value, or (b) when a future is completed
+with an exception thrown by the computation, we say the future was {\em failed}
+with that exception.
 
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=0.75\textwidth]{images/future-promise-basic-async}
-% \setlength{\abovecaptionskip}{-10pt}
-% \setlength{\belowcaptionskip}{-20pt}
-\caption{Illustration of fully asynchronous, non-blocking futures, as in Scala.}
-\label{fig:future-promise-basic}
-\end{figure}
+\subsubsection{Basic Usage}
+
+The type of \verb|Future| and \verb|Promise| is as follows: ({\em simplified})
+
+% \begin{minipage}[t]{0.4\linewidth}
+% % \begin{minted}{scala}
+% % trait Future[T] {
+% %   def onSuccess(f: T => Unit): Unit
+% % }
+% % \end{minted}
+% \begin{minipage}[t]{0.4\linewidth}
+% % \begin{minted}{scala}
+% % trait Promise[T] {
+% %   def success(elem: T): Unit
+% %   def future: Future[T]
+% % }
+% % \end{minted}
+% \end{minipage}
+
+\begin{minipage}[t]{0.5\linewidth}
+\begin{minted}{scala}
+trait Future[T] {
+  def onSuccess(f: T => Unit): Unit
+}
+\end{minted}
+\end{minipage}
+\begin{minipage}[t]{0.5\linewidth}
+\begin{minted}{scala}
+trait Promise[T] {
+  def success(elem: T): Unit
+  def future[T]: Future[T]
+}
+\end{minted}
+\end{minipage}
+
+As depicted visually in Figure~\ref{fig:future-promise-basic}, every
+\verb|Promise[T]| can return a reference to its corresponding \verb|Future| with
+the \verb|future| method.
+
+An example of how a future can be created is as follows. Let’s assume that we
+want to use a hypothetical API of some popular social network to obtain a list
+of friends for a given user. We will open a new session and then send a request
+to obtain a list of friends of a particular user:
+
+\begin{minted}{scala}
+val session = ... // obtain a list of friends for some user/credentials
+val f: Future[List[Friend]] = Future {
+  session.getFriends() // network call to get a list of that user's friends
+}
+\end{minted}
+
+To obtain the list of friends of a user, a request has to be sent over a
+network, which can take a long time. This is illustrated with the call to the
+method \verb|getFriends| that returns \verb|List[Friend]|. To better utilize the
+CPU until the response arrives, we should not block the rest of the program --
+this computation should be scheduled asynchronously. The future method does
+exactly that--it performs the specified computation block concurrently, in this
+case sending a request to the server and waiting for a response.
+
+The list of friends becomes available in the future \verb|f| once the server
+responds.
+
+An unsuccessful attempt may result in an exception. In the following example,
+the session value is incorrectly initialized, so the computation in the future
+block will throw a \verb|NullPointerException|. This future \verb|f| is then
+failed with this exception instead of being completed successfully:
+
+\begin{minted}{scala}
+val session = null
+val f: Future[List[Friend]] = Future {
+  session.getFriends
+}
+\end{minted}
+
+We now know how to start an asynchronous computation to create a new future
+value, but we have not shown how to use the result once it becomes available, so
+that we can do something useful with it. Once created, a future may be used in
+one of two ways, either via:
+
+\begin{itemize}
+  \item {\em callbacks}, or
+  \item {\em composable higer-order combinators}, such as \verb|map|, \verb|flatMap|, and \verb|filter|.
+\end{itemize}
+
+\subsubsection{Callbacks}
+
+
+
+\subsubsection{Higher-Order Combinators}
+
+
+% A fundamental building block of dataflow is the notion of {\em futures and
+% promises}.
+
+
 
 
 Dataflow variables in Oz are blocking. Futures in Java are blocking.
 
 Callback-based asynchronous programming.
+
+\subsection{Promises}
+\label{sec:promises}
+
+\cite{PromisesLiskov}
+
+\subsection{\texttt{Try} Type}
+\label{sec:try-type}
+
+\subsection{Functional Composition}
+\label{sec:futures-functional}
+
+\subsection{Blocking}
+\label{sec:futures-blocking}
+
+\subsection{Exceptions}
+\label{sec:futures-exceptions}
+
+\subsection{Execution Contexts}
+\label{sec:execution-ctx}
+
 
 \section{FlowPools}
 \label{sec:flowpools}
