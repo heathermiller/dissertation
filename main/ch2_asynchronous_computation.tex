@@ -107,7 +107,7 @@ of two forms: (a) when a future is completed with a value, we say the future was
 with an exception thrown by the computation, we say the future was {\em failed}
 with that exception.
 
-\subsubsection{Basic Usage}
+\subsection{Basic Usage}
 
 The type of \verb|Future| and \verb|Promise| is as follows: ({\em simplified})
 
@@ -187,15 +187,35 @@ that we can do something useful with it. Once created, a future may be used in
 one of two ways, either via:
 
 \begin{itemize}
+  \itemsep0em
   \item {\em callbacks}, or
   \item {\em composable higer-order combinators}, such as \verb|map|, \verb|flatMap|, and \verb|filter|.
 \end{itemize}
 
-\subsubsection{Callbacks}
+\subsection{Callbacks}
 
+One way to interact with the result of a future computation in a non-blocking
+way is to attach a callback to perform some side-effecting operation such as
+completing another future. There are three sorts of callbacks that can be
+handled by Scala's futures:
 
+\begin{itemize}
+  \itemsep0em
+  \item \verb|def onComplete[U](f: (Try[T]) => U): Unit|
+  \item \verb|def onSuccess[U](pf: PartialFunction[T, U]): Unit|
+  \item \verb|def onFailure[U](pf: PartialFunction[Throwable, U]): Unit|
+\end{itemize}
 
-\subsubsection{Higher-Order Combinators}
+All three varieties methods which
+
+\subsection{Higher-Order Combinators}
+
+\begin{itemize}
+  \itemsep0em
+  \item \verb|def map[S](f: (T) => S): Future[S]|
+  \item \verb|def flatMap[S](f: (T) => Future[S]): Future[S]|
+  \item \verb|def filter(p: (T) => Boolean): Future[T]|
+\end{itemize}
 
 
 % A fundamental building block of dataflow is the notion of {\em futures and
@@ -208,26 +228,68 @@ Dataflow variables in Oz are blocking. Futures in Java are blocking.
 
 Callback-based asynchronous programming.
 
-\subsection{Promises}
-\label{sec:promises}
+% \subsection{Promises}
+% \label{sec:promises}
 
 \cite{PromisesLiskov}
 
-\subsection{\texttt{Try} Type}
-\label{sec:try-type}
+% \subsection{\texttt{Try} Type}
+% \label{sec:try-type}
+%
+% \subsection{Functional Composition}
+% \label{sec:futures-functional}
 
-\subsection{Functional Composition}
-\label{sec:futures-functional}
-
-\subsection{Blocking}
-\label{sec:futures-blocking}
-
-\subsection{Exceptions}
+\subsection{Exceptions and Recovery}
 \label{sec:futures-exceptions}
 
 \subsection{Execution Contexts}
 \label{sec:execution-ctx}
 
+Throughout this chapter, we have covered asynchronous completion of tasks
+without actually detailing how tasks are eventually executed. All tasks are
+eventually completed and made available through a future are executed via a
+so-called \verb|ExecutionContext|, typically, but not necessarily, backed by a
+thread pool.
+
+In fact many methods, such as all higher-order combinators (\verb|map|,
+\verb|flatMap|, \verb|filter|), callback-based methods (\verb|onComplete|,
+\verb|onSuccess|, \verb|onFailure|) and more take an implicit
+\verb|ExecutionContext| as an argument. For example:
+
+\begin{minted}{scala}
+def flatMap[S](f: (T) => Future[S])(implicit executor: ExecutionContext): Future[S]
+\end{minted}
+
+For all of these methods, this implicit \verb|executor|, passed via implicit
+scope, acts as the thread pool or event loop which the given task is executed
+upon. To globally import a default \verb|ExecutionContext|, one must simply use
+the following import:
+
+\begin{minted}{scala}
+import ExecutionContext.Implicits.global
+\end{minted}
+
+This imports an \verb|ExecutionContext| backed by a pre-configured
+implementation of Java's ForkJoin pool~\cite{ForkJoin}.
+
+It's also possible to provide a custom \verb|ExecutionContext| to execute code
+which blocks on IO or performs long-running computations. For example one may
+implement a custom \verb|ExecutionContext| by simply importing the underlying
+execution scheme, such as an implementation of an event loop or a Java
+\verb|ExecutorService|, and implementing a few basic methods such as
+\verb|execute| and \verb|reportFailure|.
+
+The intent of \verb|ExecutionContext| is to lexically scope code execution. That
+is, each method, class, file, package, or application should be the one to
+determine how to run its own code. This avoids issues such as running
+application callbacks on a thread pool belonging to a networking library. The
+size of a networking library's thread pool can be safely configured, knowing
+that only that library's network operations will be affected while application
+callback execution can be configured separately.
+
+
+\subsection{Blocking}
+\label{sec:futures-blocking}
 
 \section{FlowPools}
 \label{sec:flowpools}
