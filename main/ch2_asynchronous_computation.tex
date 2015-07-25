@@ -192,23 +192,96 @@ one of two ways, either via:
   \item {\em composable higer-order combinators}, such as \verb|map|, \verb|flatMap|, and \verb|filter|.
 \end{itemize}
 
+We will see how to use both callbacks and higher-order functions to interact
+with to-be-computed values in the following two subsections.
+
 \subsection{Callbacks}
 
 One way to interact with the result of a future computation in a non-blocking
 way is to attach a callback to perform some side-effecting operation such as
-completing another future. There are three sorts of callbacks that can be
-handled by Scala's futures:
+completing another future. Callbacks are a typical way to do asynchronous
+computation--a callback is a function that is called once its arguments become
+available. There are three methods provided to work with callbacks on Scala's
+futures:
 
 \begin{itemize}
   \itemsep0em
+  \item \verb|def foreach[U](f: (T) => U): Unit|
   \item \verb|def onComplete[U](f: (Try[T]) => U): Unit|
   \item \verb|def onSuccess[U](pf: PartialFunction[T, U]): Unit|
   \item \verb|def onFailure[U](pf: PartialFunction[Throwable, U]): Unit|
 \end{itemize}
 
-All three varieties methods which
+The most general form of registering a callback is by using the
+\verb|onComplete| method, which takes a callback function of type
+\verb|Try[T]=>U| \footnote{\texttt{Try[T]} can be thought of as being similar to
+\texttt{Option[T]} or an \texttt{Either[T, S]} in that it is a container type.
+However, it has been specifically designed to either hold a value or some
+throwable object. \texttt{Try[T]} is a \texttt{Success[T]} when it holds a value
+and otherwise \texttt{Failure[T]}, which holds an exception. Another way to
+think of \texttt{Try[T]} is to consider it as a special version of
+\texttt{Either[Throwable, T]}, specialized for the case when the left value is a
+\texttt{Throwable}. }. The callback is applied to the value of type
+\verb|Success[T]| if the future completes successfully, or to a value of type
+\verb|Failure[T]| otherwise.
+
+To get a feeling for how \verb|onComplete| is used, let's use a running example.
+Let's assume for a given social network, we want to fetch a list of our own
+recent posts and render them to the screen. We can do this with
+\verb|onComplete|:
+
+\begin{minted}{scala}
+val f: Future[List[String]] = Future {
+  session.getRecentPosts
+}
+f onComplete {
+  case Success(posts) => for (post <- posts) println(post)
+  case Failure(t) => println("An error has occured: " + t.getMessage)
+}
+\end{minted}
+
+The \verb|onComplete| method is general in the sense that it allows the client
+to handle the result of both failed and successful future computations. To
+handle only successful results, the \verb|onSuccess| callback is used (which
+takes a partial function). Similarly, to handle failed results, the
+\verb|onFailure| callback is used:
+
+\begin{minted}{scala}
+val f: Future[List[String]] = Future {
+  session.getRecentPosts
+}
+f onFailure {
+  case t => println("An error has occured: " + t.getMessage)
+}
+f onSuccess {
+  case posts => for (post <- posts) println(post)
+}
+\end{minted}
+
+Another way to attach callbacks is via the \verb|foreach| method, which
+asynchronously processes the value in the future once the value becomes
+available. However, it will not be called if the future fails.
+
+The \verb|onComplete|, \verb|onSuccess|, and \verb|onFailure| methods have
+result type \verb|Unit|, which means invocations of these methods cannot be
+chained. This design is intentional, to avoid suggesting that chained
+invocations may imply an ordering on the execution of the registered callbacks
+(callbacks registered on the same future are unordered).
+
+
 
 \subsection{Higher-Order Combinators}
+
+While callbacks work reasonably well in simple situations, they can quickly get
+out of hand and when numerous, they can become difficult to reason about.
+Programmers affectoinately refer to this situation as {\em callback hell}.
+
+Scala's futures provide combinators which allow a more straightforward
+composition. One of the basic combinators is \verb|map|, which, given a future
+and a mapping function for the value of the future, produces a new future that
+is completed with the mapped value once the original future is successfully
+completed. What more, due to the type signature of these methods (they each
+return another \verb|Future|), it's possible to {\em compose} them.
 
 \begin{itemize}
   \itemsep0em
@@ -218,20 +291,24 @@ All three varieties methods which
 \end{itemize}
 
 
+
+Importantly, since the above methods are provided, built-in Scala support for
+for-comprehensions comes along for free.
+
 % A fundamental building block of dataflow is the notion of {\em futures and
 % promises}.
 
 
 
-
-Dataflow variables in Oz are blocking. Futures in Java are blocking.
-
-Callback-based asynchronous programming.
-
-% \subsection{Promises}
-% \label{sec:promises}
-
-\cite{PromisesLiskov}
+%
+% Dataflow variables in Oz are blocking. Futures in Java are blocking.
+%
+% Callback-based asynchronous programming.
+%
+% % \subsection{Promises}
+% % \label{sec:promises}
+%
+% \cite{PromisesLiskov}
 
 % \subsection{\texttt{Try} Type}
 % \label{sec:try-type}
@@ -241,6 +318,9 @@ Callback-based asynchronous programming.
 
 \subsection{Exceptions and Recovery}
 \label{sec:futures-exceptions}
+
+Futures in Scala also come with a number of methods specialized on handling
+failures by providing alternate operations in the event of a failure. 
 
 \subsection{Execution Contexts}
 \label{sec:execution-ctx}
@@ -329,12 +409,15 @@ point, which means that the pool will shrink back down to its expected size.
 Later on, the \verb|Await| object used to ensure that \verb|display| is executed
 on the calling thread--\verb|Await.result| simply forces the current thread to
 wait until the future that it is passed is completed. (This uses managed
-blocking internally.) Here, \verb|Await.result| must be used to prevent the
-program's main thread from completing before \verb|imagesFuts| completes.
+blocking internally.) Here, \verb|Await.result| must be used to block on
+\verb|futImages| so as to prevent the program's main thread from completing
+before \verb|imagesFuts| or \verb|futImages| completes.
 
 
 \section{FlowPools}
 \label{sec:flowpools}
+
+Futures can be built up into DAGs.
 
 {\em FlowPools} are a  fundamental dataflow collections abstraction which can be
 used as a building block for larger and more complex \textit{deterministic} and
