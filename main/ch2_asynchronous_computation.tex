@@ -10,52 +10,85 @@ possible, piece together an interface or some other user experience.
 Responsiveness is a requirement. Yet providing a responsive experience is at
 odds with the need to piece together the results from many calls over the
 network to other services. Synchronously making a request to a remote service
-and blocking, or waiting, until that request is fulfilled in order to move on to
+and blocking, or waiting, until that request is fulfilled before moving on to
 the next request is slow -- roundtrip network communication is known to be
 1,000,000 to 10,000,000 times slower than roundtrips to main
-memory~\cite{LatencyNumbersEveryProgrammerShouldKnow}.
+memory~\cite{LatencyNumbersEveryProgrammerShouldKnow} -- and making requests
+sequentially, one by one, is also often unnecessary.
 
-Asynchronous programming solves this problem by separating the execution of
-individual tasks (\eg calls to network services) from the main program flow.
-This reduces blocking because rather than stopping a thread to stop and wait on
-the completion of another task. Instead, a separate task is simply scheduled to
-proceed when the resource its waiting for becomes available. Thus freeing up the
-thread that would otherwise be waiting to do more meaningful work, typically in
-parallel.
+Asynchronous programming solves these problems by separating the execution of
+individual tasks (\eg calls to network services) from the main program flow. In
+a language like Scala where tasks can be executed by multiple threads, this
+reduces blocking because rather than stopping a thread to wait on the completion
+of another task, a separate task is simply scheduled to proceed when the
+resource its waiting for becomes available. Thus freeing up the thread that
+would otherwise be waiting to do more meaningful work.
 % That is, Unlike conventional parallelism, asynchronous parallelism
 
-In this chapter, we will see two abstractions for asynchronous programming;
-functionally-inspired {\em futures and promises} in Scala~\cite{Futures} in
-Section~\ref{sec:futures} and a generalization of futures to a pool or
-multiset-type data structure called {\em FlowPools}~\cite{FlowPools} in
-Section~\ref{sec:flowpools}.
+In this chapter, we will see two abstractions for fully non-blocking,
+asynchronous programming; functionally-inspired {\em futures and promises} in
+Scala~\cite{Futures} in Section~\ref{sec:futures} and a generalization of
+futures to a pool or multiset-type data structure called {\em
+FlowPools}~\cite{FlowPools} in Section~\ref{sec:flowpools}.
 
-\section{Motivation}
-
-Asynchronous computation, \eg managing requests.
-
-Multicore architectures have become ubiquitous-- even most mobile devices now
-ship with multiple core processors. Yet parallel programming has yet to enter
-the daily workflow of the mainstream developer. One significant obstacle is an
-undesirable choice programmers must often face when solving a problem that
-could greatly benefit from leveraging available parallelism. Either choose a
-non-deterministic, but performant, data structure or programming model, or
-sacrifice performance for the sake of clarity and correctness.
-
-Programming models based on \emph{dataflow} \cite{Arvind89,CnC10} have the
-potential to simplify parallel programming, since the resulting programs are
-deterministic. Moreover, dataflow programs can be expressed more declaratively
-than programs based on mainstream concurrency constructs, such as shared-memory
-threads and locks, as programmers are only required to specify data and
-control dependencies. This allows one to reason sequentially about the
-intended behavior of their program, meanwhile enabling the underlying
-framework to effectively extract parallelism.
+% \section{Motivation}
+%
+% Asynchronous computation, \eg managing requests.
+%
+% Multicore architectures have become ubiquitous-- even most mobile devices now
+% ship with multiple core processors. Yet parallel programming has yet to enter
+% the daily workflow of the mainstream developer. One significant obstacle is an
+% undesirable choice programmers must often face when solving a problem that
+% could greatly benefit from leveraging available parallelism. Either choose a
+% non-deterministic, but performant, data structure or programming model, or
+% sacrifice performance for the sake of clarity and correctness.
+%
+% Programming models based on \emph{dataflow} \cite{Arvind89,CnC10} have the
+% potential to simplify parallel programming, since the resulting programs are
+% deterministic. Moreover, dataflow programs can be expressed more declaratively
+% than programs based on mainstream concurrency constructs, such as shared-memory
+% threads and locks, as programmers are only required to specify data and
+% control dependencies. This allows one to reason sequentially about the
+% intended behavior of their program, meanwhile enabling the underlying
+% framework to effectively extract parallelism.
 
 \section{Futures}
 \label{sec:futures}
 
 A fundamental building block of dataflow is the notion of {\em futures and
 promises}.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=0.5\textwidth]{images/future-promise-basic}
+% \setlength{\abovecaptionskip}{-10pt}
+% \setlength{\belowcaptionskip}{-20pt}
+\caption{Futures and promises can be thought of as a single concurrency abstraction.}
+\label{fig:future-promise-basic}
+\end{figure}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=0.75\textwidth]{images/future-promise-basic-async-blocking}
+% \setlength{\abovecaptionskip}{-10pt}
+% \setlength{\belowcaptionskip}{-20pt}
+\caption{Illustration of blocking futures, as in Java.}
+\label{fig:future-promise-basic}
+\end{figure}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=0.75\textwidth]{images/future-promise-basic-async}
+% \setlength{\abovecaptionskip}{-10pt}
+% \setlength{\belowcaptionskip}{-20pt}
+\caption{Illustration of fully asynchronous, non-blocking futures, as in Scala.}
+\label{fig:future-promise-basic}
+\end{figure}
+
+
+Dataflow variables in Oz are blocking. Futures in Java are blocking.
+
+Callback-based asynchronous programming.
 
 \section{FlowPools}
 \label{sec:flowpools}
@@ -205,7 +238,7 @@ other popular concurrent data structures.
 
 
 \vspace{-0.4cm}
-\section{Model of Computation}
+\subsection{Model of Computation}
 
 FlowPools are similar to a typical collections abstraction.
 Operations invoked on a FlowPool are executed on its individual
@@ -330,7 +363,7 @@ trace. For a more formal definition and proof of determinism, see section
 
 
 \vspace{-0.3cm}
-\section{Programming Interface}
+\subsection{Programming Interface}
 \label{sec:programming-interface}
 
 A FlowPool can be thought of as a concurrent pool data structure,
@@ -381,8 +414,7 @@ denotes the number of times the \verb=foreach= has been called.
 
 The \verb=aggregate= operation aggregates the elements of the pool
 and has the following signature: \verb+def aggregate[S]+\verb+(zero: =>S)+
-\verb+(cb: (S, S) => S)+\\
-\verb+(op: (S, T) => S):+ \verb+Future[S]+,
+\verb+(cb: (S, S) => S)+\verb+(op: (S, T) => S):+ \verb+Future[S]+,
 where \verb=zero= is the initial aggregation, \verb=cb= is an
 associative operator which combines several aggregations, \verb=op= is
 an operator that adds an element to the aggregation, and
@@ -796,7 +828,7 @@ def asyncFor(f: Elem => Unit, b: Block, idx: Int)
 
 
 \vspace{-0.3cm}
-\section{Implementation}
+\subsection{Implementation}
 
 We now describe the FlowPool and its basic operations.
 In doing so, we omit the details not relevant to the
@@ -924,7 +956,7 @@ thus ensuring that the \verb=append= operation scales.
 
 
 \vspace{-0.3cm}
-\section{Correctness}
+\subsection{Correctness}
 \label{sec:correctness}
 We give an outline of the correctness proof here. More formal
 definitions, and a complete set of lemmas and proofs can be found
@@ -1155,7 +1187,7 @@ Reduction of terms $t$ is deterministic.
 \end{theorem}
 
 
-\section{Evaluation}
+\subsection{Evaluation}
 \label{sec:evaluation}
 
 We evaluate our implementation (single-lane and multi-lane FlowPools) against
@@ -1255,7 +1287,7 @@ across all architectures.}
 \end{figure}
 
 
-\section{Related Work}
+\subsection{Related Work}
 
 An introduction to linearizability and lock-freedom
 is given by Herlihy and Shavit \cite{Herlihy08}.
