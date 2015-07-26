@@ -57,7 +57,7 @@ of weaker or no type safety, a fixed serialization format, more restrictions
 placed on the objects to-be-serialized, or only rudimentary language
 integration.
 
-This paper takes a step towards more principled open programming through a new
+This chapter takes a step towards more principled open programming through a new
 foundation for pickling in object-oriented languages. We present object-oriented
 picklers and \textit{scala/pickling}, a framework for their generation either at runtime or at
 compile time. The introduced notion of object-oriented pickler combinators
@@ -79,6 +79,7 @@ from the lower-level aspects of data formatting. This means that the type
 safety guarantees provided by type-specialized picklers are ``portable'' in
 the sense that they carry over to different pickle formats.
 
+\subsection{Design Constraints}
 The design of our framework has been guided by the following principles:
 \vspace{-0.3cm}
 \begin{itemize}
@@ -131,10 +132,10 @@ picklers. Our approach is also general, supporting object graphs with cycles.
 
 \subsection{Contributions}
 
-This paper makes the following contributions:
+This chapter outlines the following contributions:
+% This paper makes the following contributions:
 
 \begin{itemize}
-
 \item An extension to pickler combinators, well-known in functional
 programming, to support the core concepts of object-oriented programming,
 namely subtyping polymorphism, open class hierarchies, and object identity.
@@ -150,7 +151,6 @@ language or the underlying virtual machine.
 \item An experimental evaluation comparing the performance of our framework
 with Java serialization and Kryo on a number of data types used in real-world,
 large-scale distributed applications and frameworks.
-
 \end{itemize}
 
 
@@ -392,8 +392,7 @@ defined as if it is a normal method, but it is linked using the \verb|macro|
 keyword to an additional method that operates on abstract syntax trees.
 
 \begin{minted}{scala}
-def assert(x: Boolean, msg: String): Unit =
-  macro assert_impl
+def assert(x: Boolean, msg: String): Unit = macro assert_impl
 def assert_impl(c: Context)
   (x: c.Expr[Boolean], msg: c.Expr[String]):
                             c.Expr[Unit] = ...
@@ -907,7 +906,7 @@ $mbody(m, C) = (\seq{x}, e)$ and $mtype(m, C) = \seq{C} \rightarrow D$.
 \infrule[\textsc{R-Pickle-S}]
 {  V(x) = r_p  \andalso  H(r_p) = (C_p, s, C)  \\
    V(y) = r    \andalso  H(r)   = C(\_)         \\
-   mbody(p, C_p) = (z, e)
+   \textit{mbody}(p, C_p) = (z, e)
 }
 { \sreducebreak H V
     {\texttt{let}~x' = x.p(y)~\texttt{in}~t}
@@ -924,7 +923,7 @@ $mbody(m, C) = (\seq{x}, e)$ and $mtype(m, C) = \seq{C} \rightarrow D$.
 \infrule[\textsc{R-Pickle-D}]
 {  V(x) = r_p  \andalso  H(r_p) = (C_p, d, C)                    \\
    V(y) = r    \andalso  H(r)   = D(\_)        \andalso D \sub C \\
-   mbody(p, C_p) = (z, e)
+   \textit{mbody}(p, C_p) = (z, e)
 }
 { \sreducebreak H V
     {\texttt{let}~x' = x.p(y)~\texttt{in}~t}
@@ -939,7 +938,7 @@ $mbody(m, C) = (\seq{x}, e)$ and $mtype(m, C) = \seq{C} \rightarrow D$.
 \infrule[\textsc{R-Invoke}]
 {  V(x) = r  \andalso  H(r) = C(\_)  \\
    V(\seq{y}) = r_1 \ldots r_n       \\
-  mbody(m, C) = (\seq{x}, e)
+  \textit{mbody}(m, C) = (\seq{x}, e)
 }
 { \sreducebreak H V
     {\texttt{let}~x' = x.m(\seq{y})~\texttt{in}~t}
@@ -980,7 +979,7 @@ picklers are different from objects in the present formal model. The reason is
 that a pickler has to contain a type tag indicating the types of objects that
 it can pickle (this is apparent in the rules of the operational semantics
 below); however, the alternative of adding parameterized types (as in, \eg
-FGJ~\cite{Igarashi2001}) is beyond the scope of the present paper.
+FGJ~\cite{Igarashi2001}) is beyond the scope of this work.
 
 According to the grammar in Figure~\ref{fig:lang-syntax}, expressions are
 always reduced in the context of a let-binding, except for field assignments.
@@ -1019,6 +1018,7 @@ satisfy the property that ``pickling followed by unpickling generates an
 object that is structurally equal to the original object''. The following
 definition captures this formally:
 
+% \begin{minipage}{\linewidth}
 \begin{defn}
 
 Given variables $x,x',y,y'$, heaps $H,H'$, variable environments $V,V'$, and a
@@ -1049,6 +1049,7 @@ Then $r$ and $r'$ must be structurally equivalent in heap $H'$, written $r
 \equiv_{H'} r'$.
 
 \end{defn}
+% \end{minipage}
 
 Note that in the above definition we assume that references in heap $H$ are
 not garbage collected in heap $H'$. The definition of structural equivalence
@@ -1594,7 +1595,8 @@ as follows:
   tree; \verb|${fld.name}| splices the name of \term{fld} into the tree.
 
   \item Recursively generate the pickler for \term{fld}'s type by emitting either
-  \\\verb|val fldp = implicitly[DPickler[${fld.tpe}]]| or \verb|val fldp = implicitly[SPickler[${fld.tpe}]]|,
+  \\\verb|val fldp = implicitly[DPickler[${fld.tpe}]]| or
+  \\\verb|val fldp = implicitly[SPickler[${fld.tpe}]]|,
   depending on whether \term{fld}'s type is effectively final or not.
 
   \item Emit the logic for pickling \term{v} into \term{b}: \verb|fldp.pickle(v, b)|
@@ -1932,7 +1934,6 @@ Intel Core i7 processor with 16 GB of memory running Mac OS X version
 10.8.4 and Oracle's Java HotSpot(TM) 64-Bit Server VM version
 1.6.0\_51. In all cases we used the following configuration flags:
 \linebreak \texttt{-XX:MaxPermSize=512m} \texttt{-XX:+CMSClassUnloadingEnabled}
-\linebreak
 \texttt{-XX:ReservedCodeCacheSize=192m}
 \texttt{-XX:+UseConcMarkSweepGC  -Xms512m -Xmx2g}.
 Each benchmark was run on a warmed-up JVM. The result shown is the median of 9 such
@@ -1988,23 +1989,24 @@ these pickler combinators in the case where static picklers can be generated.
 
 % \footnote{As a framework intended for eventual production use, we are actively seeking to bring performance closer to that of fully-static hand-composed pickler combinators. Towards that aim, we maintain a full benchmark suite at \url{http://lampwww.epfl.ch/~hmiller/pickling}}.
 
-\begin{figure*}[ht!]
+\begin{figure*}[t!]
  \centering
- \includegraphics[width=0.95\textwidth]{wikigraph.pdf}
- \caption{Results for pickling/unpickling a partition of Wikipedia, represented as a graph with many cycles. Figure~\ref{fig:evactor}(a) shows a ``pickling'' benchmark across scala/pickling, Kryo, and Java. In Figure~\ref{fig:evactor}(b), results for a roundtrip pickling/unpickling is shown. Here, Kryo is removed because it crashes during unpickling.}
+ \includegraphics[width=\textwidth]{wikigraph.pdf}
+ \caption{Results for pickling/unpickling a partition of Wikipedia, represented as a graph with many cycles. Figure~\ref{fig:wikigraph}(a) shows a ``pickling'' benchmark across scala/pickling, Kryo, and Java. In Figure~\ref{fig:wikigraph}(b), results for a roundtrip pickling/unpickling is shown. Here, Kryo is removed because it crashes during unpickling.}
  \label{fig:wikigraph}
 \end{figure*}
 
-\begin{figure*}[ht!]
+\begin{figure*}[t!]
  \centering
- \includegraphics[width=0.95\textwidth]{evactor.pdf}
+ \includegraphics[width=\textwidth]{evactor.pdf}
  \caption{Results for pickling/unpickling evactor datatypes (numerous tiny messages represented as case classes containing primitive fields.) Figure~\ref{fig:evactor}(a) shows a benchmark which pickles/unpickles up to 10,000 evactor messages. Java runs out of memory at this point. Figure~\ref{fig:evactor}(b) removes Java and scales up the benchmark to more evactor events.}
  \label{fig:evactor}
 \end{figure*}
 
+\vspace{-0.4cm}
 \begin{figure}[ht!]
  \centering
- \includegraphics[width=\columnwidth]{sparklr.pdf}
+ \includegraphics[width=0.5\textwidth]{sparklr.pdf}
  \caption{Results for pickling/unpickling data points from an implementation of linear regression using Spark.}
  \label{fig:spark}
 \end{figure}
@@ -2077,16 +2079,16 @@ to internally partition and represent its data.
 The results are shown in Figure~\ref{fig:spark}, with Java and Kryo
 running in comparable time and scala/pickling consistently outperforming both of them. For example, for a dataset of 40000 points, it takes Java 68ms and Kryo 86ms to perform a pickling/unpickling roundtrip, whereas scala/pickling completes in 28ms, a speedup of about 2.4x compared to Java and about 3.0x compared to Kryo.
 
-\begin{figure}[ht!]
+\begin{figure}[t!]
  \centering
- \includegraphics[width=\columnwidth]{geotrellis.pdf}
+ \includegraphics[width=0.65\textwidth]{geotrellis.pdf}
  \caption{Results for pickling/unpickling geotrellis datatypes (case classes and large primitive arrays).}
  \label{fig:geotrellis}
 \end{figure}
 
-\begin{figure*}[ht!]
+\begin{figure*}[t!]
  \centering
- \includegraphics[width=0.9\textwidth]{application-table.pdf}
+ \includegraphics[width=\textwidth]{application-table.pdf}
  \vspace{-1em}
  \caption{Scala types used in industrial distributed frameworks and applications.}
  \label{fig:application-table}
@@ -2219,7 +2221,7 @@ introduction. The main difference of our framework compared to
 pickling, or serialization, in widespread OO languages is that our
 approach does not require special support by the underlying
 runtime. In fact, the core concepts of object-oriented picklers as
-presented in this paper can be realized in most OO languages with
+presented in this chapter can be realized in most OO languages with
 generics.
 
 While work on pickling is typically focused on finding optimally compact
@@ -2236,12 +2238,12 @@ There is a body of work on maximizing sharing of runtime data
 structures~\cite{appel93hashconsing,Elsman2005,Tack2006} which we believe
 could be applied to the pickler combinators presented in
 Section~\ref{sec:oopicklers}; however, a complete solution is beyond the scope
-of the present paper.
+of the present work.
 
 
 % \section{Future Work}
 
-\section{Conclusion and Future Work}
+\section{Conclusion}
 
 We have introduced a model of pickler combinators which supports core
 concepts of object-oriented programming including subtyping polymorphism
@@ -2256,5 +2258,5 @@ static generation of pickler combinators can outperform
 state-of-the-art serialization frameworks and significantly reduce
 memory usage.
 
-In future work we plan to further optimize the pickler generation and
-to extend the framework with support for closures.
+% In future work we plan to further optimize the pickler generation and
+% to extend the framework with support for closures.
