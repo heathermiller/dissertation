@@ -431,7 +431,7 @@ val purchase: Future[Int] = rateQuote map {
 }
 \end{minted}
 
-Here, \verb|recover combinator creates a new future which holds the same result
+Here, \verb|recover| combinator creates a new future which holds the same result
 as the original future if it completed successfully. If it did not complete
 successfully, then the partial function argument is applied to the
 \verb|Throwable| which failed the original future. If it maps the
@@ -1879,6 +1879,3 @@ callbacks within the data-structure itself, as is the case with
 callback-based futures and FlowPools -- this has a particular
 benefit on platforms which do not support efficient
 continuations.
-
-\lipsum[1]
-\end{minted}
