@@ -258,16 +258,15 @@ f onSuccess {
 }
 \end{minted}
 
-Another way to attach callbacks is via the \verb|foreach| method, which
-asynchronously processes the value in the future once the value becomes
-available. However, it will not be called if the future fails.
-
 The \verb|onComplete|, \verb|onSuccess|, and \verb|onFailure| methods have
 result type \verb|Unit|, which means invocations of these methods cannot be
 chained. This design is intentional, to avoid suggesting that chained
 invocations may imply an ordering on the execution of the registered callbacks
 (callbacks registered on the same future are unordered).
 
+% Another way to attach callbacks is via the \verb|foreach| method, which
+% asynchronously processes the value in the future once the value becomes
+% available. However, it will not be called if the future fails.
 
 
 \subsection{Higher-Order Combinators}
@@ -277,23 +276,108 @@ out of hand and when numerous, they can become difficult to reason about.
 Programmers affectoinately refer to this situation as {\em callback hell}.
 
 Scala's futures provide combinators which allow a more straightforward
-composition. One of the basic combinators is \verb|map|, which, given a future
-and a mapping function for the value of the future, produces a new future that
-is completed with the mapped value once the original future is successfully
-completed. What more, due to the type signature of these methods (they each
-return another \verb|Future|), it's possible to {\em compose} them.
+composition.  What's more, due to the type signature of these methods (they each
+return another \verb|Future|), it's possible to {\em compose} operations on
+futures and to build up rich computation graphs. The three basic functional
+combinators on futures include:
 
 \begin{itemize}
   \itemsep0em
   \item \verb|def map[S](f: (T) => S): Future[S]|
   \item \verb|def flatMap[S](f: (T) => Future[S]): Future[S]|
-  \item \verb|def filter(p: (T) => Boolean): Future[T]|
+  \item \verb|def filter(p: (T) => Boolean): Future[T]| {\em (Also, \verb|withFilter|)}
 \end{itemize}
 
+To get a feeling for how to use these combinators, and later, how to {\em
+pipeline} or {\em chain} them together to build up computation graphs, let's
+start with a simple example.
 
+Assume we have an API for interfacing with a currency trading service. Suppose
+we want to buy US dollars, but only when it’s profitable. One of the basic
+combinators is \verb|map|, which, given a future and a mapping function for the
+value of the future, produces a new future that is completed with the mapped
+value once the original future is successfully completed. We can use the
+\verb|map| combinator to handle the successful case:
 
-Importantly, since the above methods are provided, built-in Scala support for
-for-comprehensions comes along for free.
+\begin{minted}{scala}
+val rateQuote = Future {
+  connection.getCurrentValue(USD)
+}
+val purchase = rateQuote map { quote =>
+  if (isProfitable(quote)) connection.buy(amount, quote)
+  else throw new Exception("not profitable")
+}
+purchase onSuccess {
+  case _ => println("Purchased " + amount + " USD")
+}
+\end{minted}
+
+Here, we start by creating a future rateQuote which gets the current exchange
+rate. After this value is obtained from the server and the future successfully
+completed, we call \verb|map| on \verb|rateQuote|, which applies the function
+which checks whether or not it's profitable to buy US dollars, and if so, it
+buys some amount of the currency. If we now decide to sell some other currency,
+it suffices to use map on purchase again.
+
+But what happens if \verb|isProfitable| returns false, hence causing an
+exception to be thrown? In this case, \verb|purchase| is failed with that
+exception. Furthermore, imagine that the connection was broken and that
+\verb|getCurrentValue| threw an exception, failing \verb|rateQuote|. In this
+case there would be no value to map, so the purchase would automatically be
+failed with the same exception as \verb|rateQuote|.
+
+In conclusion, if the original future is completed successfully then the
+returned future is completed with a mapped value from the original future. If
+the mapping function throws an exception the future is completed with that
+exception. If the original future fails with an exception then the returned
+future also contains the same exception. This exception propagating semantics is
+present in the rest of the combinators, as well.
+
+Importantly, since the methods \verb|map|, \verb|flatMap|, and \verb|withFilter|
+methods are provided on futures (there is an automatic desugaring from
+for-comprehensions to calls of these methods), Scala can provide built-in
+support for doing using for-comprehensions on futures. We will now see an
+example where a for-comprehension is desirable over using chained higher-order
+combinators.
+
+In this example, let's assume that we want to exchange US dollars for Swiss
+francs (CHF). We have to fetch quotes for both currencies, and then decide on
+buying based on both quotes. Here is what this example would look like using for-comprehension syntax:
+
+\begin{minted}{scala}
+val usdQuote = Future { connection.getCurrentValue(USD) }
+val chfQuote = Future { connection.getCurrentValue(CHF) }
+val purchase = for {
+  usd <- usdQuote
+  chf <- chfQuote
+  if isProfitable(usd, chf)
+} yield connection.buy(amount, chf)
+purchase onSuccess {
+  case _ => println("Purchased " + amount + " CHF")
+}
+\end{minted}
+
+The purchase \verb|future| is completed only once both \verb|usdQuote| and
+\verb|chfQuote| are completed--it depends on the values of both these futures so
+its own computation cannot begin earlier.
+
+The for-comprehension above is translated into:
+\begin{minted}{scala}
+val purchase = usdQuote flatMap {
+  usd =>
+  chfQuote
+    .withFilter(chf => isProfitable(usd, chf))
+    .map(chf => connection.buy(amount, chf))
+}
+\end{minted}
+
+Here, the \verb|flatMap| operation maps its own value into some other future.
+Once this different future is completed, the resulting future is completed with
+its value. In our example, \verb|flatMap| uses the value of the \verb|usdQuote|
+future to map the value of the \verb|chfQuote| into a third future which sends a
+request to buy a certain amount of Swiss francs. The resulting future
+\verb|purchase| is completed only once this third future returned from
+\verb|map| completes.
 
 % A fundamental building block of dataflow is the notion of {\em futures and
 % promises}.
@@ -319,8 +403,71 @@ for-comprehensions comes along for free.
 \subsection{Exceptions and Recovery}
 \label{sec:futures-exceptions}
 
-Futures in Scala also come with a number of methods specialized on handling
-failures by providing alternate operations in the event of a failure.
+Futures in Scala also come with a number of combinator methods specialized on
+handling failures by providing alternate operations in the event of a failure.
+The three main combinators for managing failure are:
+
+\begin{itemize}
+  \itemsep0em
+  \item \verb|def recover[U >: T](pf: PartialFunction[Throwable, U]): Future[U]|
+  \item \verb|def recoverWith[U >: T](pf: PartialFunction[Throwable, Future[U]]): Future[U]|
+  \item \verb|def transform[S](s: T => S, f: Throwable => Throwable): Future[S]|
+\end{itemize}
+
+To get a feeling for how these work, let's return to the previous example of
+purchasing currencies. Let's assume that based on the \verb|rateQuote|
+introduced above, we decide to buy a certain amount of some currency. The
+\verb|connection.buy| method takes an \verb|amount| to buy and the expected
+\verb|quote|. It returns the amount bought. If the quote has changed in the
+meantime, it will throw a \verb|QuoteChangedException| and it will not buy
+anything. If we want our future to contain 0 instead of the exception, we use
+the \verb|recover| combinator:
+
+\begin{minted}{scala}
+val purchase: Future[Int] = rateQuote map {
+  quote => connection.buy(amount, quote)
+} recover {
+  case QuoteChangedException() => 0
+}
+\end{minted}
+
+Here, \verb|recover combinator creates a new future which holds the same result
+as the original future if it completed successfully. If it did not complete
+successfully, then the partial function argument is applied to the
+\verb|Throwable| which failed the original future. If it maps the
+\verb|Throwable| to some value, then the new future is successfully completed
+with that value. If the partial function is not defined on that
+\verb|Throwable|, then the resulting future is failed with the same
+\verb|Throwable|.
+
+The \verb|recoverWith| combinator creates a new future which holds the same
+result as the original future if it completed successfully. Otherwise, the
+partial function is applied to the \verb|Throwable| which failed the original
+future. If it maps the \verb|Throwable| to some future, then this future is
+completed with the result of that future. Its relation to recover is similar to
+that of \verb|flatMap| to \verb|map|.
+
+Combinator \verb|fallbackTo| creates a new future which holds the result of this
+future if it was completed successfully, or otherwise the successful result of
+the argument future. In the event that both this future and the argument future
+fail, the new future is completed with the exception from this future, as in the
+following example which tries to print US dollar value, but prints the Swiss
+franc value in the case it fails to obtain the dollar value:
+
+\begin{minted}{scala}
+val usdQuote = Future {
+  connection.getCurrentValue(USD)
+} map {
+  usd => "Value: " + usd + "$"
+}
+val chfQuote = Future {
+  connection.getCurrentValue(CHF)
+} map {
+  chf => "Value: " + chf + "CHF"
+}
+val anyQuote = usdQuote fallbackTo chfQuote
+anyQuote onSuccess { println(_) }
+\end{minted}
 
 \subsection{Execution Contexts}
 \label{sec:execution-ctx}
@@ -1734,3 +1881,4 @@ benefit on platforms which do not support efficient
 continuations.
 
 \lipsum[1]
+\end{minted}
