@@ -454,6 +454,7 @@ fail, the new future is completed with the exception from this future, as in the
 following example which tries to print US dollar value, but prints the Swiss
 franc value in the case it fails to obtain the dollar value:
 
+\begin{minipage}{\linewidth}
 \begin{minted}{scala}
 val usdQuote = Future {
   connection.getCurrentValue(USD)
@@ -468,6 +469,7 @@ val chfQuote = Future {
 val anyQuote = usdQuote fallbackTo chfQuote
 anyQuote onSuccess { println(_) }
 \end{minted}
+\end{minipage}
 
 \subsection{Execution Contexts}
 \label{sec:execution-ctx}
@@ -565,14 +567,21 @@ before \verb|imagesFuts| or \verb|futImages| completes.
 \label{sec:flowpools}
 
 In our treatment of futures, we focused mainly on applying individual
-asynchronous operations to future values. We alluded to the
-possibility of chaining . Such chaining amounts to buliding up a directed
-acyclic graph (DAG) of computations.
+asynchronous operations to future values. We alluded to the possibility of
+chaining together composable operations on futures in order to build up rich
+computation graphs. Such chaining amounts to buliding up a directed acyclic
+graph (DAG) of computations and can be viewed as a sort of dataflow.
 
-{\em FlowPools} are a  fundamental dataflow collections abstraction which can be
-used as a building block for larger and more complex \textit{deterministic} and
-parallel dataflow programs. Our FlowPool abstraction is backed by an efficient
-non-blocking data structure.
+Thus, from a bird's eye view, one can think of Scala's futures as a {\em
+single-element} asynchronous dataflow framework, capable of building up rich and
+interesting DAGs of computation.
+
+{\em FlowPools} are a fundamental dataflow {\em collections} abstraction which
+can be used as a building block for larger and more complex
+\textit{deterministic} and parallel dataflow programs. That is, one can think of
+FlowPools as a pool-like collection of asynchronous elements like futures.
+
+Our FlowPool abstraction is backed by an efficient non-blocking data structure.
 %, which we go on to prove is lock-free. ---> no need to say this twice, see end of paragraph
 As a result, our data structure benefits from the increased robustness
 provided by lock-freedom~\cite{Herlihy90}, since its operations are not blocked
@@ -581,23 +590,23 @@ regardless of the behavior, including the failure, of concurrent threads.
 
 % I don't like how it says "we go on to show"
 In combining lock-freedom with a functional interface, we go on to show that
-FlowPools are \textit{composable}. That is, using prototypical higher-order
-functions such as \verb=foreach= and \verb=aggregate=, one can concisely form
-dataflow graphs, in which associated functions are executed asynchronously in
-a completely non-blocking way, as elements of FlowPools in the dataflow graph
-become available.
+FlowPools, like futures, are \textit{composable}. That is, using prototypical
+higher-order functions such as \verb=foreach= and \verb=aggregate=, one can
+concisely form dataflow graphs, in which associated functions are executed
+asynchronously in a completely non-blocking way, as elements of FlowPools in the
+dataflow graph become available.
 
 % I don't like how it says "we show"
-Finally, we show that FlowPools are able to overcome practical issues, such as
+Finally, present how FlowPools are able to overcome practical issues, such as
 out-of-memory errors, thus enabling programs based upon FlowPools to run
-indefinitely. By using a \textit{builder} abstraction, instead of something
-like iterators or streams (which can lead to non-determinism)
-we are able to garbage collect parts of the
-data structure we no longer need, thus reducing memory consumption.
+indefinitely. By using a \textit{builder} abstraction, instead of something like
+iterators or streams (which can lead to non-determinism) we are able to garbage
+collect parts of the data structure we no longer need, thus reducing memory
+consumption.
 
-Our contributions are the following:
+This chapter outlines the following contributions:
 \begin{enumerate}
-\item The design and Scala~\cite{Odersky10} implementation\footnote{See \texttt{http://www.assembla.com/code/scala-dataflow/git/nodes}}
+\item The design and Scala implementation\footnote{See \url{https://github.com/heathermiller/scala-dataflow}}
 of a parallel dataflow abstraction and underlying data structure that
 is deterministic, lock-free, \& composable.
 \item Proofs of lock-freedom, linearizability, and determinism.
@@ -741,7 +750,7 @@ FlowPool does not add barriers between nodes in the DAG, it only extends the DAG
 This means that individual elements within a FlowPool can \textit{flow} through
 different edges of the DAG independently.
 
-\textbf{Properties of FlowPools}. In our model, FlowPools have certain properties
+\textbf{Properties of FlowPools}. FlowPools have certain properties
 which ensure that resulting programs are deterministic.
 
 \begin{enumerate}
@@ -967,10 +976,10 @@ One can imagine more complex generators, which add elements from a
 network socket or a file, for example.
 
 \noindent
-\begin{minipage}[b]{4.2 cm}
+\begin{minipage}[t]{5.2 cm}
 \begin{minted}{scala}
 def tabulate[T]
-  (n: Int, f: Int => T)
+  (n: Int, f: Int => T) {
   val p = new FlowPool[T]
   val b = p.builder
   def recurse(i: Int) {
@@ -979,10 +988,11 @@ def tabulate[T]
   }
   future { recurse(0) }
   p
+}
 \end{minted}
-\end{minipage}\begin{minipage}[b]{4 cm}
+\end{minipage}\begin{minipage}[t]{5 cm}
 \begin{minted}{scala}
-def map[S](f: T => S)
+def map[S](f: T => S) {
   val p = new FlowPool[S]
   val b = p.builder
   for (x <- this) {
@@ -991,16 +1001,18 @@ def map[S](f: T => S)
     sz => b.seal(sz)
   }
   p
+}
 \end{minted}
 \end{minipage}
-\begin{minipage}[b]{2.5 cm}
+\begin{minipage}[t]{4 cm}
 \begin{minted}{scala}
-def foreach[U](f: T => U)
+def foreach[U](f: T => U) {
   aggregate(0)(_ + _) {
     (acc, x) =>
     f(x)
     acc + 1
   }
+}
 \end{minted}
 \end{minipage}
 
@@ -1038,49 +1050,54 @@ thus, the \verb=aggregate= accumulator is used to track the number
 of added elements.
 
 \noindent
-\begin{minipage}[b]{4 cm}
+\begin{minipage}[t]{5.2 cm}
 \begin{minted}{scala}
 def filter
-  (pred: T => Boolean)
+  (pred: T => Boolean) {
   val p = new FlowPool[T]
   val b = p.builder
-  aggregate(0)(_ + _) \{
-    (acc, x) => if pred(x) \{
+  aggregate(0)(_ + _) {
+    (acc, x) => if pred(x){
       b << x
       1
-    \} else 0
-  \} map \{ sz => b.seal(sz) \}
+    } else 0
+  } map {sz => b.seal(sz)}
   p
+}
 \end{minted}
-\end{minipage}\begin{minipage}[b]{4 cm}
+\end{minipage}\begin{minipage}[t]{5.3 cm}
 \begin{minted}{scala}
 def flatMap[S]
-  (f: T => FlowPool[S])
+  (f: T => FlowPool[S]) {
   val p = new FlowPool[S]
   val b = p.builder
-  aggregate(future(0))(add) \{
+  aggregate(future(0))(add){
     (af, x) =>
     val sf = for (y <- f(x))
       b << y
     add(af, sf)
-  \} map \{ sz => b.seal(sz) \}
+  } map {sz => b.seal(sz)}
   p
+}
 
 def add(f: Future[Int], g: Future[Int]) =
   for (a <- f; b <- g) yield a + b
 \end{minted}
 \end{minipage}
-\begin{minipage}[b]{4 cm}
+\begin{minipage}[t]{4 cm}
 \begin{minted}{scala}
 def union[T]
-  (that: FlowPool[T])
+  (that: FlowPool[T]) {
   val p = new FlowPool[T]
   val b = p.builder
-  val f = for (x <- this) b << x
-  val g = for (y <- that) b << y
+  val f =
+    for (x <- this) b << x
+  val g =
+    for (y <- that) b << y
   for (s1 <- f; s2 <- g)
     b.seal(s1 + s2)
   p
+}
 \end{minted}
 \end{minipage}
 
@@ -1110,17 +1127,18 @@ such as Oz streams, which would in turn have a nondeterministic \verb=union=.
 
 \centering
 
-\begin{minipage}[b]{4.5 cm}
+\begin{minipage}[t]{4.3 cm}
 \begin{minted}{scala}
 type Terminal {
   sealed: Int
-  callbacks: List[Elem => Unit]
+  callbacks:
+    List[Elem => Unit]
 }
 
 type Elem
 \end{minted}
 \end{minipage}
-\begin{minipage}[b]{3.5 cm}
+\begin{minipage}[t]{4 cm}
 \begin{minted}{scala}
 type Block {
   array: Array[Elem]
@@ -1130,7 +1148,7 @@ type Block {
 }
 \end{minted}
 \end{minipage}
-\begin{minipage}[b]{4 cm}
+\begin{minipage}[t]{5 cm}
 \begin{minted}{scala}
 type FlowPool {
   start: Block
