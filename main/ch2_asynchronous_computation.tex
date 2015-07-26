@@ -569,17 +569,19 @@ before \verb|imagesFuts| or \verb|futImages| completes.
 In our treatment of futures, we focused mainly on applying individual
 asynchronous operations to future values. We alluded to the possibility of
 chaining together composable operations on futures in order to build up rich
-computation graphs. Such chaining amounts to buliding up a directed acyclic
-graph (DAG) of computations and can be viewed as a sort of dataflow.
+computation graphs. Such chaining amounts to building up a directed acyclic
+graph (DAG) of computations and can be viewed as a sort of asynchronous
+dataflow.
 
-Thus, from a bird's eye view, one can think of Scala's futures as a {\em
-single-element} asynchronous dataflow framework, capable of building up rich and
+Thus, from a bird's eye view, one can think of Scala's futures as {\em
+single-element} asynchronous dataflow, capable of building up rich and
 interesting DAGs of computation.
 
 {\em FlowPools} are a fundamental dataflow {\em collections} abstraction which
 can be used as a building block for larger and more complex
 \textit{deterministic} and parallel dataflow programs. That is, one can think of
-FlowPools as a pool-like collection of asynchronous elements like futures.
+FlowPools as a fully asynchronous pool-like collection of individually
+asynchronous elements like futures.
 
 Our FlowPool abstraction is backed by an efficient non-blocking data structure.
 %, which we go on to prove is lock-free. ---> no need to say this twice, see end of paragraph
@@ -749,6 +751,56 @@ Put another way, invoking several higher-order functions in succession on a give
 FlowPool does not add barriers between nodes in the DAG, it only extends the DAG.
 This means that individual elements within a FlowPool can \textit{flow} through
 different edges of the DAG independently.
+
+To illustrate this, let's examine a simple example, visualizing how elements are
+processed within a FlowPool as compared to how elements within a parallel
+collection like \verb|ParVector| are processed. Let's assume we have a
+collection (either a FlowPool or a \verb|ParVector|) full of users of some
+social network. Ultimately, we would like to obtain a list of each user's friends who are the same age as the user:
+
+\begin{minted}{scala}
+val users: FlowPool[User] = ... // consider also ParVector[Users]
+users.map( user => (user.age, user.getFriends() ) ) // network call, long-running
+     .map {
+       case (userAge, friends) =>
+         friends.filter(friend => userAge == friend.age)
+     }
+\end{minted}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\textwidth]{images/barriers}
+\caption{Other collections, such as parallel collections, have barriers between
+nodes in the DAG. This means that all parallel computation happens only on the
+individual nodes (collections) meaning there is no parallelism {\em between}
+nodes in the DAG.}
+\label{fig:barriers}
+\end{figure}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=\textwidth]{images/barrier-free}
+\caption{FlowPools are fully asynchronous and barrier-free between nodes in the
+DAG. This means that parallel computation can happen both on the individual node
+(within the same collection) as well as {\em between} nodes (collections) along
+edges in the DAG.}
+\label{fig:barrier-free}
+\end{figure}
+
+While the programming interface remains identical across FlowPools and parallel
+collections, elements are processed differently between the two. The differences
+are illustrated in Figures~\ref{fig:barriers} and~\ref{fig:barrier-free}. As is
+depicted for parallel collections in Figure~\ref{fig:barriers}, elements are
+processed with barriers between stages, that is, the processing of all elements
+in the first stage (the \verb|users| parallel collection) must be complete
+before processing in the second stage (the first \verb|map| operation) can even
+begin. FlowPools on the other hand, as depicted in
+Figure~\ref{fig:barrier-free}, remove such barriers--when an element in
+\verb|users| is finished being processed, the first \verb|map| operation can be
+applied to that element individually, we need not wait until all other elements
+are completed in the first stage (in the \verb|users| FlowPool) before beginning
+the second stage of processing (the first \verb|map| operation). We thus refer
+to FlowPools as {\em barrier-free} between nodes in the computation DAG.
 
 \textbf{Properties of FlowPools}. FlowPools have certain properties
 which ensure that resulting programs are deterministic.
@@ -975,6 +1027,8 @@ by applying a user-specified function \verb=f= to natural numbers.
 One can imagine more complex generators, which add elements from a
 network socket or a file, for example.
 
+% \pagebreak
+% \vspace{10cm}
 \noindent
 \begin{minipage}[t]{5.2 cm}
 \begin{minted}{scala}
@@ -1123,9 +1177,9 @@ The \verb=zip= function is better suited for data structures with deterministic 
 such as Oz streams, which would in turn have a nondeterministic \verb=union=.
 
 
-\begin{figure}[t]
+% \begin{figure}[t]
 
-\centering
+% \centering
 
 \begin{minipage}[t]{4.3 cm}
 \begin{minted}{scala}
@@ -1159,11 +1213,11 @@ NOSEAL = -1
 \end{minted}
 \end{minipage}
 
-\caption{FlowPool data-types}
-\label{f-datatypes}
-\end{figure}
+% \caption{FlowPool data-types}
+% \label{f-datatypes}
+% \end{figure}
 
-\setlength\linenumbersep{2pt}
+% \setlength\linenumbersep{2pt}
 
 
 % \begin{figure}
@@ -1606,9 +1660,11 @@ thus ensuring that the \verb=append= operation scales.
 \vspace{-0.3cm}
 \subsection{Correctness}
 \label{sec:correctness}
-We give an outline of the correctness proof here. More formal
-definitions, and a complete set of lemmas and proofs can be found
-in the tech report \cite{Prokopec12}.
+
+We give an outline of the correctness proof here. More formal definitions, and
+the full lock-freedom proof can be found in Appendix~\ref{appdx:flowpools}.
+Linearizability and determinism proofs can be can be found in the companion
+technical report \cite{Prokopec12}.
 
 We define the notion of an abstract pool $\mathbb{A} = (elems,
 callbacks, seal)$ of elements in the pool, callbacks and the seal
@@ -1722,7 +1778,7 @@ FlowPool operations \verb=append=, \verb=foreach= and \verb=seal= are lock-free.
 
 \smallrulenames
 
-\begin{figure}[t]
+\begin{figure}
 %\figurebox{
 %{\bf Syntax}\medskip
 
@@ -1888,6 +1944,23 @@ time it takes to insert elements into the FlowPool is also measured, since the
 FlowPool programming model allows one to insert elements concurrently with the
 execution of higher-order functions.
 
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=\textwidth]{images/hist-comm}
+\setlength{\abovecaptionskip}{-10pt}
+\setlength{\belowcaptionskip}{-15pt}
+\caption{Execution time vs parallelization on a real histogram application
+(top), \& communication benchmark (bottom) showing memory efficiency,
+across all architectures.}
+\label{fig:eval-hist-comm}
+%   $\Diamond$ single-lane FlowPool,
+%   $\times$ multi-lane FlowPool,
+%   $\triangle$ linked transfer queue,
+%   $\circ$ concurrent linked queue} \label{fig:eval-cpu-scaling}
+\end{figure}
+
+
 In the \textit{Histogram} benchmark, Figure \ref{fig:eval-hist-comm}, $P$ threads produce a total of
 $N$ elements, adding them to the FlowPool.
 The \verb=aggregate= operation is then used to produce 10 different
@@ -1918,21 +1991,6 @@ FlowPools perform considerably better than the linked transfer queues.
 As a matter of fact, the linked transfer queue on the Xeon benchmark ran out of
 memory, and was unable to complete, while the multi-lane FlowPool scaled effortlessly
 to 400 million elements, indicating that unneeded elements are properly garbage collected.
-
-\begin{figure}[t!]
-\centering
-\includegraphics[width=\textwidth]{images/hist-comm}
-\setlength{\abovecaptionskip}{-10pt}
-\setlength{\belowcaptionskip}{-15pt}
-\caption{Execution time vs parallelization on a real histogram application
-(top), \& communication benchmark (bottom) showing memory efficiency,
-across all architectures.}
-\label{fig:eval-hist-comm}
-%   $\Diamond$ single-lane FlowPool,
-%   $\times$ multi-lane FlowPool,
-%   $\triangle$ linked transfer queue,
-%   $\circ$ concurrent linked queue} \label{fig:eval-cpu-scaling}
-\end{figure}
 
 
 \section{Related Work}
@@ -1976,10 +2034,10 @@ futures proposed by Baker and Hewitt \cite{Hewitt77}, and promises
 first mentioned by Friedman and Wise \cite{Wise76}.
 Futures were first implemented in MultiLISP \cite{Halstead85},
 and have been employed in many languages and frameworks since.
-Scala 2.10 futures~\cite{SIP14} and Twitter futures~\cite{TwitterFutures} are
-of interest, because they define monadic operators and a
-number of high-level combinators that create new futures.
-These APIs avoid blocking.
+% Scala 2.10 futures~\cite{SIP14} and Twitter futures~\cite{TwitterFutures} are
+% of interest, because they define monadic operators and a
+% number of high-level combinators that create new futures.
+% These APIs avoid blocking.
 Futures have been generalized to data-driven futures,
 which provide additional information to the scheduler~\cite{Tasirlar11}.
 Many frameworks have constructs that start an asynchronous
