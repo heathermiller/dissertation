@@ -1166,12 +1166,167 @@ NOSEAL = -1
 \setlength\linenumbersep{2pt}
 
 
+% \begin{figure}
+%
+% \centering
+%
+% \begin{minipage}[b]{6 cm}
+% \begin{minted}{scala}
+% {\internallinenumbers{def create()
+%   new FlowPool \{
+%     start = createBlock(0)
+%     current = start
+%   \}
+%
+% def createBlock(bidx: Int)
+%   new Block \{
+%     array = new Array(BLOCKSIZE)
+%     index = 0
+%     blockindex = bidx
+%     next = null
+%   \}
+%
+% def append(elem: Elem)
+%   b = READ(current) {\customlabel{read_block}{\LineNumber}}
+%   idx = READ(b.index) {\customlabel{read_index}{\LineNumber}}
+%   nexto = READ(b.array(idx + 1)) {\customlabel{read_next}{\LineNumber}}
+%   curo = READ(b.array(idx)) {\customlabel{read_current}{\LineNumber}}
+%   if check(b, idx, curo) \{
+%     if CAS(b.array(idx + 1), nexto, curo) \{ {\customlabel{cas_propagate}{\LineNumber}}
+%       if CAS(b.array(idx), curo, elem) \{ {\customlabel{cas_append}{\LineNumber}}
+%         WRITE(b.index, idx + 1) {\customlabel{write_append}{\LineNumber}}
+%         invokeCallbacks(elem, curo)
+%       \} else append(elem)
+%     \} else append(elem)
+%   \} else \{
+%     advance()
+%     append(elem)
+%   \}
+%
+% def check(b: Block, idx: Int, curo: Object)
+%   if idx > LASTELEMPOS return false
+%   else curo match \{
+%     elem: Elem =>
+%       return false
+%     term: Terminal =>
+%       if term.sealed = NOSEAL return true
+%       else \{
+%         if totalElems(b, idx) < term.sealed
+%           return true
+%         else error("sealed")
+%       \}
+%     null =>
+%       error("unreachable")
+%   \}
+%
+% def advance()
+%   b = READ(current)
+%   idx = READ(b.index)
+%   if idx > LASTELEMPOS
+%     expand(b, b.array(idx))
+%   else \{
+%     obj = READ(b.array(idx))
+%     if obj is Elem WRITE(b.index, idx + 1) {\customlabel{write_advance}{\LineNumber}}
+%   \}
+%
+% def expand(b: Block, t: Terminal)
+%   nb = READ(b.next)
+%   if nb is null \{
+%     nb = createBlock(b.blockindex + 1)
+%     nb.array(0) = t
+%     if CAS(b.next, null, nb) {\customlabel{cas_expand}{\LineNumber}}
+%       expand(b, t)
+%   \} else \{
+%     CAS(current, b, nb) {\customlabel{cas_block}{\LineNumber}}
+%   \}
+% }}
+% \end{minted}
+% \end{minipage}
+% \begin{minipage}[b]{6 cm}
+% \begin{minted}{scala}
+% {\internallinenumbers{def totalElems(b: Block, idx: Int)
+%   return b.blockindex * (BLOCKSIZE - 1) + idx
+%
+% def invokeCallbacks(e: Elem, term: Terminal)
+%   for (f <- term.callbacks) future \{
+%     f(e)
+%   \}
+%
+% def seal(size: Int)
+%   b = READ(current)
+%   idx = READ(b.index)
+%   if idx <= LASTELEMPOS \{
+%     curo = READ(b.array(idx)) {\customlabel{read_seal}{\LineNumber}}
+%     curo match \{
+%       term: Terminal =>
+%         if \(\lnot\)tryWriteSeal(term, b, idx, size)
+%           seal(size)
+%       elem: Elem =>
+%         WRITE(b.index, idx + 1) {\customlabel{write_seal}{\LineNumber}}
+%         seal(size)
+%       null =>
+%         error("unreachable")
+%     \}
+%   \} else \{
+%     expand(b, b.array(idx))
+%     seal(size)
+%   \}
+%
+% def tryWriteSeal(term: Terminal, b: Block,
+%   idx: Int, size: Int)
+%   val total = totalElems(b, idx)
+%   if total > size error("too many elements")
+%   if term.sealed = NOSEAL \{
+%     nterm = new Terminal \{
+%       sealed = size
+%       callbacks = term.callbacks
+%     \}
+%     return CAS(b.array(idx), term, nterm) {\customlabel{cas_seal}{\LineNumber}}
+%   \} else if term.sealed \(\neq\) size \{
+%     error("already sealed with different size")
+%   \} else return true
+%
+% def foreach(f: Elem => Unit)
+%   future \{
+%     asyncFor(f, start, 0)
+%   \}
+%
+% def asyncFor(f: Elem => Unit, b: Block, idx: Int)
+%   if idx <= LASTELEMPOS \{
+%     obj = READ(b.array(idx)) {\customlabel{read_callback}{\LineNumber}}
+%     obj match \{
+%       term: Terminal =>
+%         nterm = new Terminal \{
+%           sealed = term.sealed
+%           callbacks = f \(\cup\) term.callbacks
+%         \}
+%         if \(\lnot\)CAS(b.array(idx), term, nterm) {\customlabel{cas_callback}{\LineNumber}}
+%           asyncFor(f, b, idx)
+%       elem: Elem =>
+%         f(elem) {\customlabel{call_callback}{\LineNumber}}
+%         asyncFor(f, b, idx + 1)
+%       null =>
+%         error("unreachable")
+%     \}
+%   \} else \{
+%     expand(b, b.array(idx))
+%     asyncFor(f, b.next, 0)
+%   \}
+% }}
+% \end{minted}
+% \end{minipage}
+%
+% \caption{FlowPool operations pseudocode}
+% \label{f-pseudo}
+% \end{figure}
+
 \begin{figure}
 
 \centering
 
-\begin{minipage}[b]{6 cm}
-\begin{minted}{scala}
+\begin{minipage}[b]{7 cm}
+\begin{alltt}
+{\scriptsize
 {\internallinenumbers{def create()
   new FlowPool \{
     start = createBlock(0)
@@ -1239,11 +1394,12 @@ def expand(b: Block, t: Terminal)
   \} else \{
     CAS(current, b, nb) {\customlabel{cas_block}{\LineNumber}}
   \}
-}}
-\end{minted}
+}}}
+\end{alltt}
 \end{minipage}
-\begin{minipage}[b]{6 cm}
-\begin{minted}{scala}
+\begin{minipage}[b]{7 cm}
+\begin{alltt}
+{\scriptsize
 {\internallinenumbers{def totalElems(b: Block, idx: Int)
   return b.blockindex * (BLOCKSIZE - 1) + idx
 
@@ -1312,14 +1468,12 @@ def asyncFor(f: Elem => Unit, b: Block, idx: Int)
     expand(b, b.array(idx))
     asyncFor(f, b.next, 0)
   \}
-}}
-\end{minted}
+}}}
+\end{alltt}
 \end{minipage}
-
 \caption{FlowPool operations pseudocode}
 \label{f-pseudo}
 \end{figure}
-
 
 \vspace{-0.3cm}
 \subsection{Implementation}
