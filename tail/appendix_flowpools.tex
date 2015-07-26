@@ -198,11 +198,6 @@ def asyncFor(f: Elem => Unit, b: Block, idx: Int)
 \end{figure}
 
 \begin{lemmatwo}
-Given a FlowPool consistent with some abstract pool,
-CAS instructions in lines \ref{cas_propagate}
-\end{lemmatwo}
-
-\begin{lemmatwo}
 Given a FlowPool consistent with some abstract
 pool, CAS instructions in lines \ref{cas_propagate}, \ref{cas_expand} and
 \ref{cas_block} do not change the corresponding abstract pool.
@@ -396,10 +391,10 @@ n \in \mathbb{N}
 \section{Proof of Correctness}
 \label{appendix-correctness}
 
-% \setcounter{lemma}{0}
-% \setcounter{theorem}{0}
-% \setcounter{corollary}{0}
-% \setcounter{definitiontwo}{0}
+% \setcounter{lemmatwo}{0}
+% \setcounter{theoremtwo}{0}
+% % \setcounter{cor}{0}
+% \setcounter{definition}{0}
 
 \begin{definitiontwo}[Data types]
 A \textbf{Block} $b$ is an object which
@@ -614,18 +609,18 @@ Every valid state is consistent with some abstract pool.
 \end{proptwo}
 
 
-\begin{theorem}[Safety]
+\begin{theoremtwo}[Safety]
 FlowPool operation \verb=create= creates a new FlowPool consistent with the abstract pool
 $\mathbb{P} = (\emptyset, \emptyset, -1)$. FlowPool operations \verb=foreach=, \verb=append=
 and \verb=seal= are consistent with the abstract pool semantics.
-\end{theorem}
+\end{theoremtwo}
 
 
-\begin{lemma}[End of life]\label{lemma-end-of-life}
+\begin{lemmatwo}[End of life]\label{lemma-end-of-life}
 For all blocks $b \in reachable(start)$, if value $v \in Elem$ is
 written to $b.array$ at some position $idx$ at some time $t_0$, then
 $\forall t > t_0, b.array(idx) = v$.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 The CAS in line \ref{cas_append} is the only CAS which writes an
@@ -642,10 +637,10 @@ of type $Elem$ at $t_0$, then $\forall t > t_0$ there is no write to $b.array$.
 \end{cor}
 
 
-\begin{lemma}[Valid hint]\label{lemma-valid-hint}
+\begin{lemmatwo}[Valid hint]\label{lemma-valid-hint}
 For all blocks $b \in reachable(start)$, if $b.index > 0$ at some time $t_0$, then
 $b.array(b.index - 1) \in Elem$ at time $t_0$.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 Observe every write to $b.index$ -- they are all unconditional.
@@ -686,10 +681,10 @@ A function of time $f(t)$ is said to be \textbf{monotonic}, if every value in it
 \end{definitiontwo}
 
 
-\begin{lemma}[Freshness]\label{lemma-freshness}
+\begin{lemmatwo}[Freshness]\label{lemma-freshness}
 For all blocks $b \in reachable(start)$, and for all $x \in b.array$,
 function $x$ is monotonic.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 CAS instruction in line \ref{cas_append} writes a value of type
@@ -764,13 +759,13 @@ for any $idx$, so there is no thread that writes a non-fresh value at all.
 \end{proof}
 
 
-\begin{lemma}[Lifecycle]\label{lemma-lifecycle}
+\begin{lemmatwo}[Lifecycle]\label{lemma-lifecycle}
 For all blocks $b \in reachable(start)$, and for all $x \in b.array$, function $x$ goes through and only through the prefix of the following transitions:
 
 $null \rightarrow cb_1 \rightarrow \dots \rightarrow cb_n \rightarrow elem$, where:
 
 $cb_i \in Terminal, i \neq j \Rightarrow cb_i \neq cb_j, elem \in Elem$
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 First of all, it is obvious from the code that each block that becomes
@@ -812,7 +807,7 @@ Finally, note that the statement for CAS instructions in lines \ref{cas_seal} an
 \end{proof}
 
 
-\begin{lemma}[Subsequence]\label{lemma-subsequence}
+\begin{lemmatwo}[Subsequence]\label{lemma-subsequence}
 Assume that for some block $b \in reachable(start)$ the transitions of
 $b.array(idx)$ are:
 
@@ -831,7 +826,7 @@ b.array(idx + 1): null \rightarrow cb_1' \rightarrow \cdots
 The string of transitions $null \rightarrow cb_1' \rightarrow \cdots
 \rightarrow cb_m'$ is a subsequence of $null \rightarrow cb_1
 \rightarrow \cdots \rightarrow cb_n$.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 Note that all the values written to $idx + 1$ before $t_0$ by CAS in line \ref{cas_propagate} were
@@ -857,9 +852,9 @@ of \textbf{all} the transitions of values at $idx$ (not just until $t_0$).
 \end{proof}
 
 
-\begin{lemma}[Valid writes]\label{lemma-valid}
+\begin{lemmatwo}[Valid writes]\label{lemma-valid}
 Given a FlowPool in a valid state, all writes in all operations produce a FlowPool in a valid state.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 A new FlowPool is trivially in a valid state.
@@ -915,11 +910,11 @@ This means that [INV4] is kept.
 \end{proof}
 
 
-\begin{lemma}[Housekeeping]\label{lemma-housekeeping}
+\begin{lemmatwo}[Housekeeping]\label{lemma-housekeeping}
 Given a FlowPool in state $\mathbb{S}$ consistent with some abstract
 pool state $\mathbb{A}$, CAS instructions in lines \ref{cas_propagate}, \ref{cas_expand} and
 \ref{cas_block} do not change the abstract pool state $\mathbb{A}$.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 Since none of the relations $hasElem$, $hasCallback$, $willBeCalled$ and $sealedAt$
@@ -959,7 +954,7 @@ and $sealedAt$ are not changed by the CAS in line \ref{cas_propagate}.
 \end{proof}
 
 
-\begin{lemma}[Append correctness]\label{lemma-append}
+\begin{lemmatwo}[Append correctness]\label{lemma-append}
 Given a FlowPool in state $\mathbb{S}$ consistent with some abstract pool state $\mathbb{A}$,
 a successful CAS in line \ref{cas_append} at some time $t_0$ changes the state of the FlowPool
 to $\mathbb{S}_0$ consistent with an abstract pool state $\mathbb{A}_0$, such that:
@@ -974,7 +969,7 @@ is consistent with an abstract pool in state $\mathbb{A}_1$, such that:
 $\mathbb{A}_1 = (elems_1, callbacks_1, seal_1)$, where:
 
 $\forall (f, called_1) \in callbacks_1, (f, called) \in callbacks \Rightarrow elem \in called_1$
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 Assume that the CAS in line \ref{cas_append} succeeds at some time
@@ -1016,7 +1011,7 @@ scheduled within a finite number of steps.
 \end{proof}
 
 
-\begin{lemma}[Foreach correctness]\label{lemma-foreach}
+\begin{lemmatwo}[Foreach correctness]\label{lemma-foreach}
 Given a FlowPool in state $\mathbb{S}$ consistent with some abstract pool state $\mathbb{A}$,
 a successful CAS in line \ref{cas_callback} at some time $t_0$ changes the state of the FlowPool
 to $\mathbb{S}_0$ consistent with an abstract pool state $\mathbb{A}_0$, such that:
@@ -1033,7 +1028,7 @@ $\mathbb{A}_1 = (elems_1, callbacks_1, seal_1)$, where:
 $elems \subseteq elems_1$
 
 $\forall (f, called_1) \in callbacks_1, elems \subseteq called_1$
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 From \ref{lemma-freshness} and the assumption that the CAS is
@@ -1055,7 +1050,7 @@ Trivially, the time $t_1$ from the statement of the lemma is such that $t_1 = t_
 \end{proof}
 
 
-\begin{lemma}[Seal correctness]\label{lemma-seal}
+\begin{lemmatwo}[Seal correctness]\label{lemma-seal}
 Given a FlowPool in state $\mathbb{S}$ consistent with some abstract pool state $\mathbb{A}$,
 a successful CAS in line \ref{cas_seal} at some time $t_0$ changes the state of the FlowPool
 to $\mathbb{S}_0$ consistent with an abstract pool state $\mathbb{A}_0$, such that:
@@ -1064,7 +1059,7 @@ $\mathbb{A} = (elems, callbacks, seal)$, where $seal \in \{ -1 \} \cup
 \{ s \}$
 
 $\mathbb{A}_0 = (elems, callbacks, \{ s \})$
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 Similar to the proof of \ref{lemma-foreach}.
@@ -1081,9 +1076,9 @@ We say that thread T executes the operation $op$ \textbf{in isolation}.
 \end{definitiontwo}
 
 
-\begin{lemma}[Obstruction-free operations]\label{lemma-obstruction-free}
+\begin{lemmatwo}[Obstruction-free operations]\label{lemma-obstruction-free}
 All operations on FlowPools are obstruction-free.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 By trivial sequential code analysis supported by the fact that the
@@ -1105,9 +1100,9 @@ and before it finished executing.
 \end{definitiontwo}
 
 
-\begin{theorem}[Linearizable operations]
+\begin{theoremtwo}[Linearizable operations]
 FlowPool operations \verb=append= and \verb=seal= are linearizable.
-\end{theorem}
+\end{theoremtwo}
 
 \begin{proof}[Linearizable operations]
 This follows directly from statements about CAS instructions in \ref{lemma-housekeeping},
@@ -1158,7 +1153,7 @@ thread.
 \end{definitiontwo}
 
 
-\begin{theorem}[Lock-freedom]\label{theorem-lock-freedom}
+\begin{theoremtwo}[Lock-freedom]\label{theorem-lock-freedom}
 FlowPool operations \verb=append=, \verb=seal=, and \verb=foreach= are lock-free.
 
 We begin by first proving that there are a finite number of execution steps
@@ -1176,7 +1171,7 @@ By \ref{lemma-operation-completes}, this means a concurrent operation
 \verb=append=, \verb=seal=, or \verb=foreach= will successfully complete.
 Therefore, by \ref{def-lock-freedom},  these operations are lock-free.
 
-\end{theorem}
+\end{theoremtwo}
 
 % CASes that fail by being completed by other CASes signify progress.
 
@@ -1201,11 +1196,11 @@ WRITE instructions:
 % LEMMA 1
 %==============================
 
-\begin{lemma}\label{lemma-non-consistency-cas} After invoking an operation
+\begin{lemmatwo}\label{lemma-non-consistency-cas} After invoking an operation
 $op$, if non-consistency changing CAS operations $CAS_{append-out}$,
 $CAS_{expand-nxt}$, or $CAS_{expand-curr}$, in the pseudocode fail, they must have
 already been successfully completed by another thread since $op$ began.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof} Trivial inspection of the pseudocode reveals that since $CAS_{append-out}$
 makes up a check that precedes $CAS_{append-inn}$, and since
@@ -1230,7 +1225,7 @@ already successfully completed $CAS_{expand-curr}$ since $op$ began.
 % Lemma \ref{lemma-expand} (EXPAND)
 %==============================
 
-\begin{lemma}[Expand]\label{lemma-expand}
+\begin{lemmatwo}[Expand]\label{lemma-expand}
 Invoking the $expand$ operation will execute a non- consistency changing
 instruction after a finite number of steps. Moreover, it is guaranteed that
 the $current$ reference is updated to point to a subsequent block after a
@@ -1240,7 +1235,7 @@ steps
 % FlowPool $pool$ before invoking $expand$ through \verb=append=, the number of
 % blocks $numBlocks'$ after some finite number of steps is guaranteed to satisfy
 % $numBlocks'>numBlocks$
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 
@@ -1287,11 +1282,11 @@ strictly increases after some finite number of steps.
 % Lemma \ref{lemma-cas2} (CAS2)
 %==============================
 
-\begin{lemma}[$CAS_{append-inn}$]\label{lemma-cas2} After invoking \verb=append(elem)=, if
+\begin{lemmatwo}[$CAS_{append-inn}$]\label{lemma-cas2} After invoking \verb=append(elem)=, if
 $CAS_{append-inn}$ fails, then some thread has successfully completed
 $CAS_{append-inn}$ or $CAS_{seal}$ (or likewise, $CAS_{foreach}$) after some
 finite number of steps.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 First, we show that a thread attempting to complete $CAS_{append-inn}$ can't fail due to a
@@ -1336,11 +1331,11 @@ using the same steps as were taken for $CAS_{seal}$.
 % Lemma \ref{lemma-finite-steps-state-change} (FINITE # STEPS BEFORE STATE CHANGE)
 %==============================
 
-\begin{lemma}[Finite Steps Before State Change]\label{lemma-finite-steps-state-change}
+\begin{lemmatwo}[Finite Steps Before State Change]\label{lemma-finite-steps-state-change}
 All operations with the exception of \verb=append=, \verb=seal=, and
 \verb=foreach= execute only a finite number of steps between each state
 changing instruction.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof} The \verb=advance=, \verb=check=, \verb=totalElems=,
 \verb=invokeCallbacks=, and \verb=tryWriteSeal= operations have a finite
@@ -1359,10 +1354,10 @@ finite number of steps.
 % Lemma \ref{lemma-append} (APPEND: FINITE # STEPS BEFORE CONSISTENCY CHANGE)
 %==============================
 
-\begin{lemma}[Append]\label{lemma-append}
+\begin{lemmatwo}[Append]\label{lemma-append}
 After invoking \verb=append(elem)=, a consistency changing instruction will be
 completed after a finite number of steps.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 The \verb=append= operation can be restarted in three cases. We show that in
@@ -1434,10 +1429,10 @@ invocation of \verb=append= are guaranteed to have a finite number of steps betw
 
 % We don't actually cite this lemma? Really?
 
-\begin{lemma}[$CAS_{seal}$]\label{lemma-cas5}
+\begin{lemmatwo}[$CAS_{seal}$]\label{lemma-cas5}
 After invoking \verb=seal(size)=, if $CAS_{seal}$ fails, then some thread has
 successfully completed $CAS_{seal}$ or $CAS_{append-inn}$ after some finite number of steps.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof} Since by \ref{lemma-cas2}, we know that $CAS_{append-out}$
 only duplicates an existing $Terminal$, it can not be the cause for a failing
@@ -1458,10 +1453,10 @@ $elem$  into location $idx$.
 % Lemma \ref{lemma-write2-write3}, WRITE2 AND WRITE3
 %==============================
 
-\begin{lemma}[$WRITE_{adv}$ and $WRITE_{seal}$]\label{lemma-write2-write3}
+\begin{lemmatwo}[$WRITE_{adv}$ and $WRITE_{seal}$]\label{lemma-write2-write3}
 After updating $b.index$ using $WRITE_{adv}$ or $WRITE_{seal}$,  $b.index$ is guaranteed
 to be incremented after a finite number of steps.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 For some index, $idx$, both calls to $WRITE_{adv}$ and $WRITE_{seal}$ attempt
@@ -1481,11 +1476,11 @@ updates $b.index$ with $idx+1$.
 % Lemma \ref{lemma-finite-steps-consistency-change} (SEAL: FINITE # STEPS BEFORE CONSISTENCY CHANGE)
 %==============================
 
-\begin{lemma}[Finite Steps Before Consistency Change]\label{lemma-finite-steps-consistency-change}
+\begin{lemmatwo}[Finite Steps Before Consistency Change]\label{lemma-finite-steps-consistency-change}
 After invoking \verb=seal(size)=, a consistency changing instruction will be
 completed after a finite number of steps, or the initial invocation of
 \verb=seal(size)= completes.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 The \verb=seal= operation can be restarted in two scenarios.
@@ -1556,10 +1551,10 @@ showed will successfully complete in a finite number of steps.
 % Lemma \ref{lemma-foreach-cons} (FOREACH: FINITE # STEPS BEFORE CONSISTENCY CHANGE)
 %==============================
 
-\begin{lemma}[Foreach]\label{lemma-foreach-cons}
+\begin{lemmatwo}[Foreach]\label{lemma-foreach-cons}
 After invoking \verb=foreach(fun)=, a consistency changing instruction will
 be completed after a finite number of steps.
-\end{lemma}
+\end{lemmatwo}
 
 We omit the proof for \verb=foreach= since it proceeds in the exactly the same way
 as does the proof for \verb=seal= in
@@ -1569,11 +1564,11 @@ as does the proof for \verb=seal= in
 % Lemma \ref{lemma-operation-completes}
 %==============================
 
-\begin{lemma}\label{lemma-operation-completes}
+\begin{lemmatwo}\label{lemma-operation-completes}
 Assume some concurrent operation is started. If some thread completes
 a consistency changing CAS instruction, then some concurrent operation is
 guaranteed to be completed.
-\end{lemma}
+\end{lemmatwo}
 
 \begin{proof}
 % By Lemma X and Y, we know that consistency changing
