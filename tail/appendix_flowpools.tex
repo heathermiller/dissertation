@@ -3,9 +3,19 @@
 
 \section{Introduction}
 
+Implementing correct and deterministic parallel programs is challenging. Even
+though concurrency constructs exist in popular programming languages to
+facilitate the task of deterministic parallel programming, they are often too
+low level, or do not compose well due to underlying blocking mechanisms. In this
+appendix, we present the detailed proofs of the lock-freedom, and determinism
+properties of FlowPools, a deterministic concurrent dataflow abstraction
+presented in~\cite{FlowPools}. The detailed proofs for linearizability and
+determinism can be found in the companion tech report~\cite{Prokopec12}.
+
 We first provide a summary of the lemmas and theorems introduced in the
-associated paper, \emph{FlowPools: A Lock-Free Deterministic Concurrent
-Dataflow Abstraction}  \cite{Prokopec12}
+associated paper, \emph{FlowPools: A Lock-Free Deterministic Concurrent Dataflow
+Abstraction}~\cite{FlowPools}. We then cover definitions and invariants before
+moving on to our proof of lock-freedom.
 
 We define the notion of an abstract pool $\mathbb{A} = (elems,
 callbacks, seal)$ of elements in the pool, callbacks and the seal
@@ -608,512 +618,512 @@ with an abstract set $\mathbb{A'}$, where $\mathbb{A} \neq \mathbb{A'}$.
 Every valid state is consistent with some abstract pool.
 \end{proptwo}
 
-
-\begin{theoremtwo}[Safety]
-FlowPool operation \verb=create= creates a new FlowPool consistent with the abstract pool
-$\mathbb{P} = (\emptyset, \emptyset, -1)$. FlowPool operations \verb=foreach=, \verb=append=
-and \verb=seal= are consistent with the abstract pool semantics.
-\end{theoremtwo}
-
-
-\begin{lemmatwo}[End of life]\label{lemma-end-of-life}
-For all blocks $b \in reachable(start)$, if value $v \in Elem$ is
-written to $b.array$ at some position $idx$ at some time $t_0$, then
-$\forall t > t_0, b.array(idx) = v$.
-\end{lemmatwo}
-
-\begin{proof}
-The CAS in line \ref{cas_append} is the only CAS which writes an
-element.
-No other CAS has a value of type $Elem$ as the expected value.
-This means that once the CAS in line \ref{cas_append} writes a value
-of type $Elem$, no other write can change it.
-\end{proof}
-
-
-\begin{cor}\label{cor-end-of-life}
-The end of life lemma implies that if all the values in $b.array$ are
-of type $Elem$ at $t_0$, then $\forall t > t_0$ there is no write to $b.array$.
-\end{cor}
-
-
-\begin{lemmatwo}[Valid hint]\label{lemma-valid-hint}
-For all blocks $b \in reachable(start)$, if $b.index > 0$ at some time $t_0$, then
-$b.array(b.index - 1) \in Elem$ at time $t_0$.
-\end{lemmatwo}
-
-\begin{proof}
-Observe every write to $b.index$ -- they are all unconditional.
-However, at every such write occurring at some time $t_1$ that writes
-some value $idx$ we know that some previous value at $b.array$ entry $idx - 1$
-at some time $t_0 < t_1$ was of type $Elem$.
-Hence, from \ref{lemma-end-of-life} it follows that
-$\forall t \geq t_1, b.array(idx - 1) \in Elem$.
-\end{proof}
-
-
-\begin{cor}[Compactness]\label{cor-compactness}
-For all blocks $b \in reachable(start)$, if for some $idx$
-$b.array(idx) \in Elem$ at time $t_0$ then $b.array(idx - 1) \in Elem$
-at time $t_0$. This follows
-directly from the \ref{lemma-end-of-life} and
-\ref{lemma-valid-hint}, and the fact that the CAS in line
-\ref{cas_append} only writes to array entries $idx$ for which it
-previously read the value from $b.index$.
-\end{cor}
-
-
-\begin{definitiontwo}[Transition]
-If for a function $f(t)$ there exist times $t_0$ and $t_1$ such that
-$\forall t, t_0 < t < t_1, f(t) = v_0$ and $f(t_1) = v_1$, then we say
-that the function $f$ goes through a \textbf{transition} at $t_1$. We denote this as:
-
-$f: v_0 \stackrel{t_1}{\rightarrow} v_1$
-
-Or, if we don't care about the exact time $t_1$, simply as:
-
-$f: v_0 \rightarrow v_1$
-\end{definitiontwo}
-
-
-\begin{definitiontwo}[Monotonicity]
-A function of time $f(t)$ is said to be \textbf{monotonic}, if every value in its string of transitions occurs only once.
-\end{definitiontwo}
-
-
-\begin{lemmatwo}[Freshness]\label{lemma-freshness}
-For all blocks $b \in reachable(start)$, and for all $x \in b.array$,
-function $x$ is monotonic.
-\end{lemmatwo}
-
-\begin{proof}
-CAS instruction in line \ref{cas_append} writes a value of type
-$Elem$. No CAS instruction has a value of type $Elem$ as the expected value,
-so this write occurs only once.
-
-Trivial analysis of CAS instructions in lines \ref{cas_seal} and
-\ref{cas_callback}, shows that their expected values are of type
-$Terminal$. Their new values are always freshly allocated.
-
-The more difficult part is to show that CAS instruction in line
-\ref{cas_propagate} respects the statement of the lemma.
-
-Since the CAS instructions in lines \ref{cas_seal} and
-\ref{cas_callback} are preceeded by a read of $idx = b.index$,
-from \ref{lemma-valid-hint} it follows that $b.array(idx - 1)$
-contains a value of type $Elem$.
-These are also the only CAS instructions which replace a $Terminal$
-value with another $Terminal$ value. The new value is always unique, as
-shown above.
-
-So the only potential CAS to write a non-fresh value to $idx + 1$ is the CAS
-in line \ref{cas_propagate}.
-
-A successful CAS in line \ref{cas_propagate} overwrites a value $cb_0$ at $idx + 1$
-read in line \ref{read_next} at $t_0$ with a new value $cb_2$ at time $t_2$. Value $cb_2$ was
-read in line \ref{read_current} at $t_1$ from the entry $idx$. The
-string of transitions of values at $idx$ is composed of unique values
-at least since $t_1$ (by \ref{lemma-end-of-life}), since there is
-a value of type $Elem$ at the index $idx - 1$.
-
-The conclusion above ensures that the values read in line \ref{read_current}
-to be subsequently used as new values for the CAS in line \ref{cas_propagate}
-form a monotonic function $f(t) = b.array(idx) \text{ at } t$.
-
-Now assume that a thread T1 successfully overwrites $cb_0$
-via CAS in line \ref{cas_propagate} at $idx + 1$ at time $t_2$
-to a value $cb_2$ read from $idx$ at $t_1$, and that another thread T2
-is the \textbf{first} thread (since the FlowPool was created) to subsequently successfully
-complete the CAS in line \ref{cas_propagate} at $idx + 1$ at time
-$t_{prev2} > t_2$ with some value $cb_{prev2}$ which was at $idx + 1$ at some time
-$t < t_0$.
-
-That would mean that $b.array(idx + 1)$ does not change during $\langle t_0, t_2 \rangle$,
-since T2 was the first thread the write a non-fresh value to $idx + 1$, and any
-other write would cause the CAS in line \ref{cas_propagate} by T1 to fail.
-%That means that $t_0 > t_{prev0}$, otherwise the CAS in line \ref{cas_propagate}
-%by T2 would have failed.
-
-Also, that would mean that the thread T2 read the value
-$cb_{prev2}$ in line \ref{read_current} at some time $t_{prev1} < t_1$
-and successfully completed the CAS at time $t_{prev2} > t_2$. If the
-CAS was successful, then the read in line \ref{read_next} by T2
-occured at $t_{prev0} < t_{prev1} < t_1$. Since we assumed that T2 is the
-first thread to write a value $cb_{prev2}$ to $idx + 1$ at time $t_{prev2}$
-which was previously in $idx + 1$ at some time $t < t_0$, then the CAS
-in line \ref{cas_propagate} at time $t_{prev2}$ could not have succeeded,
-since its expected value is $cb_{prev0}$ read at some time $t_{prev0}$, and
-we know that the value at $idx + 1$ was changed at least once in $\langle t_{prev0}, t_{prev2} \rangle$
-because of the write of a fresh value by thread T1 at $t_2 \in \langle t_{prev0}, t_{prev2} \rangle$.
-This value is known to be fresh because $b.array(idx)$ is a monotonic
-function at least since $t_{prev1}$, and the read of the new value
-written by T1 occurred at $t_1 > t_{prev1}$.
-We also know that there is no other thread T3 to write the value
- $cb_{prev0}$ during $\langle t_{prev0}, t_{prev2} \rangle$
-back to $idx + 1$, since we assumed that T2 is the first to write
-a non-fresh value at that position.
-
-Hence, a contradiction shows that there is no thread T2 which is the \textbf{first}
-to write a non-fresh value via CAS in line \ref{cas_propagate} at $idx + 1$
-for any $idx$, so there is no thread that writes a non-fresh value at all.
-\end{proof}
-
-
-\begin{lemmatwo}[Lifecycle]\label{lemma-lifecycle}
-For all blocks $b \in reachable(start)$, and for all $x \in b.array$, function $x$ goes through and only through the prefix of the following transitions:
-
-$null \rightarrow cb_1 \rightarrow \dots \rightarrow cb_n \rightarrow elem$, where:
-
-$cb_i \in Terminal, i \neq j \Rightarrow cb_i \neq cb_j, elem \in Elem$
-\end{lemmatwo}
-
-\begin{proof}
-First of all, it is obvious from the code that each block that becomes
-an element of $reachable(start)$ at some time $t_0$ has the value of
-all $x \in b.array$ set to $null$.
-
-Next, we inspect all the CAS instructions that operate on entries of
-$b.array$.
-
-The CAS in line \ref{cas_append} has a value $curo \in Terminal$ as
-an expected value and writes an $elem \in Elem$.
-This means that the only transition that this CAS
-can cause is of type $cb_i \in Terminal \rightarrow elem \in Elem$.
-
-We will now prove that the CAS in line \ref{cas_propagate} at time $t_2$ is successful if and
-only if the entry at $idx + 1$ is $null$ or $nexto \in
-Terminal$.
-We know that the entry at $idx + 1$ does not change $\forall t, t_0 < t < t_2$,
-where $t_0$ is the read in line \ref{read_next},
-because of \ref{lemma-freshness} and the fact that CAS in line \ref{cas_propagate} is assumed to be successful.
-We know that during the read in line \ref{read_current} at time $t_1$,
-such that $t_0 < t_1 < t_2$, the entry at $idx$ was $curo \in
-Terminal$, by trivial analysis of the \verb=check= procedure.
-It follows from corollary \ref{cor-compactness} that the array entry $idx
-+ 1$ is not of type $Elem$ at time $t_1$, otherwise array entry $idx$
-would have to be of type $Elem$.
-Finally, we know that the entry at $idx + 1$ has the same value during
-the interval $\langle t_1, t_2 \rangle$, so its value is not $Elem$ at $t_2$.
-
-The above reasoning shows that the CAS in line \ref{cas_propagate}
-always overwrites a one value of type $Terminal$ (or $null$) with
-another value of type $Terminal$.
-We have shown in \ref{lemma-freshness} that it never
-overwrites the value $cb_0$ with a value $cb_2$ that was at
-$b.array(idx)$ at an earlier time.
-
-Finally, note that the statement for CAS instructions in lines \ref{cas_seal} and
-\ref{cas_callback} also follows directly from the proof for \ref{lemma-freshness}.
-\end{proof}
-
-
-\begin{lemmatwo}[Subsequence]\label{lemma-subsequence}
-Assume that for some block $b \in reachable(start)$ the transitions of
-$b.array(idx)$ are:
-
-\begin{equation*}
-b.array(idx): null \rightarrow cb_1 \rightarrow \cdots \rightarrow
-cb_n \stackrel{t_0}{\rightarrow} elem: Elem
-\end{equation*}
-
-Assume that the transitions of $b.array(idx + 1)$ up to time $t_0$ are:
-
-\begin{equation*}
-b.array(idx + 1): null \rightarrow cb_1' \rightarrow \cdots
-\rightarrow cb_m'
-\end{equation*}
-
-The string of transitions $null \rightarrow cb_1' \rightarrow \cdots
-\rightarrow cb_m'$ is a subsequence of $null \rightarrow cb_1
-\rightarrow \cdots \rightarrow cb_n$.
-\end{lemmatwo}
-
-\begin{proof}
-Note that all the values written to $idx + 1$ before $t_0$ by CAS in line \ref{cas_propagate} were
-previously read from $idx$ in line \ref{read_current}.
-This means that the set of values occurring in $b.array(idx + 1)$
-before $t_0$ is a subset of the set of values in $b.array(idx)$.
-We have to prove that it is actually a subsequence.
-
-Assume that there exist two values $cb_1$ and $cb_2$ read by threads T1 and T2
-in line \ref{read_current} at times $t_1$ and $t_2 > t_1$, respectively.
-Assume that these values are written to $idx + 1$ by threads T1 and T2
-in line \ref{cas_propagate} in the opposite order, that is at times
-$t_{cas1}$ and $t_{cas2} < t_{cas1}$, respectively.
-That would mean that the CAS by thread T1 would have to fail, since its expected
-value $cb_0$ has changed between the time it was read in line \ref{read_next} and
-the $t_{cas1}$ at least once to a different value, and it could not have been
-changed back to $cb_0$ as we know from the \ref{lemma-freshness}.
-
-Notice that we have actually prooved a stronger result above.
-We have also shown that the string of values
-written at $idx + 1$ by CAS in line \ref{cas_propagate} successfully is a subsequence
-of \textbf{all} the transitions of values at $idx$ (not just until $t_0$).
-\end{proof}
-
-
-\begin{lemmatwo}[Valid writes]\label{lemma-valid}
-Given a FlowPool in a valid state, all writes in all operations produce a FlowPool in a valid state.
-\end{lemmatwo}
-
-\begin{proof}
-A new FlowPool is trivially in a valid state.
-
-Otherwise, assume that the FlowPool is in a valid state
-$\mathbb{S}$.
-In the rest of the proof, whenever some invariant is trivially
-unaffected by a write, we omit mentioning it.
-We start by noting that we already prooved the claim
-for atomic writes in lines \ref{write_append}, \ref{write_advance} and
-\ref{write_seal} (which only affect [INV5]) in \ref{lemma-valid-hint}.
-We proceed by analyzing each atomic CAS instruction.
-
-CAS in line \ref{cas_expand} at time $t_1$ maintains the invariant
-[INV1].
-This is because its expected value is always
-$null$, which ensures that the lifecycle of $b.next$ is $null
-\rightarrow b': Block$, meaning that the function $reachable(start)$
-returns a monotonically growing set.
-So if $current \in reachable(start)$ at $t_0$, then this also holds at
-$t_1 > t_0$.
-It also maintains [INV2] because the new value $nb$ is always fresh,
-so $\forall b, b \not \in following(b)$.
-Finally, it maintains [INV3] because it is preceeded with a bounds
-check and we know from corollary \ref{cor-compactness} and the
-\ref{lemma-end-of-life} that all the values in $b.array(idx),
-idx < LASTELEMPOS$ must be of type $Elem$.
-
-CAS in line \ref{cas_block} at time $t_1$ maintains the
-invariant [INV1], since the new value for the $current \neq null$ was read from
-$b.next$ at $t_0 < t_1$ when the invariant was assumed to hold, and
-it is still there a $t_1$, as shown before.
-
-For CAS instructions in lines \ref{cas_append}, \ref{cas_callback} and
-\ref{cas_seal} that write to index $idx$ we know from
-\ref{lemma-valid-hint} that the value at $idx - 1$ is of type $Elem$.
-This immediately shows that CAS instructions in lines
-\ref{cas_callback} and \ref{cas_seal} maintain [INV3] and [INV4].
-
-For CAS in line \ref{cas_append} we additionally know that it must
-have been preceeded by a successful CAS in line \ref{cas_propagate}
-which previously wrote a $Terminal$ value to $idx + 1$. From
-\ref{lemma-lifecycle} we know that $idx + 1$ is still $Terminal$ when
-the CAS in line \ref{cas_append} occurs, hence [INV4] is kept.
-
-Finally, CAS in line \ref{cas_propagate} succeeds only if the value at
-$idx + 1$ is of type $Terminal$, as shown before in
-\ref{lemma-lifecycle}.
-By the same lemma, the value at $idx$ is either
-$Terminal$ or $Elem$ at that point, since $idx - 1$ is known to be
-$Elem$ by \ref{lemma-valid-hint}.
-This means that [INV4] is kept.
-\end{proof}
-
-
-\begin{lemmatwo}[Housekeeping]\label{lemma-housekeeping}
-Given a FlowPool in state $\mathbb{S}$ consistent with some abstract
-pool state $\mathbb{A}$, CAS instructions in lines \ref{cas_propagate}, \ref{cas_expand} and
-\ref{cas_block} do not change the abstract pool state $\mathbb{A}$.
-\end{lemmatwo}
-
-\begin{proof}
-Since none of the relations $hasElem$, $hasCallback$, $willBeCalled$ and $sealedAt$
-are defined by the value of $current$ CAS in line \ref{cas_block}
-does not change them, hence it does not change the abstract pool
-state.
-
-No CAS changes the set of scheduled futures, nor is
-succeeded by a \verb=future= construct so it does not affect
-the $willBeCalled$ relation.
-
-It is easy to see that the CAS in line \ref{cas_expand} does not remove any elements, nor make
-any additional elements reachable, since the new block $nb$ which
-becomes reachable does not contain any elements at that time.
-Hence the $hasElem$ relation is not affected.
-It does change the value $last(start)$ to $nb$, but since $nb.array =
-t \cdot null^{BLOCKSIZE - 1}$, where $t \in Terminal$ was previously
-the last non-null element in $b.array$, it does changes neither the
-$sealedAt$ nor the $hasCallback$ relation.
-
-The CAS in line \ref{cas_propagate} does not make some new element reachable,
-hence the $hasElem$ relation is preserved.
-
-Note now that this CAS does not change the relations $hasCallback$
-and $sealedAt$ as long as there is a value of type $Terminal$ at the
-preceeding entry $idx$.
-We claim that if the CAS succeeds at $t_2$, then
-either the value at $idx$ is of type $Terminal$ (trivially) or the CAS
-did not change the value at $idx + 1$.
-In other words, if the value at $idx$ at time $t_2$ is of type $Elem$,
-then the write by CAS in line \ref{cas_propagate} does not change
-the value at $idx + 1$ at $t_2$.
-This was, in fact, already shown in the proof of \ref{lemma-subsequence}.
-
-The argument above proves directly that relations $hasCallback$
-and $sealedAt$ are not changed by the CAS in line \ref{cas_propagate}.
-\end{proof}
-
-
-\begin{lemmatwo}[Append correctness]\label{lemma-append}
-Given a FlowPool in state $\mathbb{S}$ consistent with some abstract pool state $\mathbb{A}$,
-a successful CAS in line \ref{cas_append} at some time $t_0$ changes the state of the FlowPool
-to $\mathbb{S}_0$ consistent with an abstract pool state $\mathbb{A}_0$, such that:
-
-$\mathbb{A} = (elems, callbacks, seal)$
-
-$\mathbb{A}_0 = (\{elem\} \cup elems, callbacks, seal)$
-
-Furthermore, given a fair scheduler, there exists a time $t_1 > t_0$ at which the FlowPool
-is consistent with an abstract pool in state $\mathbb{A}_1$, such that:
-
-$\mathbb{A}_1 = (elems_1, callbacks_1, seal_1)$, where:
-
-$\forall (f, called_1) \in callbacks_1, (f, called) \in callbacks \Rightarrow elem \in called_1$
-\end{lemmatwo}
-
-\begin{proof}
-Assume that the CAS in line \ref{cas_append} succeeds at some time
-$t_3$, the CAS in line \ref{cas_propagate} succeeds at some time $t_2 <
-t_3$, the read in line \ref{read_current} occurs at some time $t_1 <
-t_2$ and the read in line \ref{read_current} occurs at some time $t_0
-< t_1$.
-
-It is easy to see from the invariants, $check$ procedure and the
-corollary \ref{cor-end-of-life} that the CAS in line \ref{cas_append} can only
-occur if $b = last(start)$.
-
-We claim that for the block $b \in reachable(start)$ such that $b = last(b)$ the
-following holds at $t_2$:
-
-$b.array = elem^N \cdot cb_1 \cdot cb_2 \cdot null^{BLOCKSIZE - N - 2}$
-
-where $cb_1 = cb_2$, since there was no write to $idx$ after $cb_1$, otherwise the
-CAS in line \ref{cas_append} at $t_3$ would not have been successful
-(by lemma \ref{lemma-freshness}).
-
-Furthermore, $cb_1 = cb_2$ at $t_3$, as shown in the
-\ref{lemma-subsequence}. Due to the same lemma, the entries of
-$b.array$ stay the same until $t_3$, otherwise the CAS in line
-\ref{cas_append} would not have been successful.
-After the successful CAS at $t_3$, we have:
-
-$b.array = elem^N \cdot e \cdot cb_1 \cdot null^{BLOCKSIZE - N - 2}$
-
-where $e: Elem$ is the newly appended element-- at $t_3$ the relation
-$hasElem(start, e)$ holds, and $sealedAt(start, s)$ and $hasCallback(start,
-f)$ did not change between $t_2$ and $t_3$.
-
-It remains to be shown that $willBeCalled(start, e, f)$ holds at $t_3$.
-Given a fair scheduler, within a finite number of steps the
-future store will contain a request for an asynchronous computation
-that invokes $f$ on $e$. The fair scheduler ensures that the future is
-scheduled within a finite number of steps.
-\end{proof}
-
-
-\begin{lemmatwo}[Foreach correctness]\label{lemma-foreach}
-Given a FlowPool in state $\mathbb{S}$ consistent with some abstract pool state $\mathbb{A}$,
-a successful CAS in line \ref{cas_callback} at some time $t_0$ changes the state of the FlowPool
-to $\mathbb{S}_0$ consistent with an abstract pool state $\mathbb{A}_0$, such that:
-
-$\mathbb{A} = (elems, callbacks, seal)$
-
-$\mathbb{A}_0 = (elems, (f, \emptyset) \cup callbacks, seal)$
-
-Furthermore, given a fair scheduler, there exists a time $t_1 \geq t_0$ at which the FlowPool
-is consistent with an abstract pool in state $\mathbb{A}_1$, such that:
-
-$\mathbb{A}_1 = (elems_1, callbacks_1, seal_1)$, where:
-
-$elems \subseteq elems_1$
-
-$\forall (f, called_1) \in callbacks_1, elems \subseteq called_1$
-\end{lemmatwo}
-
-\begin{proof}
-From \ref{lemma-freshness} and the assumption that the CAS is
-successful we know that the value at $b.array(idx)$ has not changed
-between the read in line \ref{read_callback} and the CAS in line
-\ref{cas_callback}.
-From \ref{lemma-valid-hint} we know that the value at $idx - 1$
-was of type $Elem$ since $b.index$ was read.
-This means that neither $hasElem(start, e)$ nor $sealedAt$ have changed after the CAS.
-Since after the CAS there is a $Terminal$ with an additional function $f$ at $idx$,
-the $hasCallback(start, f)$ holds after the CAS.
-Finally, the $willBeCalled(start, e, f)$ holds for all elements $e$
-for which the $hasElem(e)$ holds, since the CAS has been preceeded by
-a call $f(e)$ in line \ref{call_callback} for each element. The
-\ref{lemma-end-of-life} ensures that for each element $f$ was called
-for stays in the pool indefinitely (i.e. is not removed).
-
-Trivially, the time $t_1$ from the statement of the lemma is such that $t_1 = t_0$.
-\end{proof}
-
-
-\begin{lemmatwo}[Seal correctness]\label{lemma-seal}
-Given a FlowPool in state $\mathbb{S}$ consistent with some abstract pool state $\mathbb{A}$,
-a successful CAS in line \ref{cas_seal} at some time $t_0$ changes the state of the FlowPool
-to $\mathbb{S}_0$ consistent with an abstract pool state $\mathbb{A}_0$, such that:
-
-$\mathbb{A} = (elems, callbacks, seal)$, where $seal \in \{ -1 \} \cup
-\{ s \}$
-
-$\mathbb{A}_0 = (elems, callbacks, \{ s \})$
-\end{lemmatwo}
-
-\begin{proof}
-Similar to the proof of \ref{lemma-foreach}.
-\end{proof}
-
-
-\begin{definitiontwo}[Obstruction-freedom]
-Given a FlowPool in a valid state, an operation $op$ is
-\textbf{obstruction-free} if and only if a thread T executing the
-operation $op$ completes within a finite number of steps given that
-no other thread was executing the operation $op$ since T started executing it.
-
-We say that thread T executes the operation $op$ \textbf{in isolation}.
-\end{definitiontwo}
-
-
-\begin{lemmatwo}[Obstruction-free operations]\label{lemma-obstruction-free}
-All operations on FlowPools are obstruction-free.
-\end{lemmatwo}
-
-\begin{proof}
-By trivial sequential code analysis supported by the fact that the
-invariants (especially [INV2]) hold in a valid state.
-\end{proof}
-
-
-\begin{proof}[Safety]
-From \ref{lemma-housekeeping}, \ref{lemma-append}, \ref{lemma-foreach} and
-\ref{lemma-seal} directly, along with the fact that all operations
-executing in isolation complete after a finite number of steps by \ref{lemma-obstruction-free}.
-\end{proof}
-
-
-\begin{definitiontwo}[Linearizability]
-We say that an operation $op$ is linearizable if every thread
-observers that it completes at some time $t_0$ after it was invoked
-and before it finished executing.
-\end{definitiontwo}
-
-
-\begin{theoremtwo}[Linearizable operations]
-FlowPool operations \verb=append= and \verb=seal= are linearizable.
-\end{theoremtwo}
-
-\begin{proof}[Linearizable operations]
-This follows directly from statements about CAS instructions in \ref{lemma-housekeeping},
-\ref{lemma-append} and \ref{lemma-seal}, along with the fact that a
-CAS instruction itself is linearizable.
-\end{proof}
-
-Note that \verb=foreach= starts by executing an asynchronous
-computation and then returns the control to the caller. This means
-that the linearization point may happen outside the execution interval
-of that procedure -- so, \verb=foreach= is not linearizable.
+%
+% \begin{theoremtwo}[Safety]
+% FlowPool operation \verb=create= creates a new FlowPool consistent with the abstract pool
+% $\mathbb{P} = (\emptyset, \emptyset, -1)$. FlowPool operations \verb=foreach=, \verb=append=
+% and \verb=seal= are consistent with the abstract pool semantics.
+% \end{theoremtwo}
+%
+%
+% \begin{lemmatwo}[End of life]\label{lemma-end-of-life}
+% For all blocks $b \in reachable(start)$, if value $v \in Elem$ is
+% written to $b.array$ at some position $idx$ at some time $t_0$, then
+% $\forall t > t_0, b.array(idx) = v$.
+% \end{lemmatwo}
+%
+% \begin{prooftwo}
+% The CAS in line \ref{cas_append} is the only CAS which writes an
+% element.
+% No other CAS has a value of type $Elem$ as the expected value.
+% This means that once the CAS in line \ref{cas_append} writes a value
+% of type $Elem$, no other write can change it.
+% \end{prooftwo}
+%
+%
+% \begin{cor}\label{cor-end-of-life}
+% The end of life lemma implies that if all the values in $b.array$ are
+% of type $Elem$ at $t_0$, then $\forall t > t_0$ there is no write to $b.array$.
+% \end{cor}
+%
+%
+% \begin{lemmatwo}[Valid hint]\label{lemma-valid-hint}
+% For all blocks $b \in reachable(start)$, if $b.index > 0$ at some time $t_0$, then
+% $b.array(b.index - 1) \in Elem$ at time $t_0$.
+% \end{lemmatwo}
+%
+% \begin{prooftwo}
+% Observe every write to $b.index$ -- they are all unconditional.
+% However, at every such write occurring at some time $t_1$ that writes
+% some value $idx$ we know that some previous value at $b.array$ entry $idx - 1$
+% at some time $t_0 < t_1$ was of type $Elem$.
+% Hence, from \ref{lemma-end-of-life} it follows that
+% $\forall t \geq t_1, b.array(idx - 1) \in Elem$.
+% \end{prooftwo}
+%
+%
+% \begin{cor}[Compactness]\label{cor-compactness}
+% For all blocks $b \in reachable(start)$, if for some $idx$
+% $b.array(idx) \in Elem$ at time $t_0$ then $b.array(idx - 1) \in Elem$
+% at time $t_0$. This follows
+% directly from the \ref{lemma-end-of-life} and
+% \ref{lemma-valid-hint}, and the fact that the CAS in line
+% \ref{cas_append} only writes to array entries $idx$ for which it
+% previously read the value from $b.index$.
+% \end{cor}
+%
+%
+% \begin{definitiontwo}[Transition]
+% If for a function $f(t)$ there exist times $t_0$ and $t_1$ such that
+% $\forall t, t_0 < t < t_1, f(t) = v_0$ and $f(t_1) = v_1$, then we say
+% that the function $f$ goes through a \textbf{transition} at $t_1$. We denote this as:
+%
+% $f: v_0 \stackrel{t_1}{\rightarrow} v_1$
+%
+% Or, if we don't care about the exact time $t_1$, simply as:
+%
+% $f: v_0 \rightarrow v_1$
+% \end{definitiontwo}
+%
+%
+% \begin{definitiontwo}[Monotonicity]
+% A function of time $f(t)$ is said to be \textbf{monotonic}, if every value in its string of transitions occurs only once.
+% \end{definitiontwo}
+%
+%
+% \begin{lemmatwo}[Freshness]\label{lemma-freshness}
+% For all blocks $b \in reachable(start)$, and for all $x \in b.array$,
+% function $x$ is monotonic.
+% \end{lemmatwo}
+%
+% \begin{prooftwo}
+% CAS instruction in line \ref{cas_append} writes a value of type
+% $Elem$. No CAS instruction has a value of type $Elem$ as the expected value,
+% so this write occurs only once.
+%
+% Trivial analysis of CAS instructions in lines \ref{cas_seal} and
+% \ref{cas_callback}, shows that their expected values are of type
+% $Terminal$. Their new values are always freshly allocated.
+%
+% The more difficult part is to show that CAS instruction in line
+% \ref{cas_propagate} respects the statement of the lemma.
+%
+% Since the CAS instructions in lines \ref{cas_seal} and
+% \ref{cas_callback} are preceeded by a read of $idx = b.index$,
+% from \ref{lemma-valid-hint} it follows that $b.array(idx - 1)$
+% contains a value of type $Elem$.
+% These are also the only CAS instructions which replace a $Terminal$
+% value with another $Terminal$ value. The new value is always unique, as
+% shown above.
+%
+% So the only potential CAS to write a non-fresh value to $idx + 1$ is the CAS
+% in line \ref{cas_propagate}.
+%
+% A successful CAS in line \ref{cas_propagate} overwrites a value $cb_0$ at $idx + 1$
+% read in line \ref{read_next} at $t_0$ with a new value $cb_2$ at time $t_2$. Value $cb_2$ was
+% read in line \ref{read_current} at $t_1$ from the entry $idx$. The
+% string of transitions of values at $idx$ is composed of unique values
+% at least since $t_1$ (by \ref{lemma-end-of-life}), since there is
+% a value of type $Elem$ at the index $idx - 1$.
+%
+% The conclusion above ensures that the values read in line \ref{read_current}
+% to be subsequently used as new values for the CAS in line \ref{cas_propagate}
+% form a monotonic function $f(t) = b.array(idx) \text{ at } t$.
+%
+% Now assume that a thread T1 successfully overwrites $cb_0$
+% via CAS in line \ref{cas_propagate} at $idx + 1$ at time $t_2$
+% to a value $cb_2$ read from $idx$ at $t_1$, and that another thread T2
+% is the \textbf{first} thread (since the FlowPool was created) to subsequently successfully
+% complete the CAS in line \ref{cas_propagate} at $idx + 1$ at time
+% $t_{prev2} > t_2$ with some value $cb_{prev2}$ which was at $idx + 1$ at some time
+% $t < t_0$.
+%
+% That would mean that $b.array(idx + 1)$ does not change during $\langle t_0, t_2 \rangle$,
+% since T2 was the first thread the write a non-fresh value to $idx + 1$, and any
+% other write would cause the CAS in line \ref{cas_propagate} by T1 to fail.
+% %That means that $t_0 > t_{prev0}$, otherwise the CAS in line \ref{cas_propagate}
+% %by T2 would have failed.
+%
+% Also, that would mean that the thread T2 read the value
+% $cb_{prev2}$ in line \ref{read_current} at some time $t_{prev1} < t_1$
+% and successfully completed the CAS at time $t_{prev2} > t_2$. If the
+% CAS was successful, then the read in line \ref{read_next} by T2
+% occured at $t_{prev0} < t_{prev1} < t_1$. Since we assumed that T2 is the
+% first thread to write a value $cb_{prev2}$ to $idx + 1$ at time $t_{prev2}$
+% which was previously in $idx + 1$ at some time $t < t_0$, then the CAS
+% in line \ref{cas_propagate} at time $t_{prev2}$ could not have succeeded,
+% since its expected value is $cb_{prev0}$ read at some time $t_{prev0}$, and
+% we know that the value at $idx + 1$ was changed at least once in $\langle t_{prev0}, t_{prev2} \rangle$
+% because of the write of a fresh value by thread T1 at $t_2 \in \langle t_{prev0}, t_{prev2} \rangle$.
+% This value is known to be fresh because $b.array(idx)$ is a monotonic
+% function at least since $t_{prev1}$, and the read of the new value
+% written by T1 occurred at $t_1 > t_{prev1}$.
+% We also know that there is no other thread T3 to write the value
+%  $cb_{prev0}$ during $\langle t_{prev0}, t_{prev2} \rangle$
+% back to $idx + 1$, since we assumed that T2 is the first to write
+% a non-fresh value at that position.
+%
+% Hence, a contradiction shows that there is no thread T2 which is the \textbf{first}
+% to write a non-fresh value via CAS in line \ref{cas_propagate} at $idx + 1$
+% for any $idx$, so there is no thread that writes a non-fresh value at all.
+% \end{prooftwo}
+%
+%
+% \begin{lemmatwo}[Lifecycle]\label{lemma-lifecycle}
+% For all blocks $b \in reachable(start)$, and for all $x \in b.array$, function $x$ goes through and only through the prefix of the following transitions:
+%
+% $null \rightarrow cb_1 \rightarrow \dots \rightarrow cb_n \rightarrow elem$, where:
+%
+% $cb_i \in Terminal, i \neq j \Rightarrow cb_i \neq cb_j, elem \in Elem$
+% \end{lemmatwo}
+%
+% \begin{prooftwo}
+% First of all, it is obvious from the code that each block that becomes
+% an element of $reachable(start)$ at some time $t_0$ has the value of
+% all $x \in b.array$ set to $null$.
+%
+% Next, we inspect all the CAS instructions that operate on entries of
+% $b.array$.
+%
+% The CAS in line \ref{cas_append} has a value $curo \in Terminal$ as
+% an expected value and writes an $elem \in Elem$.
+% This means that the only transition that this CAS
+% can cause is of type $cb_i \in Terminal \rightarrow elem \in Elem$.
+%
+% We will now prove that the CAS in line \ref{cas_propagate} at time $t_2$ is successful if and
+% only if the entry at $idx + 1$ is $null$ or $nexto \in
+% Terminal$.
+% We know that the entry at $idx + 1$ does not change $\forall t, t_0 < t < t_2$,
+% where $t_0$ is the read in line \ref{read_next},
+% because of \ref{lemma-freshness} and the fact that CAS in line \ref{cas_propagate} is assumed to be successful.
+% We know that during the read in line \ref{read_current} at time $t_1$,
+% such that $t_0 < t_1 < t_2$, the entry at $idx$ was $curo \in
+% Terminal$, by trivial analysis of the \verb=check= procedure.
+% It follows from corollary \ref{cor-compactness} that the array entry $idx
+% + 1$ is not of type $Elem$ at time $t_1$, otherwise array entry $idx$
+% would have to be of type $Elem$.
+% Finally, we know that the entry at $idx + 1$ has the same value during
+% the interval $\langle t_1, t_2 \rangle$, so its value is not $Elem$ at $t_2$.
+%
+% The above reasoning shows that the CAS in line \ref{cas_propagate}
+% always overwrites a one value of type $Terminal$ (or $null$) with
+% another value of type $Terminal$.
+% We have shown in \ref{lemma-freshness} that it never
+% overwrites the value $cb_0$ with a value $cb_2$ that was at
+% $b.array(idx)$ at an earlier time.
+%
+% Finally, note that the statement for CAS instructions in lines \ref{cas_seal} and
+% \ref{cas_callback} also follows directly from the proof for \ref{lemma-freshness}.
+% \end{prooftwo}
+%
+%
+% \begin{lemmatwo}[Subsequence]\label{lemma-subsequence}
+% Assume that for some block $b \in reachable(start)$ the transitions of
+% $b.array(idx)$ are:
+%
+% \begin{equation*}
+% b.array(idx): null \rightarrow cb_1 \rightarrow \cdots \rightarrow
+% cb_n \stackrel{t_0}{\rightarrow} elem: Elem
+% \end{equation*}
+%
+% Assume that the transitions of $b.array(idx + 1)$ up to time $t_0$ are:
+%
+% \begin{equation*}
+% b.array(idx + 1): null \rightarrow cb_1' \rightarrow \cdots
+% \rightarrow cb_m'
+% \end{equation*}
+%
+% The string of transitions $null \rightarrow cb_1' \rightarrow \cdots
+% \rightarrow cb_m'$ is a subsequence of $null \rightarrow cb_1
+% \rightarrow \cdots \rightarrow cb_n$.
+% \end{lemmatwo}
+%
+% \begin{prooftwo}
+% Note that all the values written to $idx + 1$ before $t_0$ by CAS in line \ref{cas_propagate} were
+% previously read from $idx$ in line \ref{read_current}.
+% This means that the set of values occurring in $b.array(idx + 1)$
+% before $t_0$ is a subset of the set of values in $b.array(idx)$.
+% We have to prove that it is actually a subsequence.
+%
+% Assume that there exist two values $cb_1$ and $cb_2$ read by threads T1 and T2
+% in line \ref{read_current} at times $t_1$ and $t_2 > t_1$, respectively.
+% Assume that these values are written to $idx + 1$ by threads T1 and T2
+% in line \ref{cas_propagate} in the opposite order, that is at times
+% $t_{cas1}$ and $t_{cas2} < t_{cas1}$, respectively.
+% That would mean that the CAS by thread T1 would have to fail, since its expected
+% value $cb_0$ has changed between the time it was read in line \ref{read_next} and
+% the $t_{cas1}$ at least once to a different value, and it could not have been
+% changed back to $cb_0$ as we know from the \ref{lemma-freshness}.
+%
+% Notice that we have actually prooved a stronger result above.
+% We have also shown that the string of values
+% written at $idx + 1$ by CAS in line \ref{cas_propagate} successfully is a subsequence
+% of \textbf{all} the transitions of values at $idx$ (not just until $t_0$).
+% \end{prooftwo}
+%
+%
+% \begin{lemmatwo}[Valid writes]\label{lemma-valid}
+% Given a FlowPool in a valid state, all writes in all operations produce a FlowPool in a valid state.
+% \end{lemmatwo}
+%
+% \begin{prooftwo}
+% A new FlowPool is trivially in a valid state.
+%
+% Otherwise, assume that the FlowPool is in a valid state
+% $\mathbb{S}$.
+% In the rest of the proof, whenever some invariant is trivially
+% unaffected by a write, we omit mentioning it.
+% We start by noting that we already prooved the claim
+% for atomic writes in lines \ref{write_append}, \ref{write_advance} and
+% \ref{write_seal} (which only affect [INV5]) in \ref{lemma-valid-hint}.
+% We proceed by analyzing each atomic CAS instruction.
+%
+% CAS in line \ref{cas_expand} at time $t_1$ maintains the invariant
+% [INV1].
+% This is because its expected value is always
+% $null$, which ensures that the lifecycle of $b.next$ is $null
+% \rightarrow b': Block$, meaning that the function $reachable(start)$
+% returns a monotonically growing set.
+% So if $current \in reachable(start)$ at $t_0$, then this also holds at
+% $t_1 > t_0$.
+% It also maintains [INV2] because the new value $nb$ is always fresh,
+% so $\forall b, b \not \in following(b)$.
+% Finally, it maintains [INV3] because it is preceeded with a bounds
+% check and we know from corollary \ref{cor-compactness} and the
+% \ref{lemma-end-of-life} that all the values in $b.array(idx),
+% idx < LASTELEMPOS$ must be of type $Elem$.
+%
+% CAS in line \ref{cas_block} at time $t_1$ maintains the
+% invariant [INV1], since the new value for the $current \neq null$ was read from
+% $b.next$ at $t_0 < t_1$ when the invariant was assumed to hold, and
+% it is still there a $t_1$, as shown before.
+%
+% For CAS instructions in lines \ref{cas_append}, \ref{cas_callback} and
+% \ref{cas_seal} that write to index $idx$ we know from
+% \ref{lemma-valid-hint} that the value at $idx - 1$ is of type $Elem$.
+% This immediately shows that CAS instructions in lines
+% \ref{cas_callback} and \ref{cas_seal} maintain [INV3] and [INV4].
+%
+% For CAS in line \ref{cas_append} we additionally know that it must
+% have been preceeded by a successful CAS in line \ref{cas_propagate}
+% which previously wrote a $Terminal$ value to $idx + 1$. From
+% \ref{lemma-lifecycle} we know that $idx + 1$ is still $Terminal$ when
+% the CAS in line \ref{cas_append} occurs, hence [INV4] is kept.
+%
+% Finally, CAS in line \ref{cas_propagate} succeeds only if the value at
+% $idx + 1$ is of type $Terminal$, as shown before in
+% \ref{lemma-lifecycle}.
+% By the same lemma, the value at $idx$ is either
+% $Terminal$ or $Elem$ at that point, since $idx - 1$ is known to be
+% $Elem$ by \ref{lemma-valid-hint}.
+% This means that [INV4] is kept.
+% \end{prooftwo}
+%
+%
+% \begin{lemmatwo}[Housekeeping]\label{lemma-housekeeping}
+% Given a FlowPool in state $\mathbb{S}$ consistent with some abstract
+% pool state $\mathbb{A}$, CAS instructions in lines \ref{cas_propagate}, \ref{cas_expand} and
+% \ref{cas_block} do not change the abstract pool state $\mathbb{A}$.
+% \end{lemmatwo}
+%
+% \begin{prooftwo}
+% Since none of the relations $hasElem$, $hasCallback$, $willBeCalled$ and $sealedAt$
+% are defined by the value of $current$ CAS in line \ref{cas_block}
+% does not change them, hence it does not change the abstract pool
+% state.
+%
+% No CAS changes the set of scheduled futures, nor is
+% succeeded by a \verb=future= construct so it does not affect
+% the $willBeCalled$ relation.
+%
+% It is easy to see that the CAS in line \ref{cas_expand} does not remove any elements, nor make
+% any additional elements reachable, since the new block $nb$ which
+% becomes reachable does not contain any elements at that time.
+% Hence the $hasElem$ relation is not affected.
+% It does change the value $last(start)$ to $nb$, but since $nb.array =
+% t \cdot null^{BLOCKSIZE - 1}$, where $t \in Terminal$ was previously
+% the last non-null element in $b.array$, it does changes neither the
+% $sealedAt$ nor the $hasCallback$ relation.
+%
+% The CAS in line \ref{cas_propagate} does not make some new element reachable,
+% hence the $hasElem$ relation is preserved.
+%
+% Note now that this CAS does not change the relations $hasCallback$
+% and $sealedAt$ as long as there is a value of type $Terminal$ at the
+% preceeding entry $idx$.
+% We claim that if the CAS succeeds at $t_2$, then
+% either the value at $idx$ is of type $Terminal$ (trivially) or the CAS
+% did not change the value at $idx + 1$.
+% In other words, if the value at $idx$ at time $t_2$ is of type $Elem$,
+% then the write by CAS in line \ref{cas_propagate} does not change
+% the value at $idx + 1$ at $t_2$.
+% This was, in fact, already shown in the proof of \ref{lemma-subsequence}.
+%
+% The argument above proves directly that relations $hasCallback$
+% and $sealedAt$ are not changed by the CAS in line \ref{cas_propagate}.
+% \end{prooftwo}
+%
+%
+% \begin{lemmatwo}[Append correctness]\label{lemma-append}
+% Given a FlowPool in state $\mathbb{S}$ consistent with some abstract pool state $\mathbb{A}$,
+% a successful CAS in line \ref{cas_append} at some time $t_0$ changes the state of the FlowPool
+% to $\mathbb{S}_0$ consistent with an abstract pool state $\mathbb{A}_0$, such that:
+%
+% $\mathbb{A} = (elems, callbacks, seal)$
+%
+% $\mathbb{A}_0 = (\{elem\} \cup elems, callbacks, seal)$
+%
+% Furthermore, given a fair scheduler, there exists a time $t_1 > t_0$ at which the FlowPool
+% is consistent with an abstract pool in state $\mathbb{A}_1$, such that:
+%
+% $\mathbb{A}_1 = (elems_1, callbacks_1, seal_1)$, where:
+%
+% $\forall (f, called_1) \in callbacks_1, (f, called) \in callbacks \Rightarrow elem \in called_1$
+% \end{lemmatwo}
+%
+% \begin{prooftwo}
+% Assume that the CAS in line \ref{cas_append} succeeds at some time
+% $t_3$, the CAS in line \ref{cas_propagate} succeeds at some time $t_2 <
+% t_3$, the read in line \ref{read_current} occurs at some time $t_1 <
+% t_2$ and the read in line \ref{read_current} occurs at some time $t_0
+% < t_1$.
+%
+% It is easy to see from the invariants, $check$ procedure and the
+% corollary \ref{cor-end-of-life} that the CAS in line \ref{cas_append} can only
+% occur if $b = last(start)$.
+%
+% We claim that for the block $b \in reachable(start)$ such that $b = last(b)$ the
+% following holds at $t_2$:
+%
+% $b.array = elem^N \cdot cb_1 \cdot cb_2 \cdot null^{BLOCKSIZE - N - 2}$
+%
+% where $cb_1 = cb_2$, since there was no write to $idx$ after $cb_1$, otherwise the
+% CAS in line \ref{cas_append} at $t_3$ would not have been successful
+% (by lemma \ref{lemma-freshness}).
+%
+% Furthermore, $cb_1 = cb_2$ at $t_3$, as shown in the
+% \ref{lemma-subsequence}. Due to the same lemma, the entries of
+% $b.array$ stay the same until $t_3$, otherwise the CAS in line
+% \ref{cas_append} would not have been successful.
+% After the successful CAS at $t_3$, we have:
+%
+% $b.array = elem^N \cdot e \cdot cb_1 \cdot null^{BLOCKSIZE - N - 2}$
+%
+% where $e: Elem$ is the newly appended element-- at $t_3$ the relation
+% $hasElem(start, e)$ holds, and $sealedAt(start, s)$ and $hasCallback(start,
+% f)$ did not change between $t_2$ and $t_3$.
+%
+% It remains to be shown that $willBeCalled(start, e, f)$ holds at $t_3$.
+% Given a fair scheduler, within a finite number of steps the
+% future store will contain a request for an asynchronous computation
+% that invokes $f$ on $e$. The fair scheduler ensures that the future is
+% scheduled within a finite number of steps.
+% \end{prooftwo}
+%
+%
+% \begin{lemmatwo}[Foreach correctness]\label{lemma-foreach}
+% Given a FlowPool in state $\mathbb{S}$ consistent with some abstract pool state $\mathbb{A}$,
+% a successful CAS in line \ref{cas_callback} at some time $t_0$ changes the state of the FlowPool
+% to $\mathbb{S}_0$ consistent with an abstract pool state $\mathbb{A}_0$, such that:
+%
+% $\mathbb{A} = (elems, callbacks, seal)$
+%
+% $\mathbb{A}_0 = (elems, (f, \emptyset) \cup callbacks, seal)$
+%
+% Furthermore, given a fair scheduler, there exists a time $t_1 \geq t_0$ at which the FlowPool
+% is consistent with an abstract pool in state $\mathbb{A}_1$, such that:
+%
+% $\mathbb{A}_1 = (elems_1, callbacks_1, seal_1)$, where:
+%
+% $elems \subseteq elems_1$
+%
+% $\forall (f, called_1) \in callbacks_1, elems \subseteq called_1$
+% \end{lemmatwo}
+%
+% \begin{prooftwo}
+% From \ref{lemma-freshness} and the assumption that the CAS is
+% successful we know that the value at $b.array(idx)$ has not changed
+% between the read in line \ref{read_callback} and the CAS in line
+% \ref{cas_callback}.
+% From \ref{lemma-valid-hint} we know that the value at $idx - 1$
+% was of type $Elem$ since $b.index$ was read.
+% This means that neither $hasElem(start, e)$ nor $sealedAt$ have changed after the CAS.
+% Since after the CAS there is a $Terminal$ with an additional function $f$ at $idx$,
+% the $hasCallback(start, f)$ holds after the CAS.
+% Finally, the $willBeCalled(start, e, f)$ holds for all elements $e$
+% for which the $hasElem(e)$ holds, since the CAS has been preceeded by
+% a call $f(e)$ in line \ref{call_callback} for each element. The
+% \ref{lemma-end-of-life} ensures that for each element $f$ was called
+% for stays in the pool indefinitely (i.e. is not removed).
+%
+% Trivially, the time $t_1$ from the statement of the lemma is such that $t_1 = t_0$.
+% \end{prooftwo}
+%
+%
+% \begin{lemmatwo}[Seal correctness]\label{lemma-seal}
+% Given a FlowPool in state $\mathbb{S}$ consistent with some abstract pool state $\mathbb{A}$,
+% a successful CAS in line \ref{cas_seal} at some time $t_0$ changes the state of the FlowPool
+% to $\mathbb{S}_0$ consistent with an abstract pool state $\mathbb{A}_0$, such that:
+%
+% $\mathbb{A} = (elems, callbacks, seal)$, where $seal \in \{ -1 \} \cup
+% \{ s \}$
+%
+% $\mathbb{A}_0 = (elems, callbacks, \{ s \})$
+% \end{lemmatwo}
+%
+% \begin{prooftwo}
+% Similar to the proof of \ref{lemma-foreach}.
+% \end{prooftwo}
+%
+%
+% \begin{definitiontwo}[Obstruction-freedom]
+% Given a FlowPool in a valid state, an operation $op$ is
+% \textbf{obstruction-free} if and only if a thread T executing the
+% operation $op$ completes within a finite number of steps given that
+% no other thread was executing the operation $op$ since T started executing it.
+%
+% We say that thread T executes the operation $op$ \textbf{in isolation}.
+% \end{definitiontwo}
+%
+%
+% \begin{lemmatwo}[Obstruction-free operations]\label{lemma-obstruction-free}
+% All operations on FlowPools are obstruction-free.
+% \end{lemmatwo}
+%
+% \begin{prooftwo}
+% By trivial sequential code analysis supported by the fact that the
+% invariants (especially [INV2]) hold in a valid state.
+% \end{prooftwo}
+%
+%
+% \begin{prooftwo}[Safety]
+% From \ref{lemma-housekeeping}, \ref{lemma-append}, \ref{lemma-foreach} and
+% \ref{lemma-seal} directly, along with the fact that all operations
+% executing in isolation complete after a finite number of steps by \ref{lemma-obstruction-free}.
+% \end{prooftwo}
+%
+%
+% \begin{definitiontwo}[Linearizability]
+% We say that an operation $op$ is linearizable if every thread
+% observers that it completes at some time $t_0$ after it was invoked
+% and before it finished executing.
+% \end{definitiontwo}
+%
+%
+% \begin{theoremtwo}[Linearizable operations]
+% FlowPool operations \verb=append= and \verb=seal= are linearizable.
+% \end{theoremtwo}
+%
+% \begin{prooftwo}[Linearizable operations]
+% This follows directly from statements about CAS instructions in \ref{lemma-housekeeping},
+% \ref{lemma-append} and \ref{lemma-seal}, along with the fact that a
+% CAS instruction itself is linearizable.
+% \end{prooftwo}
+%
+% Note that \verb=foreach= starts by executing an asynchronous
+% computation and then returns the control to the caller. This means
+% that the linearization point may happen outside the execution interval
+% of that procedure -- so, \verb=foreach= is not linearizable.
 
 
 % \textbf{Definition 2} (FlowPool). typically pointing to some
@@ -1202,7 +1212,7 @@ $CAS_{expand-nxt}$, or $CAS_{expand-curr}$, in the pseudocode fail, they must ha
 already been successfully completed by another thread since $op$ began.
 \end{lemmatwo}
 
-\begin{proof} Trivial inspection of the pseudocode reveals that since $CAS_{append-out}$
+\begin{prooftwo} Trivial inspection of the pseudocode reveals that since $CAS_{append-out}$
 makes up a check that precedes $CAS_{append-inn}$, and since
 $CAS_{append-inn}$ is the only operation besides $CAS_{append-out}$ which can
 change the expected value of $CAS_{append-out}$, in the case of a failure of
@@ -1219,7 +1229,7 @@ Like above, $CAS_{expand-curr}$ is the only CAS which can change the $current$
 reference, therefore in the case of a failure, some other thread must have
 already successfully completed $CAS_{expand-curr}$ since $op$ began.
 \qed
-\end{proof}
+\end{prooftwo}
 
 %==============================
 % Lemma \ref{lemma-expand} (EXPAND)
@@ -1237,7 +1247,7 @@ steps
 % $numBlocks'>numBlocks$
 \end{lemmatwo}
 
-\begin{proof}
+\begin{prooftwo}
 
 From inspection of the pseudocode, it is clear that the only point at which
 $expand(b)$ can be invoked is under the condition that for some block $b$,
@@ -1275,7 +1285,7 @@ references are always correctly set, that is both $b.next $ and $current$ are
 correctly updated to refer to the new block, it follows that $numBlocks$
 strictly increases after some finite number of steps.
 \qed
-\end{proof}
+\end{prooftwo}
 
 
 %==============================
@@ -1288,7 +1298,7 @@ $CAS_{append-inn}$ or $CAS_{seal}$ (or likewise, $CAS_{foreach}$) after some
 finite number of steps.
 \end{lemmatwo}
 
-\begin{proof}
+\begin{prooftwo}
 First, we show that a thread attempting to complete $CAS_{append-inn}$ can't fail due to a
 different thread completing $CAS_{append-out}$ so long as \verb=seal= has not been invoked
 after completing the read of $currobj$. We address this exception later on.
@@ -1325,7 +1335,7 @@ $term.callbacks\in\{Elem \Rightarrow Unit\}$).
 We omit the proof and detailed discussion of $CAS_{foreach}$ because it can be proven
 using the same steps as were taken for $CAS_{seal}$.
 \qed
-\end{proof}
+\end{prooftwo}
 
 %==============================
 % Lemma \ref{lemma-finite-steps-state-change} (FINITE # STEPS BEFORE STATE CHANGE)
@@ -1337,7 +1347,7 @@ All operations with the exception of \verb=append=, \verb=seal=, and
 changing instruction.
 \end{lemmatwo}
 
-\begin{proof} The \verb=advance=, \verb=check=, \verb=totalElems=,
+\begin{prooftwo} The \verb=advance=, \verb=check=, \verb=totalElems=,
 \verb=invokeCallbacks=, and \verb=tryWriteSeal= operations have a finite
 number of execution steps, as they contain no recursive calls, loops, or other
 possibility to restart.
@@ -1348,7 +1358,7 @@ instruction, it was shown in \ref{lemma-expand} that an invocation of
 finite number of steps.
 
 \qed
-\end{proof}
+\end{prooftwo}
 
 %==============================
 % Lemma \ref{lemma-append} (APPEND: FINITE # STEPS BEFORE CONSISTENCY CHANGE)
@@ -1359,7 +1369,7 @@ After invoking \verb=append(elem)=, a consistency changing instruction will be
 completed after a finite number of steps.
 \end{lemmatwo}
 
-\begin{proof}
+\begin{prooftwo}
 The \verb=append= operation can be restarted in three cases. We show that in
 each case, it's guaranteed to either complete in a finite number of steps,  or
 leads to a state changing instruction:
@@ -1421,7 +1431,7 @@ Therefore, \verb=append= itself as well as all other operations reachable via an
 invocation of \verb=append= are guaranteed to have a finite number of steps between
 \textit{consistency} changing instructions.
 \qed
-\end{proof}
+\end{prooftwo}
 
 %==============================
 % LEMMA 6 (CAS5)
@@ -1434,7 +1444,7 @@ After invoking \verb=seal(size)=, if $CAS_{seal}$ fails, then some thread has
 successfully completed $CAS_{seal}$ or $CAS_{append-inn}$ after some finite number of steps.
 \end{lemmatwo}
 
-\begin{proof} Since by \ref{lemma-cas2}, we know that $CAS_{append-out}$
+\begin{prooftwo} Since by \ref{lemma-cas2}, we know that $CAS_{append-out}$
 only duplicates an existing $Terminal$, it can not be the cause for a failing
 $CAS_{seal}$. This leaves only two cases in which $CAS_{seal}$ can fail:
 
@@ -1447,7 +1457,7 @@ might have  completed before, in which case, it inserts a new $Elem$ object
 $elem$  into location $idx$.
 \qed
 \end{itemize}
-\end{proof}
+\end{prooftwo}
 
 %==============================
 % Lemma \ref{lemma-write2-write3}, WRITE2 AND WRITE3
@@ -1458,7 +1468,7 @@ After updating $b.index$ using $WRITE_{adv}$ or $WRITE_{seal}$,  $b.index$ is gu
 to be incremented after a finite number of steps.
 \end{lemmatwo}
 
-\begin{proof}
+\begin{prooftwo}
 For some index, $idx$, both calls to $WRITE_{adv}$ and $WRITE_{seal}$ attempt
 to write $idx+1$ to $b.index$. In both cases, it's possible that another
 thread could complete either $WRITE_{adv}$ or $WRITE_{seal}$, once again
@@ -1470,7 +1480,7 @@ operating on the FlowPool is finite, $p$, we are guaranteed that in the worst
 case, this scenario can repeat at most $p$ times, before a write correctly
 updates $b.index$ with $idx+1$.
 \qed
-\end{proof}
+\end{prooftwo}
 
 %==============================
 % Lemma \ref{lemma-finite-steps-consistency-change} (SEAL: FINITE # STEPS BEFORE CONSISTENCY CHANGE)
@@ -1482,7 +1492,7 @@ completed after a finite number of steps, or the initial invocation of
 \verb=seal(size)= completes.
 \end{lemmatwo}
 
-\begin{proof}
+\begin{prooftwo}
 The \verb=seal= operation can be restarted in two scenarios.
 
 \begin{itemize}
@@ -1545,7 +1555,7 @@ showed will successfully complete in a finite number of steps.
 
 \end{itemize}
 \qed
-\end{proof}
+\end{prooftwo}
 
 %==============================
 % Lemma \ref{lemma-foreach-cons} (FOREACH: FINITE # STEPS BEFORE CONSISTENCY CHANGE)
@@ -1570,7 +1580,7 @@ a consistency changing CAS instruction, then some concurrent operation is
 guaranteed to be completed.
 \end{lemmatwo}
 
-\begin{proof}
+\begin{prooftwo}
 % By Lemma X and Y, we know that consistency changing
 % instructions $CAS_{append-inn}$, $CAS_{seal}$, and $CAS_{foreach}$ are guaranteed to at some point
 % complete.
@@ -1591,4 +1601,5 @@ of \verb=seal= in a finite number of steps.
 
 The case for $CAS_{foreach}$ is omitted since it follows the same steps as for the case
 of $CAS_{seal}$
-\end{proof}
+\qed
+\end{prooftwo}
