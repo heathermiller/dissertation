@@ -1,74 +1,81 @@
 \chapter{Pickling}
 \label{ch:pickling}
 
+Central to a distributed application is the need to communicate with the outside
+world. However, in order to do this, data must be transformed from an in-memory
+representation to one that can be sent over the network, \eg a binary
+representation. This act of transforming in-memory data to some form of external
+representation is called {\em pickling} or {\em serialization}.
+
+This chapter covers a new approach to this foundational aspect distributed
+programming. In this chapter, we detail {\em object oriented picklers} and
+scala/pickling, a framework for generating them at compile time.
+
 \section{Introduction}
 
-\begin{itemize}
-  \item Hairier on the JVM than other platforms, {\em objects, mutation, object
-  identity reasons why}
-  \item Applying picklign to Spark and self-describing
-  \item Argue that it's not advisable to enable anything to be serialized and
-  send over the wire, via proxy or actual transport (philosophy in Alice ML.)
-  \item It serializes arbitrary instances
-  \item Future work includes improved error messages -- if something can't be
-  serialized for some reason, the framework fails in inconspicuous ways.
-\end{itemize}
+% \begin{itemize}
+%   \item Hairier on the JVM than other platforms, {\em objects, mutation, object
+%   identity reasons why}
+%   \item Applying picklign to Spark and self-describing
+%   \item Argue that it's not advisable to enable anything to be serialized and
+%   send over the wire, via proxy or actual transport (philosophy in Alice ML.)
+%   \item It serializes arbitrary instances
+%   \item Future work includes improved error messages -- if something can't be
+%   serialized for some reason, the framework fails in inconspicuous ways.
+% \end{itemize}
+%
+% In Scala, we do not treat code as data. \todo{Maybe do a literature study of mobile code?}
+%
+% Serialization isn't typically associated with network communication. Java
+% developed under the auspices of ``serialization that works'' over
+% ``serialization that's fast''. While that's a fine way to constrain the design
+% problem at hand, as more and more applications migrate to or otherwise
+% communicate with {\em the cloud}, performance during network communication is
+% taking an evermore important role.
 
-In Scala, we do not treat code as data. \todo{Maybe do a literature study of mobile code?}
-
-Serialization isn't typically associated with network communication. Java
-developed under the auspices of ``serialization that works'' over
-``serialization that's fast''. While that's a fine way to constrain the design
-problem at hand, as more and more applications migrate to or otherwise
-communicate with {\em the cloud}, performance during network communication is
-taking an evermore important role.
+% . Whether we consider a
+% cluster of commodity machines churning through a massive data-parallel job, or a
+% smartphone interacting with a social network, all are ``distributed'' jobs, and
+% all share the need to communicate in various ways, in many formats, even within
+% the same application.
 
 
-With the growing trend towards cloud computing and mobile applications,
-distributed programming has entered the mainstream. As more and more
-traditional applications migrate to the cloud, the demand for interoperability between
-different services is at an all-time high, and is increasing. At the center of
-it all is communication. Whether we consider a cluster of commodity machines
-churning through a massive data-parallel job, or a smartphone interacting with
-a social network, all are ``distributed'' jobs, and all share the need to
-communicate in various ways, in many formats, even within the same
-application.
+As more and more traditional applications migrate to the cloud, the demand for
+interoperability between different services is at an all-time high, and is
+increasing. At the center of all of this communication -- communication that
+must often take place in various ways, in many formats, even within the same
+application. However, a central aspect to this communication that has received
+surprisingly little attention in the literature is the need to serialize, or
+{\em pickle} objects, \ie to persist in-memory data by converting them to a
+binary, text, or some other representation. As more and more applications
+develop the need to communicate with different machines or services, providing
+abstractions and constructs for easy-to-use, typesafe, and performant
+serialization is becoming more important than ever.
 
-A central aspect to this communication that has received surprisingly little
-attention in the literature is the need to serialize, or {\em pickle} objects,
-\ie to persist in-memory data by converting them to a binary, text, or
-some other representation.
-% Though, often, serializing arbitrary data is a messy endeavor; one must either write custom serialization code by hand, often resulting in code duplication which doesn't scale, in the interest of performance (or the other way around, less boilerplate for poor performance), or one must have to contend with cryptic runtime exceptions which have propagated to surprising and confusing points of application code.
-As more and more applications evolve the need to communicate with different machines, providing abstractions and constructs for easy-to-use, typesafe, and performant serialization is more important than ever.
+On the JVM, serialization has long been acknowledged as having a high overhead
+\cite{Jaguar, Carpenter1999}, with some estimates purporting object
+serialization to account for 25-65\% of the cost of remote method invocation,
+and which go on to observe that the cost of serialization grows with growing
+object structures up to 50\% \cite{Philippsen2000, Maassen1999}. Due to the
+prohibitive cost of using Java Serialization in high-performance distributed
+applications, many frameworks for distributed computing, like Akka~\cite{Akka},
+Spark~\cite{Spark}, SCADS \cite{Armbrust2009}, and others, provide support for
+higher-performance alternative frameworks such as Google's Protocol
+Buffers~\cite{Protobuf}, Apache Avro~\cite{Avro}, or Kryo~\cite{Kryo}. However,
+the higher efficiency typically comes at the cost of weaker or no type safety, a
+fixed serialization format, more restrictions placed on the objects
+to-be-serialized, or only rudimentary language integration.
 
-On the JVM, serialization has long been
-acknowledged as having a high overhead \cite{Jaguar, Carpenter1999}, with
-some estimates purporting object serialization to account for 25-65\% of the
-cost of remote method invocation, and which go on to observe that the cost of
-serialization grows with growing object structures up to 50\%
-\cite{Philippsen2000, Maassen1999}.
-Due to the prohibitive cost of using Java Serialization in high-performance
-distributed applications, many frameworks for distributed computing, like
-Akka~\cite{Akka}, Spark~\cite{Spark}, SCADS \cite{Armbrust2009}, and
-others, provide support for higher-performance alternative frameworks such as
-Google's Protocol Buffers~\cite{Protobuf}, Apache Avro~\cite{Avro}, or
-Kryo~\cite{Kryo}. However, the higher efficiency typically comes at the cost
-of weaker or no type safety, a fixed serialization format, more restrictions
-placed on the objects to-be-serialized, or only rudimentary language
-integration.
-
-This chapter takes a step towards more principled open programming through a new
-foundation for pickling in object-oriented languages. We present object-oriented
-picklers and \textit{scala/pickling}, a framework for their generation either at runtime or at
-compile time. The introduced notion of object-oriented pickler combinators
-extends pickler combinators known from functional
-programming~\cite{Kennedy2004} with support for object-oriented concepts such
-as subtyping, mix-in composition,  and object identity in the face of cyclic
-object graphs. In contrast to pure functional-style
-pickler combinators, we employ static, type-based meta programming to compose
-picklers at compile time. The resulting picklers are efficient, since the
-pickling code is generated statically as much as possible, avoiding the
-overhead of runtime reflection~\cite{Gil2008,Dubochet2011}.
+This chapter presents object-oriented picklers and \textit{scala/pickling}, a
+framework for their generation either at runtime or at compile time. The
+introduced notion of object-oriented pickler combinators extends pickler
+combinators known from functional programming~\cite{Kennedy2004} with support
+for object-oriented concepts such as subtyping, mix-in composition, and object
+identity in the face of cyclic object graphs. In contrast to pure
+functional-style pickler combinators, we employ static, type-based meta
+programming to compose picklers at compile time. The resulting picklers are
+efficient, since the pickling code is generated statically as much as possible,
+avoiding the overhead of runtime reflection~\cite{Gil2008,Dubochet2011}.
 
 Furthermore, the presented pickling framework is extensible in several
 important ways. First, building on an object-oriented type-class-like
