@@ -1,16 +1,43 @@
-\chapter*{Introduction}
-\addcontentsline{toc}{chapter}{Introduction}
+\chapter{Introduction}
+
+
+Programming for distributed systems is hard. All it takes is a quick glance at
+the literature, both academic and industrial, to see that distributed systems
+builders invest a lot of effort grappling with fundamental concerns like
+consistency, availability, and latency across systems designs.
+
+The performance characteristics of the underlying programming language and
+runtime, however, should not weigh in
 
 Major goal of this thesis is to retroactively add support for distributed
 computation to an existing and widespread language with functional features.
 
-\section*{Distributing Computation}
+Many efforts have been undertaken to design from scratch a new foundation for
+distribution. Cite Leo.
+
+
+The closest the literature gets at present to the intersection of programming
+languages and falls in the direction of Datalog and the idea that ensuring that
+properties like monotonicity
+
+Nitty gritty concerns like serialization or ensuring that are left largely
+unconsidered. As an industry, we simply deal with the fact that Java 8 now has
+closures, but that closures have no added support to ensure that they are
+serializable, instead suggesting ``the serialization of lambda expressions is
+strongly discouraged.''\footnote{From the official Java documentation on lambda
+expressions, available at
+\url{https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html\#serialization}}
+
+\section{Distributing Computation}
 
 Erlang, Elixir. But no types. Go for fault tolerance? Bloom language.
 
 Sequoia. (?)
 
 Oz dataflow.
+
+Up to 50\% of the time for some Spark jobs spent in
+serialization~\cite{OusterhoutSerialization}.
 
 Datalog, Datomic, Cascalog. Query evaluation with Datalog is based on first
 order logic, and is thus sound and complete. However, Datalog is not Turing
@@ -83,10 +110,88 @@ In this thesis, rather than abstracting over network communication, we provide
 firmer, more desirable primitives to initiate your own network communication.
 
 
+\section{Thesis}
+The goal of this dissertation is to improve the above state of affairs
 
+\section{Contributions}
 
-\section*{Contributions}
+This dissertation describes a number of extensions and libraries in and for
+Scala which aim. Importantly, a goal throughout this thesis was to add better support the basics of distributed programming for {\em without extending the Scala compiler}. As a mainstream language with hundreds of thousands of users.
 
-\section*{Structure}
+\section{Structure}
 
-\lipsum[1]
+The rest of this dissertation is organized as follows.
+
+\begin{itemize}
+
+	\item Chapter 2 describes {\em futures} and {FlowPools}, funtionally-inspired
+	and fully asynchronous and non-blocking single-assignment variables (futures)
+	and pools (FlowPools) useful for reducing coordination in distributed systems.
+
+	\item Chapter 3 introduces {\em object oriented picklers} and {\em
+	scala/pickling}, a new distribution-focused approach to serialization that
+	generates serialization code statically, allowing for more type safety.
+
+	\item Chapter 4 covers a new technique for extensible and static datatype
+	generic programming. In this chapter, the generation technique used for
+	generating pickling code is generalized to be able to generate arbitrary type
+	class instances, at compile time.
+
+	\item Chapter 5 introduces {\em spores}, a new abstraction and type system
+	designed to enable function closures to be serializable by design. The type
+	system presented here also generalizes its static checking to arbitrary
+	so-called user-defined {\em properties}, such as immutability.
+
+	\item Chapter 6 describes a new programming model for functional distributed
+	programming called {\em function-passing} which aims to simplify the
+	implementation and reasoning of fault tolerance mechanisms. Because the model
+	requires user programs to themselves be stateless, issues like consistency are
+	moot. This programming model can be thought of as a generalization of the Spark
+	or MapReduce programming model.
+
+	\item Chapter 7 concludes and discusses possible directions for future work.
+
+\end{itemize}
+
+\section{Previously Published Material}
+
+This dissertation draws heavily on earlier work described in the following
+papers, written jointly with several collaborators (in the order of appearance
+in this disseratation):
+
+\begin{itemize}
+
+	\item Prokopec, Miller, Schlatter, Haller, and Odersky (2012).
+	\href{http://infoscience.epfl.ch/record/180265}{FlowPools: A lock-free
+	deterministic concurrent dataflow abstraction}. In proceedings of Languages and
+	Compilers for Parallel Computing (LCPC).
+
+	\item Miller, Haller, Burmako, and Odersky (2013).
+	\href{http://infoscience.epfl.ch/record/188383}{Instant Pickles: Generating
+	object-oriented pickler combinators for fast and extensible serialization}. In proceedings of the ACM SIGPLAN International Conference on Object-Oriented Programming, Systems, Languages, and Applications (OOPSLA).
+
+	\item Miller, Haller, and Odersky (2014).
+	\href{http://infoscience.epfl.ch/record/191239}{Spores: A type-based
+	foundation for closures in the age of concurrency and distribution}. In
+	proceedings of the European Conference on Object-Oriented Programming (ECOOP).
+
+	\item Haller and Miller (2015).
+	\href{https://infoscience.epfl.ch/record/205039}{Distributed Programming
+	via Safe Closure Passing}. In proceedings of Programming Language Approaches to
+	Concurrency and Communication-centric Software (PLACES).
+
+\end{itemize}
+
+Works that this dissertation draws upon that have been submitted but at the time
+of the writing remain in technical report form include:
+
+\begin{itemize}
+
+	\item Miller, Haller, and C. D. S. Oliveira (2015). \href{http://infoscience.epfl.ch/record/199389}{Self-Assembly: Lightweight language extension and datatype generic programming, all-in-one!}. EPFL technical report \#EPFL-CONF-199389.
+
+	\item Miller and Haller (2015).
+	\href{http://infoscience.epfl.ch/record/205822}{Function Passing: A model for
+	typed, distributed functional programming}. EPFL technical report
+	\#EPFL-CONF-205822.
+
+\end{itemize}
