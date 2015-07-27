@@ -3,8 +3,8 @@
 
 Programming for distributed systems is hard. All it takes is a quick glance at
 the literature, both academic and industrial, to see that distributed systems
-builders invest a lot of effort grappling with fundamental concerns like
-consistency, availability, and latency across systems designs.
+builders have long since grappled with fundamental concerns like consistency,
+availability, and latency across systems designs.
 
 The performance characteristics of the underlying programming language and
 runtime, however, should not weigh in
@@ -121,18 +121,24 @@ The goal of this dissertation is to improve the above state of affairs
 This dissertation describes a number of extensions and libraries in and for
 Scala which aim. Importantly, a goal throughout this thesis was to add better support the basics of distributed programming for {\em without extending the Scala compiler}. As a mainstream language with hundreds of thousands of users.
 
+This dissertation addresses the following questions:
+
 \begin{itemize}
 
-	\item How can existing programming features be improved in order to better sup
-	port concerns like performance and latency across varieties of distributed
-	systems?
+	\item How can existing programming language features be improved in order to
+	better support concerns like performance and latency across a general slice of
+	distributed systems?
 
-	\item Which important features and aspects of existing programming languages are left unsupported by the language in the face of distribution? Is it possible
+	\item Which important features and aspects of existing programming languages
+	are left unsupported by the language in the face of distribution? Is it
+	possible to support such features?
 
 	\item How can core ideas behind the development of functional programming be
-	applied to the distributed scenario?
+	applied to the distributed scenario? What other models for functional
+	programming in a distributed environment are there?
 
-	\item How can we
+	\item What are good abstractions for reasoning about concerns like network I/O
+	and failure at the level of the compiler and programming language?
 
 \end{itemize}
 
