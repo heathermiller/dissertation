@@ -30,6 +30,9 @@ expressions, available at
 
 \section{Distributing Computation}
 
+Distributed programming is fundamentally different than . Without even realizing
+it,
+
 Erlang, Elixir. But no types. Go for fault tolerance? Bloom language.
 
 Sequoia. (?)
@@ -118,6 +121,21 @@ The goal of this dissertation is to improve the above state of affairs
 This dissertation describes a number of extensions and libraries in and for
 Scala which aim. Importantly, a goal throughout this thesis was to add better support the basics of distributed programming for {\em without extending the Scala compiler}. As a mainstream language with hundreds of thousands of users.
 
+\begin{itemize}
+
+	\item How can existing programming features be improved in order to better sup
+	port concerns like performance and latency across varieties of distributed
+	systems?
+
+	\item Which important features and aspects of existing programming languages are left unsupported by the language in the face of distribution? Is it possible
+
+	\item How can core ideas behind the development of functional programming be
+	applied to the distributed scenario?
+
+	\item How can we
+
+\end{itemize}
+
 \section{Structure}
 
 The rest of this dissertation is organized as follows.
@@ -127,10 +145,21 @@ The rest of this dissertation is organized as follows.
 	\item Chapter 2 describes {\em futures} and {FlowPools}, funtionally-inspired
 	and fully asynchronous and non-blocking single-assignment variables (futures)
 	and pools (FlowPools) useful for reducing coordination in distributed systems.
+	The chapter sketches a proof of linearizability, lock-freedom, and determinism
+	of FlowPools. The full proof of lock-freedom can be found in
+	Appendix~\ref{appdx:flowpools}, and the full proofs of linearizability and
+	determinism can be found in the companion technical report~\cite{Prokopec12}.
 
 	\item Chapter 3 introduces {\em object oriented picklers} and {\em
 	scala/pickling}, a new distribution-focused approach to serialization that
-	generates serialization code statically, allowing for more type safety.
+	generates serialization code statically, allowing for more type safety. The
+	chapter includes a formalization of object oriented picklers as well as a
+	description of the generation algorithm used for automatically generating
+	picklers for arbitrary types. A performance evaluation is also included which
+	examines the performance of the serialization framework across different sorts
+	of serilaization workloads, and which compares scala/pickling against other
+	state-of-the art serialization systems like Java and Kryo, and reports
+	significant speedups.
 
 	\item Chapter 4 covers a new technique for extensible and static datatype
 	generic programming. In this chapter, the generation technique used for
@@ -139,8 +168,8 @@ The rest of this dissertation is organized as follows.
 
 	\item Chapter 5 introduces {\em spores}, a new abstraction and type system
 	designed to enable function closures to be serializable by design. The type
-	system presented here also generalizes its static checking to arbitrary
-	so-called user-defined {\em properties}, such as immutability.
+	system presented here also generalizes its added static checking capabilities
+	to arbitrary user-defined {\em properties}, \eg immutability.
 
 	\item Chapter 6 describes a new programming model for functional distributed
 	programming called {\em function-passing} which aims to simplify the
