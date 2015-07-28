@@ -119,7 +119,9 @@ stationary message handlers. Instead, our model focuses on a monadic interface
 for programming with data (and sending functions instead).} rather than keeping
 functionality stationary and sending data, in our model, we keep data stationary
 and send functionality to the data. This results in well-typed communication by
-design, a common pain point for builders of distributed systems in Scala.
+design, a common pain point for builders of distributed systems in Scala. Our
+model is in no small part inspired by Spark, and can be thought of as a
+generalization of its programming model.
 
 Our model brings together immutable, persistent data structures, monadic
 higher-order functions, strong static typing, and lazy evaluation--pillars of
