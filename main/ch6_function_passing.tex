@@ -13,9 +13,9 @@ It is difficult to deny that data-centric programming is growing in importance.
 At the same time, it is no secret that the most successful systems for
 programming with ``big data'' have all adopted ideas from functional
 programming; \ie programming with first-class functions and higher-order
-functions. These functional ideas are often touted to be the key to the
-success of these frameworks. It is not hard to imagine why--a functional,
-declarative interface to data distributed over tens to thousands of nodes
+functions. These functional ideas are often touted to be the key to the success
+of these frameworks. It is not hard to imagine why--a functional, declarative
+interface to data distributed over tens, or hundreds, or even thousands of nodes
 provides a more natural way for end-users and data scientists to reason about
 data.
 
@@ -71,7 +71,7 @@ but this is only possible if also lower layers (namely those dealing with
 object serialization) are statically typed. Several
 studies~\cite{JavaSerialization, JavaRMI, Philippsen2000, Jaguar} report
 on the high overhead of serialization in widely-used runtime environments such
-as the JVM. This overhead is so important in practice that popular systems,
+as the JVM. Researchers have even found that serialization can account for 50\% of on a Spark cluster~\cite{OusterhoutSerialization}. This overhead is so important in practice that popular systems,
 like Spark~\cite{Spark} and Akka~\cite{Akka}, leverage alternative
 serialization frameworks such as Protocol Buffers~\cite{Protobuf}, Apache
 Avro~\cite{Avro}, or Kryo~\cite{Kryo} to meet their performance requirements.
@@ -112,18 +112,18 @@ Dryad~\cite{Dryad} are based on the concept of a
 combines (a) an initial data set available on stable storage and (b) a
 sequence of transformations applied to initial and subsequent data sets.
 Maintaining such lineages enables fault recovery through recomputation.
-Practical implementations of lineage-based fault recovery suffer from complex
-code bases, typically eschewing strong static typing. This chapter outlines a
-principled approach to lineage-based fault recovery in a purely functional
-setting.
+% Practical implementations of lineage-based fault recovery suffer from complex
+% code bases, typically eschewing strong static typing. This chapter outlines a
+% principled approach to lineage-based fault recovery in a purely functional
+% setting.
 
-Our programming model is also designed to enable adoption in real-world
-languages and systems. On the one hand, our model can be thought of as a
-generalization of the MapReduce/Spark computation model, which has been shown
-to be widely portable. On the other hand, the core primitives of the
-programming model can be implemented in any language that enables closures to
-be serialized.
-
+% Our programming model is also designed to enable adoption in real-world
+% languages and systems. On the one hand, our model can be thought of as a
+% generalization of the MapReduce/Spark computation model, which has been shown
+% to be widely portable. On the other hand, the core primitives of the
+% programming model can be implemented in any language that enables closures to
+% be serialized.
+%
 
 % To ensure safe and efficient distribution of closures, our model leverages
 % both syntactic and type- based restrictions. For instance, closures sent to
@@ -344,9 +344,13 @@ conclude in Section~\ref{sec:conclusion-future-work}.
 \label{sec:basic-model}
 
 The best way to quickly visualize the F-P model is to think in terms of a
-persistent functional data structure with structural sharing. Then, rather
-than containing pure data, imagine instead that the structure represents a
-directed acyclic graph (DAG) of transformations on distributed data.
+persistent functional data structure with structural sharing. A {\em persistent
+data structure} is a data structure that always preserves the previous version
+of itself when it is modified--such data structures are effectively immutable,
+as their operations do not (visibly) update the structure in-place, but instead
+always yield a new updated structure. Then, rather than containing pure data,
+imagine instead that the data structure represents a directed acyclic graph
+(DAG) of transformations on data that is distributed.
 
 Importantly, since this DAG of computations is a persistent data structure
 itself, it is safe to exchange (copies of) subgraphs of a DAG between remote
@@ -360,7 +364,7 @@ Central to our model is the careful use of laziness. Computations on
 distributed data are typically not executed eagerly; instead, applying a
 function to distributed data just creates an immutable lineage. To obtain the
 result of a computation, it is necessary to first ``kick off'' computation, or
-to force its lineage. Within our programming model, this force
+to ``force'' its lineage. Within our programming model, this force
 operation
 % \todo{which force operation?}
 makes network communication (and thus
@@ -373,13 +377,13 @@ important and effective in distributed systems~\cite{FlumeJava}.
 % \todo{What does this have to do with FlumeJava?}
 
 \vspace{-3mm}
-\begin{center}\noindent\rule{10cm}{0.4pt}\end{center}
+\begin{center}\noindent\rule{14cm}{0.4pt}\end{center}
 \begin{displayquote}
 For these reasons, we believe that laziness should be viewed as an enabler in
 the design of distributed systems.
 \end{displayquote}
 \vspace{-4mm}
-\begin{center}\noindent\rule{10cm}{0.4pt}\end{center}
+\begin{center}\noindent\rule{14cm}{0.4pt}\end{center}
 \vspace{1mm}
 
 \noindent The F-P model consists of three main components:
@@ -402,15 +406,31 @@ Similar to a proxy object, a SiloRef represents, and allows interacting with,
 both local and remote silos. SiloRefs are immutable, storing identifiers to
 locate possibly remote silos. SiloRefs are also typed (\verb|SiloRef[T]|)
 corresponding to the type of their silo's data, leading to well-typed network
-communication. The SiloRef provides three primitive operations/combinators
-(some are lazy, some are not): map, flatMap, and send. map lazily applies a
-user-defined function to data pointed to by the SiloRef, creating in a new
-silo containing the result of this application. Like map, flatMap lazily
-applies a user-defined function to data pointed to by the SiloRef. Unlike map,
-the user-defined function passed to flatMap returns a SiloRef whose contents
-is transferred to the new silo returned by flatMap. Essentially, flatMap
-enables accessing the contents of (local or remote) silos from within remote
-computations. We illustrate these primitives in more detail in Section~\ref{sec:primitives}.
+communication. That is, by parameterizing SiloRefs, it becomes impossible by
+design to apply transformations (\eg to apply a function) to that data unless
+the type of the function agrees with the type of the data stored in the
+corresponding Silo. This avoids a common pitfall of actor-based programming in
+Scala; since communication between actors is untyped (an actor's message
+handler's type in Scala is \verb|Any => Unit|) developers commonly run into hung
+and timed-out systems during system development due to the \verb|Any => Unit|
+message handler in an actor receiving a message of a type that is not explicitly
+handled by the programmer. In F-P, this situation is avoided by design in that
+these sorts of errors are caught at compile-time rather than requiring a
+programmer to debug a hung system at runtime.
+% is a hanging and timeout unable to handle a received message because, leaving
+% the actor and corresponding system to hang until timeout.
+
+
+The SiloRef provides three primitive operations/combinators (some are lazy, some
+are not): \verb|map|, \verb|flatMap|, and \verb|send|. \verb|map| lazily applies
+a user-defined function to data pointed to by the SiloRef, creating in a new
+silo containing the result of this application. Like \verb|map|, \verb|flatMap|
+lazily applies a user-defined function to data pointed to by the SiloRef. Unlike
+\verb|map|, the user-defined function passed to \verb|flatMap| returns a SiloRef
+whose contents is transferred to the new silo returned by \verb|flatMap|.
+Essentially, \verb|flatMap| enables accessing the contents of (local or remote)
+silos from within remote computations. We illustrate these primitives in more
+detail in Section~\ref{sec:primitives}.
 
 \paragraph{Spores}
 
