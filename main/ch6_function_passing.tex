@@ -436,13 +436,15 @@ communication. That is, by parameterizing SiloRefs, it becomes impossible by
 design to apply transformations (\eg to apply a function) to that data unless
 the type of the function agrees with the type of the data stored in the
 corresponding Silo. This avoids a common pitfall of actor-based programming in
-Scala; since communication between actors is untyped\footnote{There are several ongoing efforts aimed at typed communication between actors~\cite{TypedActors,TypedAkka}} (an actor's message
-handler's type in Scala is \verb|Any => Unit|) developers commonly run into hung
-and timed-out systems during system development due to the \verb|Any => Unit|
-message handler in an actor receiving a message of a type that is not explicitly
-handled by the programmer. In F-P, this situation is avoided by design in that
-these sorts of errors are caught at compile-time rather than requiring a
-programmer to debug a hung system at runtime.
+Scala; since communication between actors is untyped\footnote{There are several
+ongoing efforts aimed at typed communication between
+actors~\cite{TypedActors,TypedAkka}.} (an actor's message handler's type in
+Scala is \verb|Any => Unit|) developers commonly run into hung and timed-out
+systems during system development due to the \verb|Any => Unit| message handler
+in an actor receiving a message of a type that is not explicitly handled by the
+programmer. In F-P, this situation is avoided by design in that these sorts of
+errors are caught at compile-time rather than requiring a programmer to debug a
+hung system at runtime.
 % is a hanging and timeout unable to handle a received message because, leaving
 % the actor and corresponding system to hang until timeout.
 
@@ -459,14 +461,17 @@ silos from within remote computations. We illustrate these primitives in more
 detail in Section~\ref{sec:primitives}.
 
 \paragraph{Spores}
+As introduced in Chapter~\ref{ch:spores}, spores~\cite{Spores} are safe closures
+that are guaranteed to be serializable and thus distributable. The following is
+a review of the important characteristics of spores as they pertain to the F-P
+model.
 
-Spores~\cite{Spores} are safe closures that are guaranteed to be serializable
-and thus distributable. They are a closure-like abstraction and type system
-which gives authors of distributed frameworks a principled way of controlling
-the environment which a closure (provided by client code) can capture. This is
-achieved by (a) enforcing a specific syntactic shape which dictates how the
-environment of a spore is declared, and (b) providing additional type-checking
-to ensure that types being captured have certain properties.
+Spores are a closure-like abstraction and type system which gives authors of
+distributed frameworks a principled way of controlling the environment which a
+closure (provided by client code) can capture. This is achieved by (a) enforcing
+a specific syntactic shape which dictates how the environment of a spore is
+declared, and (b) providing additional type-checking to ensure that types being
+captured have certain properties.
 
 \vspace{3mm}
 \noindent A spore consists of two parts:
@@ -487,15 +492,15 @@ to ensure that types being captured have certain properties.
 % \end{figure}
 % \vspace{-1mm}
 
-The characteristic property of a spore is that the spore body is only allowed
-to access its parameter, the values in the spore header, as well as top-level
-singleton objects (Scala's form of modules). The spore closure is not allowed
-to capture variables other than those declared in the spore header (\ie a
-spore may not capture variables in the environment). By enforcing this shape,
-the environment of a spore is always declared explicitly in the spore header,
-which avoids accidentally capturing problematic references. Moreover,
-importantly for object-oriented languages like Scala, it's no longer possible
-to accidentally capture the \verb|this| reference.
+The characteristic property of a spore is that the spore body is only allowed to
+access its parameter, the values in the spore header, as well as top-level
+singleton objects (Scala's form of modules). The spore closure is not allowed to
+capture variables other than those declared in the spore header (\ie the spore
+{\em closure} may not capture variables in the environment enclosing the spore).
+By enforcing this shape, the environment of a spore is always declared
+explicitly in the spore header, which avoids accidentally capturing problematic
+references. Moreover, importantly for object-oriented languages like Scala, it's
+no longer possible to accidentally capture the \verb|this| reference.
 
 Spores also come with additional type-checking. Type information corresponding
 to captured variables are included in the type of a spore. This enables
@@ -705,7 +710,7 @@ labels.cache()
 \noindent
 Assuming we would also cache the \verb|owners| SiloRef from the previous
 example, the resulting lineage graph would look as illustrated in
-Figure~\ref{fig:all-silorefs}. Note that \verb|vehicles| is not a regular
+Figure~\ref{fig:bigger-dag}. Note that \verb|vehicles| is not a regular
 parent in the lineage of \verb|owners|; it is an indirect input used to
 compute \verb|owners| by virtue of being {\em captured} by the spore used to
 compute \verb|owners|.
@@ -1726,10 +1731,12 @@ type-safe pickling.
 % not require a type system extension.
 
 Systems like Spark~\cite{Spark}, MapReduce~\cite{MapReduce}, and
-Dryad~\cite{Dryad} are just that--distributed systems. F-P is meant to act as
-more of a middleware to facilitate the design and implementation of such
-systems, and as a result provides much finer-grained control over details such
-as fault handling and network topology (\ie peer-to-peer vs master/worker).
+Dryad~\cite{Dryad} are distributed systems. Rather than being a system itself,
+F-P is meant to act as more of a substrate upon which to build systems like
+Spark, MapReduce, or Dryad. F-P aims to facilitate the design and implementation
+of such systems, and as a result provides much finer-grained control over
+details such as fault handling and network topology (\ie peer-to-peer vs
+master/worker).
 
 The Clojure programming language proposes agents~\cite{Clojure}--stationary
 mutable data containers that users apply functions to in order to update an
@@ -1774,20 +1781,18 @@ behavior in the form of serializable closures is central to the F-P model.
 \label{sec:conclusion-future-work}
 
 We have presented F-P, a new programming model and principled substrate for
-building data-centric distributed systems. Built atop a foundation consisting
-of performant and type-safe serialization, and safe, serializable closures, we
-have shown that it's possible to build elegant fault-tolerant functional
-systems. One insight of our model is that lineage-based fault recovery
-mechanisms, used in widespread frameworks for distribution, can be modeled
-elegantly in a functional way using persistent data structures. Our
-operational semantics shows that this approach makes it even amenable to
-formal treatment. We have also shown that F-P is able to express patterns of
-computation richer than those supported by common ``big data'' frameworks
-while maintaining fault-tolerance--such as decentralized peer-to-peer patterns
-of communication.  Finally, we have implemented our approach in and for Scala,
-as well as numerous applications on top, and have discovered new ways to
-reconcile type-specific serializers with patterns of static typing common in
-distributed systems.
+building data-centric distributed systems. Built atop a foundation consisting of
+performant and type-safe serialization, and safe, serializable closures, we
+believe that it's possible to build elegant fault-tolerant functional systems.
+One insight of our model is that lineage-based fault recovery mechanisms, used
+in widespread frameworks for distribution, can be modeled elegantly in a
+functional way using persistent data structures. Our operational semantics shows
+that this approach makes it even amenable to formal treatment.  We have also
+shown that F-P is able to express rich patterns of computation while maintaining
+fault-tolerance--such computation patterns include decentralized peer-to-peer
+patterns of communication. Finally, we have implemented our approach in and
+for Scala, and have discovered new ways to reconcile type-specific serializers
+with patterns of static typing common in distributed systems.
 
 
 
