@@ -7,7 +7,7 @@ representation to one that can be sent over the network, \eg a binary
 representation. This act of transforming in-memory data to some form of external
 representation is called {\em pickling} or {\em serialization}.
 
-This chapter covers a new approach to this foundational aspect distributed
+This chapter covers a new approach to this foundational aspect of distributed
 programming. In this chapter, we detail {\em object oriented picklers} and
 scala/pickling, a framework for generating them at compile time.
 
@@ -303,8 +303,13 @@ pickling/unpickling most Scala types, including generics, case classes, and
 singleton objects. Passing a type argument to pickle, whether inferred or
 explicit, which is an unsupported type leads to a compile-time error. This
 avoids a common problem in Java-style serialization where non-serializable
-types are only discovered at runtime, in general. Function types, however, are
-not yet supported, and are planned future work.
+types are only discovered at runtime, in general.
+
+Function closures, however, are not supported by scala/pickling in its
+standalone form. It turns out that function closures are tricky to serialize due
+to the complicated enviornments that they can have. Chapter~\ref{ch:spores}
+focuses on this problem and introduces a new abstraction and type system
+designed to ensure that closures are always serializable.
 
 \subsection{Advanced Usage}
 \label{sec:pickleable-annotation}
