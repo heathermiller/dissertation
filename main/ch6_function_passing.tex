@@ -47,22 +47,33 @@ to provide high-level, declarative APIs.
 % reason about and realize in practice. Some language features, like closures,
 % are not able to be reliably distributed.
 
-Yet problems manifest themselves throughout all layers of the stack of such
-systems, surprising users and impacting ease-of-use, complicating maintenance,
-and losing opportunities for optimization. Some such problems include:
+% Yet problems manifest themselves throughout all layers of the stack of such
+% systems, surprising users and impacting ease-of-use, complicating maintenance,
+% and losing opportunities for optimization. Some such problems include:
+
+% Due to the limited support for distribution in the languages that are used to
+% implement these systems, even well-developed and widely used systems still
+% encounter issues both stemming from a lack of static type information, as well
+% as issues at the level of the language and runtime that complicate their use.
+% Some of these include:
+
+Due to the limited support for distribution in the languages that are used to
+implement these systems, even well-developed and widely used systems still
+encounter issues that can complicate their use or optimization. Some of these
+include:
 
 \begin{itemize}
 
-\item {\bf Difficulty of Use} These systems' APIs cannot statically prevent
+\item {\bf Usage Errors} These systems' APIs cannot statically prevent
 {\em common usage errors} resulting from some language features not being
 designed with distribution in mind, often confronting users with hard-to-debug
 runtime errors. A common example is unsafe closure
 serialization~\cite{Spores}.
 
-\item {\bf Complicated Maintenance} Often, only high-level user-facing
-abstractions are statically typed.  The absence of static types in lower
-layers of the system makes maintenance tasks, such as code refactorings, more
-difficult.
+% \item {\bf Complicated Maintenance} Often, only high-level user-facing
+% abstractions are statically typed. The absence of static types in lower
+% layers of the system makes maintenance tasks, such as code refactorings, more
+% difficult.
 
 \item {\bf Lost Optimization Opportunities} The absence of certain kinds of
 static type information precludes systems-centric optimizations. Importantly,
@@ -75,9 +86,20 @@ as the JVM. Researchers have even found that for some jobs, as much as half of
 the CPU time is spent deserializing and decompressing data on a Spark
 cluster~\cite{OusterhoutSerialization}. This overhead is so important in
 practice that popular systems, like Spark~\cite{Spark} and Akka~\cite{Akka},
-leverage alternative serialization frameworks such as Protocol
+often leverage alternative serialization frameworks such as Protocol
 Buffers~\cite{Protobuf}, Apache Avro~\cite{Avro}, or Kryo~\cite{Kryo} to meet
 their performance requirements.
+
+\item {\bf Lack of Formal Semantics} As it stands, popular system designs don't
+allow formal reasoning about important systems-oriented concerns such as fault
+recorvery due a lack of formal operational models. As a result, formal reasoning
+is not available for the development of these systems; \ie such systems tend not
+to be built upon foundations with a formal semantics.
+
+% For the argument that systems are built on languages, and langauges have
+% semantics... one can argue that then you ahve the problems of complexity -- you
+% would then need to build up semantics for every possible layer of the system.
+% this is far too complex. the point is complexity. too fine-grained.
 
 \end{itemize}
 
@@ -150,13 +172,13 @@ supporting decentralized distributed computations. Lazy evaluation enables
 important optimizations while keeping programs simple to reason about.
 
 \item {\bf\em A formalization of our programming model} based on a small-step
-operational  semantics. To our knowledge it is the first formal account of
-fault recovery based on lineage in a purely functional setting. Inspired by
-widespread systems like Spark, our formalization closely models real-world
-fault recovery mechanisms. The presented semantics is clearly stratified into
-a deterministic layer and a concurrent/distributed layer. Importantly,
-reasoning techniques for sequential programs are not invalidated by the
-distributed layer.
+operational  semantics. To our knowledge it is the first formal account of fault
+recovery based on lineage in a purely functional setting. Inspired by widespread
+systems like, our formalization is a first step towards a formal, operational
+account of real-world fault recovery mechanisms. The presented semantics is
+clearly stratified into a deterministic layer and a concurrent/distributed
+layer. Importantly, reasoning techniques for sequential programs are not
+invalidated by the distributed layer.
 
 \item {\bf\em An implementation of the programming model} in and for Scala. We
 present experiments that show some of the benefits of the proposed design, and
@@ -374,8 +396,9 @@ makes network communication (and thus
 possibilities for latency) explicit, which is considered to be a strength when
 designing distributed systems~\cite{ANoteDistComp}. Deferred evaluation also
 enables optimizing distributed computations through operation fusion, which
-avoids the creation of unnecessary intermediate data structures--this is
-efficient in time as well as space. This kind of optimization is particularly
+avoids the creation of unnecessary intermediate data structures--which is
+% this reduces both processing time and memory consumption.
+more efficient in time as well as space. This kind of optimization is particularly
 important and effective in distributed systems~\cite{FlumeJava}.
 % \todo{What does this have to do with FlumeJava?}
 
@@ -413,7 +436,7 @@ communication. That is, by parameterizing SiloRefs, it becomes impossible by
 design to apply transformations (\eg to apply a function) to that data unless
 the type of the function agrees with the type of the data stored in the
 corresponding Silo. This avoids a common pitfall of actor-based programming in
-Scala; since communication between actors is untyped (an actor's message
+Scala; since communication between actors is untyped\footnote{There are several ongoing efforts aimed at typed communication between actors~\cite{TypedActors,TypedAkka}} (an actor's message
 handler's type in Scala is \verb|Any => Unit|) developers commonly run into hung
 and timed-out systems during system development due to the \verb|Any => Unit|
 message handler in an actor receiving a message of a type that is not explicitly
