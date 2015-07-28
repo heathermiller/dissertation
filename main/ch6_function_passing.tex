@@ -66,15 +66,18 @@ difficult.
 
 \item {\bf Lost Optimization Opportunities} The absence of certain kinds of
 static type information precludes systems-centric optimizations. Importantly,
-type-based static meta-programming enables fast serialization~\cite{ScalaPickling},
-but this is only possible if also lower layers (namely those dealing with
-object serialization) are statically typed. Several
-studies~\cite{JavaSerialization, JavaRMI, Philippsen2000, Jaguar} report
+type-based static meta-programming enables fast
+serialization~\cite{ScalaPickling}, but this is only possible if also lower
+layers (namely those dealing with object serialization) are statically typed.
+Several studies~\cite{JavaSerialization, JavaRMI, Philippsen2000, Jaguar} report
 on the high overhead of serialization in widely-used runtime environments such
-as the JVM. Researchers have even found that serialization can account for 50\% of on a Spark cluster~\cite{OusterhoutSerialization}. This overhead is so important in practice that popular systems,
-like Spark~\cite{Spark} and Akka~\cite{Akka}, leverage alternative
-serialization frameworks such as Protocol Buffers~\cite{Protobuf}, Apache
-Avro~\cite{Avro}, or Kryo~\cite{Kryo} to meet their performance requirements.
+as the JVM. Researchers have even found that for some jobs, as much as half of
+the CPU time is spent deserializing and decompressing data on a Spark
+cluster~\cite{OusterhoutSerialization}. This overhead is so important in
+practice that popular systems, like Spark~\cite{Spark} and Akka~\cite{Akka},
+leverage alternative serialization frameworks such as Protocol
+Buffers~\cite{Protobuf}, Apache Avro~\cite{Avro}, or Kryo~\cite{Kryo} to meet
+their performance requirements.
 
 \end{itemize}
 
@@ -453,9 +456,12 @@ to ensure that types being captured have certain properties.
 \noindent This shape is illustrated below.
 
 % \vspace{-1mm}
-\begin{figure}[!h]
-\centering\includegraphics[width=0.6\columnwidth]{spore-shape.pdf}
-\end{figure}
+% \begin{figure}[!htb]
+% \centering
+\begin{center}
+\includegraphics[width=0.6\columnwidth]{spore-shape.pdf}
+\end{center}
+% \end{figure}
 % \vspace{-1mm}
 
 The characteristic property of a spore is that the spore body is only allowed
