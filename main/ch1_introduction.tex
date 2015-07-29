@@ -11,21 +11,88 @@ ago.
 % have woven large swaths of themselves
 
 Today, large swaths of most applications have been woven into ``the cloud'' or
-other network services. Modest mobile apps now make network calls to dozens of
-even hundreds of services. Meanwhile as software becomes evermore pervasive,
-weaving itself more into more of our daily habits in more places, content
-providers are focusing their energies on collecting any and all seemingly
-innocuous pieces of our data that they can, in an attempt to unlock some sort of
-market value in peoples' trails of digital breadcrumbs. With all of this data
-piling up, industry and academia are scrambling to build distributed systems
-that can help more users make sense of it--clusters of machines working together
-to churn through datasets too large to fit in the memory of a single machine.
-This is the new computing landscape--the network has become ubiquitous and is
-now baked into much of the programming that professional developers do.
+other network services. Web applications are becoming patchwork quilts of made
+up of calls to multitudes of different microservices. Modest mobile apps now
+make network calls to dozens or even hundreds of services. Meanwhile as software
+becomes evermore pervasive, weaving itself more into more of our daily habits in
+more places, content providers are focusing their energies on collecting any and
+all seemingly innocuous pieces of our data that they can, in an attempt to
+unlock some sort of market value in peoples' trails of digital breadcrumbs. With
+all of this data piling up, industry and academia are scrambling to build
+distributed systems that can help more users make sense of it--clusters of
+machines working together to churn through datasets too large to fit in the
+memory of a single machine.
 
-But how have our most important tools in professional software development --
-programming languages -- kept up throughout this ongoing shift?
+Meanwhile, we're witnessing a renaissance of functional programming so prevalent
+that it has permeated the daily routines of software developers on all ends of
+the the software development spectrum, from the client-side\footnote{Popular
+functional languages for the client-side include: numerous JavaScript libraries
+such as \href{http://underscorejs.org}{Underscore.js}, Elm~\cite{Elm},
+\href{http://www.purescript.org/}{PureScript},
+\href{http://www.scala-js.org/}{Scala.js}, amongst many others.} to the
+server-side.\footnote{Popular functional languages for the server-side include:
+Scala~\cite{Odersky10}, Clojure~\cite{Clojure}, Erlang~\cite{Erlang},
+Haskell~\cite{Haskell}, amongst many others.} The distributed system core of
+services like Twitter are based on functional APIs~\cite{Eriksen2013}, big data
+has . Just about everywhere you look now a days, you'll find
+functionally-inspired system.
 
+% This is
+% where Scala shines.
+
+This is the new computing landscape; the network has become ubiquitous and is
+now baked into much of the programming that professional developers do, and that
+style of development is becoming increasingly functional. But how have our most
+important tools in professional software development -- programming languages --
+kept up throughout this ongoing shift?
+
+% Languages themselves have actually done little
+
+Little has actually been done in recent years in the programming languages
+community to address this fundamental shift.
+% Instead, the focus of the effort
+% seems to be on.
+
+Scala is a functional programming language that runs on the
+JVM\footnote{Although Scala now targets JavaScript too with a Scala-to-JS
+compiler known as \href{http://www.scala-js.org/}{Scala.js}}. Scala is popular
+amongst developers of distributed systems for two prime reasons; (1) as a JVM
+language, it seamlessly interoperates with Java, the de facto language of choice
+amongst developers of big data systems, and (2) its functional features combined
+with its concision over Java
+
+Functional language features make .
+
+% distributed programming is now the norm, it's in every program these days.
+
+but how have languages kept up? well, they really haven't. instead there are a
+handful of disparate attempts at making distributed programming easier from a
+higher level (handling concerns like consistency etc)
+
+Meanwhile, functional programming is also on the rise, gaining popularity as
+functional languages begin to mainstream.
+
+A goal of this dissertation is to revisit the fundamental concepts of modern
+languages, objects and functions, and to make them safer and more efficient to
+use in a distributed environment. We focus on three important and orthogonal
+building blocks for distributed programming:
+
+
+\begin{itemize}
+  \item {\bf \em Pickling (serialization)}
+  \item {\bf \em Functions}
+  \item {\bf \em Asynchronous programming}
+\end{itemize}
+
+furthermore, we propose a new dist. prog. model that at the same time (a)
+embraces these improved building blocks and (b) generalizes existing, well-known
+prog.models.
+
+the ultimate goal is to simplify the lives of both users and developers of dist.
+systems
+
+we believe the ideas and systems in this diss. are steps towards this goal; this
+is also witnessed by strong interest from industry in some of these systems
 
 
  Recently, a
@@ -188,8 +255,8 @@ This dissertation describes a number of extensions and libraries in and for
 Scala which aim to provide a more reliable foundation for building distributed
 systems atop of. Importantly, a goal throughout this dissertation was not only
 to add better support the basics of distributed programming, but to do it {\em
-without extending the Scala compiler}. As a mainstream language with hundreds of
-thousands of users.
+without extending the Scala compiler}\footnote{Finding ways mainstream language with
+hundreds of thousands of users.}.
 
 \begin{itemize}
 
