@@ -2044,6 +2044,13 @@ Many frameworks have constructs that start an asynchronous
 computation and yield a future holding its result, for example, Habanero Java~\cite{Shirako11} (\verb=async=)
 and Scala~\cite{Odersky10} (\verb=future=).
 
+% Outside of academia, futures have become widespread in industry, with
+% implementations (often blocking) in many languages such as
+% JavaScript~\cite{JSFuturesCujo, JSFuturesJQuery, JSFuturesAngular},
+% Python~\cite{PythonFutures}, Swift~\cite{SwiftFutures}, Ruby~\cite{RubyFutures},
+% Dart~\cite{DartFutures}, Clojure~\cite{ClojureFutures}, and
+% Racket~\cite{RacketFutures}, amongst others.
+
 A number of other models and frameworks recognized the need to embed
 the concept of futures into other data-structures.
 Single-assignment variables have been generalized to I-Structures~\cite{Arvind89} which are essentially
@@ -2069,8 +2076,40 @@ region-based type system can ensure determinism~\cite{Bocchino09}.
 X10's constrained-based dependent types can similarly ensure
 determinism and deadlock-freedom~\cite{Saraswat07}.
 
+LVars~\cite{LVars} are a generalization of single-assignment variables to
+multiple-assignment that are provably deterministic in a concurrent setting.
+LVars are based on a lattice and ensure determinism by allowing only monotonic
+writes and threshold reads. LVars were extended with freezing and
+handlers~\cite{LVarsFreezing} resembling some of the capabilities and interface
+of FlowPools. FlowPools differ in that they use many of the same properties
+(monotonicity, callbacks, and sealing) to solve a slightly different
+problem--FlowPools aim to provide a deterministic multiset or pool abstraction
+of single-assignment variables and provably non-blocking implementation. LVars
+aim to be a foundation for ensuring determinism based on lattices, which can be
+realized as a number of different types of data structures such as single
+variables, sets, or maps.
+
+CRDTs~\cite{CRDTs1, CRDTs2} are data structures with specific well-definied
+properties designed for replicating data across multiple machines in a
+distributed system. While generally useful for a different purpose (FlowPools
+don't aim to replicate state across a network, instead they intend to be
+deterministic in the face of concurrent writes), both FlowPools and CRDTs share
+the need for monotonic updates. One convenience FlowPools have over CRDTs is
+their composability. However, Lasp~\cite{Lasp} attempts to remedy this
+limitation of CRDTs through a new programming model designed for building
+convergent computations by composing CRDTs.
 
 \section{Conclusion}
+
+In this chapter, we've presented two libraries and abstractions for asynchronous
+dataflow programming. Futures in Scala, are a fully asynchronous and
+non-blocking futures and promises library with a monadic interface that enables
+operations on futures to be composed. FlowPools are an abstraction for
+concurrent dataflow programming that also provides a composable programming
+model similar to futures. We showed that FlowPools are provably deterministic
+and can be implemented in a provably non-blocking manner. Finally, we showed
+that in addition to having a richer more functional interface than other similar
+data structures in Java's concurrency library, FlowPools are also efficient and out perform a number of standard Java concurrent data structures in our benchmarks.
 
 % We have presented an abstraction and underlying data structure for
 % deterministic concurrent dataflow programming. We achieve composability
@@ -2095,10 +2134,10 @@ determinism and deadlock-freedom~\cite{Saraswat07}.
 % case with dataflow streams.
 % A consequence of this is a more flexible programming model.
 
-The abstraction for concurrent dataflow programming we
-presented provides a composable deterministic programming model.
-It can be implemented in a provably non-blocking manner
-and is efficient as well, as shown in experiments.
+% The abstraction for concurrent dataflow programming we
+% presented provides a composable deterministic programming model.
+% It can be implemented in a provably non-blocking manner
+% and is efficient as well, as shown in experiments.
 
 % As future work, we plan developing other
 % concurrent collection types with deterministic semantics, which enrich
