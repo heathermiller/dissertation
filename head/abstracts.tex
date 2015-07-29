@@ -5,7 +5,7 @@
 % English abstract
 \cleardoublepage
 \chapter*{Abstract}
-%\markboth{Abstract}{Abstract}
+\markboth{Abstract}{Abstract}
 \addcontentsline{toc}{chapter}{Abstract (English/Deutsch)} % adds an entry to the table of contents
 
 
@@ -96,11 +96,85 @@ Key words: distributed programming, functional programming, closure, serializati
 \begin{otherlanguage}{german}
 \cleardoublepage
 \chapter*{Zusammenfassung}
-%\markboth{Zusammenfassung}{Zusammenfassung}
-% put your text here
+\markboth{Zusammenfassung}{Zusammenfassung}
+
+Die Software-Entwicklung hat eine grundlegende Wendung durchlaufen. Software hat
+sich heutzutage von einfachen geschlossenen Programmen, die auf einem einzigen
+Rechner laufen, hin zu „massive open programs“ gewandelt, die Nutzeranfragen
+zusammenführen, die als Antworten von hunderten von Netzwerkanfragen an eine
+Vielzahl an Diensten eingegangen sind. Zeitgleich dazu werden Daten weiterhin
+angesammelt und Systeme für Big Data Analytics sind auf dem Vormarsch. Trotz des
+Trends zum verteilten Computing, sind Fragen zu Programmiersprachen und
+Laufzeitsystemen im Überfluss vorhanden. Serialisierung ist hinsichtlich der
+Laufzeit nach wie vor eine kostspielige Angelegenheit, die laufende Systeme zum
+Abstürzen bringt und Entwickler verwirrt. Funktions-Closures werden zu APIs
+hinzugefügt, um durch Anwendungsentwickler zum Bearbeiten von Datensätzen
+massiver Grösse genutzt werden zu können, jedoch ohne sicherzustellen, dass
+diese über das Netzwerk gesendet werden können. Und ein Grossteil der
+Frameworks, die zur Verarbeitung multipler, gleichzeitiger Anfragen durch
+asynchrone Programmierabstraktionen entwickelt wurden, basiert auf dem
+Blockieren von Threads, was schwerwiegende Skalierungsprobleme verursacht.
+
+\vspace{0.2cm}
+
+Die vorliegende Dissertation beschreibt eine Reihe von Erweiterungen und
+Bibliotheken für die Programmiersprache Scala, um die genannten Probleme
+anzugehen und eine zuverlässigere Grundlage für die Konstruktion verteilter
+Systeme zu entwickeln.
+
+\vspace{0.2cm}
+
+Die Arbeit stellt einen neuen Ansatz zur Serialisierung, {\em Pickling}, vor,
+welcher auf der Idee der Generierung und Komposition statischer
+Pickling-Funktionen beruht. Dieser Ansatz verlagert den Aspekt der
+Serialisierung so stark wie möglich auf die Übersetzungszeit, um Anwendern zu
+ermöglichen, Serialisierungsfehler zur Übersetzungszeit zu erkennen statt zur
+Laufzeit. Des Weiteren ist unser Framework durch den Serialisierungscode, der
+beim Kompilieren erzeugt wird, deutlich performanter als andere existierende
+Serialisierungs-Frameworks. Zudem verallgemeinern wir unseren Ansatz zur
+Generierung weiterer Datentyp-generischer Funktionen neben der Serialisierung.
+
+\vspace{0.2cm}
+
+In Anbetracht der Tendenz verteilter daten-paralleler Frameworks, die für
+funktionelle Muster entworfen wurden, bei denen Closures über Cluster-Knoten zu
+großen persistenten Datensätzen übertragen werden, stellt diese Arbeit eine neue
+Closure-artige Abstraktion und Typsystem, {\em Spores}, vor, dass garantieren
+kann, dass Closures serialisierbar sind, Thread-sicher sind, und sogar
+benutzerdefinierte Eigenschaften haben. Entscheidend ist, dass unser System auf
+dem Prinzip basiert, im Typ eines Spores Typinformation zu kodieren, welche den
+gefangenen Variablen entspricht. Wir beweisen die Korrektheit unseres
+Typsystems, implementieren unseren Ansatz in Scala, evaluieren dessen
+Praktikabilität mithilfe einer kleinen empirischen Studie, und zeigen die
+Mächtigkeit dieser Garantien mithilfe einer Fallstudie realistischer verteilter
+und nebenläufiger Frameworks, die durch diese sichere Grundlage für Closures
+unterstützt werden.
+
+\vspace{0.2cm}
+
+Schließlich bringen wir die obengenannten Bausteine, Pickling und Spores,
+zusammen, um die Basis eines neuen Programmiermodells, genannt  {\em
+Function-Passing}, zu bilden. Function-Passing basiert auf der Idee einer
+verteilten persistenten Datenstruktur, die in ihren Knoten
+Daten-Transformationen anstelle der verteilten Daten selbst enthält, was die
+Fehlerbeseitigung per Konstruktion vereinfacht. Lazy Evaluation ist auch von
+zentraler Bedeutung für unser Modell; da Lazy Evaluation in unserem Design nur
+an der Stelle der Initiierung von Netzwerk-Kommunikation Bedeutung hat, bleibt
+die logische Grundlage unseres Modells leicht verständlich, während es
+hinsichtlich Zeit und Speicherverbrauch effizient bleibt. Wir formalisieren
+unser Programmiermodell in Form einer strukturierten operationellen Semantik,
+die eine präzise Spezifikation der Semantik funktionaler Fehlerbeseitigung
+umfasst, und wir stellen eine Open-Source-Implementierung unseres Modells in und
+für Scala bereit.
+
+
+
 
 \vskip0.5cm
-Stichwörter: Verteilte Programmierung, Funktionale Programmierung, Closure, Serialisierung, Programmiermodell, Nebenläufigkeit, Asynchrone Programmierung, Datenfluss
+
+Stichwörter: Verteilte Programmierung, Funktionale Programmierung, Closure,
+Serialisierung, Programmiermodell, Nebenläufigkeit, Asynchrone Programmierung,
+Datenfluss
 %put your text here
 \end{otherlanguage}
 

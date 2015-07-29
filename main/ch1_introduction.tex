@@ -11,9 +11,9 @@ ago.
 % have woven large swaths of themselves
 
 Today, large swaths of most applications have been woven into ``the cloud'' or
-other network services. Web applications are becoming patchwork quilts of made
-up of calls to multitudes of different microservices. Modest mobile apps now
-make network calls to dozens or even hundreds of services. Meanwhile as software
+other network services. Web applications are becoming patchwork quilts made up
+of calls to multitudes of different microservices. Modest mobile apps now make
+network calls to dozens or even hundreds of services. Meanwhile as software
 becomes evermore pervasive, weaving itself more into more of our daily habits in
 more places, content providers are focusing their energies on collecting any and
 all seemingly innocuous pieces of our data that they can, in an attempt to
@@ -26,7 +26,7 @@ memory of a single machine.
 This is the new computing landscape; the network has become ubiquitous and is
 now baked into much of the programming that professional developers do.
 
-Meanwhile, at the same time, we're witnessing a renaissance of functional
+Meanwhile, at the same time, we are witnessing a renaissance of functional
 programming so prevalent that it has permeated the daily routines of software
 developers on all ends of the the software development spectrum, from the
 client-side\footnote{Popular functional languages for the client-side include:
@@ -72,6 +72,11 @@ Scalding~\cite{Scalding}. One of the main reasons is that closures, as they
 exist in virtually all wide-spread languages, leave essential components, such
 as their captured variables, implicit, preventing customizations necessary to
 make closures safer and more efficient to distribute.
+
+A goal of this dissertation is to revisit the fundamental concepts of modern
+languages, objects and functions, and to make them safer and more efficient to
+use in a distributed environment. We focus on three important and orthogonal
+building blocks for distributed programming:
 
 \begin{itemize}
   \item {\bf \em Pickling (serialization)}
@@ -285,13 +290,15 @@ make closures safer and more efficient to distribute.
 % firmer, more desirable primitives to initiate your own network communication.
 
 
-\section{Thesis}
 
-The goal of this dissertation is to improve the above state of affairs
-Part of this thesis aims to imagine what a more functional model for distributed programming looks like.
 
-This dissertation seeks to improve the above state of affairs from the
-perspective of
+% \section{Thesis}
+
+% The goal of this dissertation is to improve the above state of affairs
+% Part of this thesis aims to imagine what a more functional model for distributed programming looks like.
+%
+% This dissertation seeks to improve the above state of affairs from the
+% perspective of
 
 This dissertation addresses the following questions:
 
@@ -318,16 +325,25 @@ This dissertation addresses the following questions:
 
 This dissertation describes a number of extensions and libraries in and for
 Scala which aim to provide a more reliable foundation for building distributed
-systems atop of. Importantly, a goal throughout this dissertation was not only
-to add better support the basics of distributed programming, but to do it {\em
-without extending the Scala compiler}\footnote{Finding ways mainstream language with
-hundreds of thousands of users.}.
+systems atop of.
+
+In detail, our contributions are the following:
+
+% Importantly, a goal throughout this dissertation was not only
+% to add better support the basics of distributed programming, but to do it {\em
+% without extending the Scala compiler}\footnote{Finding ways mainstream language with
+% hundreds of thousands of users.}.
 
 \begin{itemize}
 
 	\item Abstractions and data structures for asynchronous programming.
 
 	\item
+
+  
+A new data-centric programming model for functional pro- cessing of distributed data which makes important concerns like fault tolerance simple by design. The main computational principle is based on the idea of sending safe, guaranteed serial- izable functions to stationary data. Using standard monadic op- erations our model enables creating immutable DAGs of com- putations, supporting decentralized distributed computations. Lazy evaluation enables important optimizations while keeping programs simple to reason about.
+• A formalization of our programming model based on a small- step operational semantics. To our knowledge it is the first for- mal account of fault recovery based on lineage in a purely func- tional setting. Inspired by widespread systems like Spark, our formalization closely models real-world fault recovery mecha- nisms. The presented semantics is clearly stratified into a deter- ministic layer and a concurrent/distributed layer. Importantly, reasoning techniques for sequential programs are not invali- dated by the distributed layer.
+• A distributed implementation of the programming model in and for Scala. We present experiments that show some of the
 
 \end{itemize}
 
@@ -368,9 +384,11 @@ The rest of this dissertation is organized as follows.
 
 	\item Chapter 6 describes a new programming model for functional distributed
 	programming called {\em function-passing} which aims to simplify the
-	implementation and reasoning of fault tolerance mechanisms. Because the model
-	requires user programs to themselves be stateless, issues like consistency are
-	moot. This programming model can be thought of as a generalization of the Spark
+	implementation and reasoning of fault tolerance mechanisms.
+  % Because the model
+	% requires user programs to themselves be stateless, issues like consistency are
+	% moot.
+  This programming model can be thought of as a generalization of the Spark
 	or MapReduce programming model.
 
 	\item Chapter 7 concludes and discusses possible directions for future work.
