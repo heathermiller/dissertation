@@ -53,6 +53,41 @@ But how have our most important tools in professional software development --
 programming languages -- kept up as the network and functional programming have
 begun to proliferate software development environments?
 
+Researchers and practitioners have explored different approaches to make dist.
+prog. simpler, more reliable, and more performant. (1) message passing, (2) ..., ...
+
+The majority of widely-used PLs relegate distribution to libraries. While many
+of the above-mentioned approaches have been realized as libraries for
+widely-used languages, there are still numerous issues using language constructs
+such as objects and functions in a distributed setting. Moreover, due to their
+nature of being built-in to the language, it is impossible to rely on libraries
+and frameworks to provide support for the reliable distribution of these
+constructs. As a result, even mature libraries and frameworks can exhibit bugs
+that are hard to diagnose and fix (or suffer from the limitations of their
+underlying languages/runtimes).
+
+For example, in mainstream languages like Java, even the act of serializing
+simple objects, a prerequisite for sending them across the network, can lead to
+runtime errors that can be difficult to diagnose and fix. While alternative
+serialization frameworks exist, they feature only rudimentary language
+integration, in stark contrast to native platform support.
+
+This issue is exacerbated when using closures, which are increasingly appearing
+in popular distributed frameworks such as Spark~\cite{Spark} and
+Scalding~\cite{Scalding}. One of the main reasons is that closures, as they
+exist in virtually all wide-spread languages, leave essential components, such
+as their captured variables, implicit, preventing custom treatment necessary to
+make closures safer and more efficient to distribute.
+
+[connect]
+
+Scala is a functional programming language that runs on the
+JVM\footnote{Although Scala now also targets JavaScript with a Scala-to-JS
+compiler known as \href{http://www.scala-js.org/}{Scala.js}} which features both a rich object model as well as extensive support for functional programming.
+Scala delegates aspects such as serialization to its underlying platform, typically Java. As a result, Scala developers are transitively also affected by issues of Java's built-in serialization. Functions too bring a whole host of complications wh
+
+Given that we desire solutions to issues traditionally impossible to fix using libraries alone, the question arises how to best extend languages in a way that does not require intrusive changes to their specification, compilers, and tools.
+
 A goal of this dissertation is to revisit the fundamental concepts of modern
 languages, objects and functions, and to make them safer and more efficient to
 use in a distributed environment. We focus on three important and orthogonal
@@ -69,166 +104,166 @@ building blocks for distributed programming:
 % where Scala shines.
 
 % Languages themselves have actually done little
-
-Little has actually been done in recent years in the programming languages
-community to address this fundamental shift.
-% Instead, the focus of the effort
-% seems to be on.
-
-Scala is a functional programming language that runs on the
-JVM\footnote{Although Scala now targets JavaScript too with a Scala-to-JS
-compiler known as \href{http://www.scala-js.org/}{Scala.js}}. Scala is popular
-amongst developers of distributed systems for two prime reasons; (1) as a JVM
-language, it seamlessly interoperates with Java, the de facto language of choice
-amongst developers of big data systems, and (2) its functional features like
-closures combined with a concise 
-
-Functional language features make .
-
-% distributed programming is now the norm, it's in every program these days.
-
-but how have languages kept up? well, they really haven't. instead there are a
-handful of disparate attempts at making distributed programming easier from a
-higher level (handling concerns like consistency etc)
-
-Meanwhile, functional programming is also on the rise, gaining popularity as
-functional languages begin to mainstream.
-
-
-furthermore, we propose a new dist. prog. model that at the same time (a)
-embraces these improved building blocks and (b) generalizes existing, well-known
-prog.models.
-
-the ultimate goal is to simplify the lives of both users and developers of dist.
-systems
-
-we believe the ideas and systems in this diss. are steps towards this goal; this
-is also witnessed by strong interest from industry in some of these systems
-
-
- Recently, a
-
- rash of distributed systems have
-sprung up, each promising to unlock information hidden in these mountains of
-messy data. Here too,
-
-The internet and other the network is
-now baked into most of the programming that we do.
-
-
-Distributed programming is fundamentally different than . Without even realizing
-it,. It requires a
-To date, no mainstream programming language has been designed with distribution in mind since the start. ...No...
-
-Programming for distributed systems is hard. All it takes is a quick glance at
-the literature, both academic and industrial, to see that distributed systems
-builders have long since grappled with fundamental concerns like consistency,
-availability, and latency across systems designs.
-
-The performance characteristics of the underlying programming language and
-runtime, however, should not weigh in
-
-Major goal of this thesis is to retroactively add support for distributed
-computation to an existing and widespread language with functional features.
-
-Many efforts have been undertaken to design from scratch a new foundation for
-distribution. Cite Leo.
-
-
-The closest the literature gets at present to the intersection of programming
-languages and falls in the direction of Datalog and the idea that ensuring that
-properties like monotonicity
-
-Nitty gritty concerns like serialization or ensuring that are left largely
-unconsidered. As an industry, we simply deal with the fact that Java 8 now has
-closures, but that closures have no added support to ensure that they are
-serializable, instead suggesting ``the serialization of lambda expressions is
-strongly discouraged.''\footnote{From the official Java documentation on lambda
-expressions, available at
-\url{https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html\#serialization}}
-
-\section{Distributing Computation}
-
-
-
-Erlang, Elixir. But no types. Go for fault tolerance? Bloom language.
-
-Sequoia. (?)
-
-Oz dataflow.
-
-Up to 50\% of the time for some Spark jobs spent in
-serialization~\cite{OusterhoutSerialization}.
-
-Datalog, Datomic, Cascalog. Query evaluation with Datalog is based on first
-order logic, and is thus sound and complete. However, Datalog is not Turing
-complete, and is thus used as a domain-specific language that can take advantage
-of efficient algorithms developed for query resolution. Datalog is a lightweight
-deductive database system where queries and database updates are expressed in
-the logic language. The use of Datalog syntax and an implementation based on
-tabling intermediate results ensures that all queries terminate.
-
-Datalog is a nonprocedural query language based on the logic-programming
-language Prolog.  A user describes the information desired without giving a
-specific procedure for obtaining that information. Datalog simplifies writing
-
-Much effort invested in a formal foundation for concurrent and distributed
-programming -- e.g., process calculi. Pi calculus. Join calculus.
-
-Join-patterns provides a way to write concurrent, parallel and distributed
-computer programs by message passing. Compared to the use of threads and locks,
-this is a high level programming model using communication constructs model to
-abstract the complexity of concurrent environment and to allow scalability. Its
-focus is on the execution of a chord between messages atomically consumed from a
-group of channels.
-
-Recent research has explored using Datalog-based languages to express a
-distributed system as a set of logical invariants.
-
-Languages foundations like Dedalus~\cite{Dedalus} focus on providing a minimal set of
-primitives for programming and reasoning about distributed systems. Dedalus
-reduces to a subset of Datalog with negation, aggregate functions,
-successor and choice, and admits an explicit representation of time into the
-logic language in order to provide a declarative foundation for the two
-signature features of distributed systems: mutable state, and asynchronous
-processing and communication.
-
-NoSQL = Datalog! Function-passing is a stateless model of this idea. All about
-using logic to reduce coordination.
-
-These languages and efforts differ from the effort presented in this thesis in
-that logic-based . They are trying to figure out ways to jointly do
-optimizations and to ensure a number of other properties important to
-distributed systems with state remain in tact. When a theoretical result is
-arrived at in this work of databases and data-centric programming systems, the
-sole effort to date concerned with integrating these advancements into the
-programming language has focused on providing a restricted logic programming
-language to attempt to ensure correctness and ease of reasoning. These are not
-the goals of this thesis. Instead, we focus less on providing langauge featuers designed to shield users from complications that arise when having to worry about consistency (after all,
-
-
-The rationale of some in purporting a language to be more adept at distributed
-programming has focused on languages which remove limitations and which enable
-more features to be distributed.
-
-That is not the central tenet of this thesis. Rather, this thesis argues that
-while indeed more language features ought to be more reliably distributed (e.g.,
-function closures) it might not be preferable that all features be given
-unrestricted support for distribution. That is, in this thesis,
-
-This thesis follows the advice given in 's Note On Distributed computing, where
-important advice is to avoid abstracting over network communication. Other
-models tout such abstraction to be a feature, or to from a programming language
-perspective provide for a more powerful or otherwise desirable . Like Note, we
-argue that this is not the case. Designers of distributed systems must have a
-handle on and be aware of all situations that could cause network communication.
-
-The distributed model of computation behind Oz~\cite{DistributedOz} abstracts
-over communication boundaries. Network transparency
-~\cite{ConceptsTechniquesModelsProgramming}
-
-In this thesis, rather than abstracting over network communication, we provide
-firmer, more desirable primitives to initiate your own network communication.
+%
+% Little has actually been done in recent years in the programming languages
+% community to address this fundamental shift.
+% % Instead, the focus of the effort
+% % seems to be on.
+%
+% Scala is a functional programming language that runs on the
+% JVM\footnote{Although Scala now targets JavaScript too with a Scala-to-JS
+% compiler known as \href{http://www.scala-js.org/}{Scala.js}}. Scala is popular
+% amongst developers of distributed systems for two prime reasons; (1) as a JVM
+% language, it seamlessly interoperates with Java, the de facto language of choice
+% amongst developers of big data systems, and (2) its functional features like
+% closures combined with a concise
+%
+% Functional language features make .
+%
+% % distributed programming is now the norm, it's in every program these days.
+%
+% but how have languages kept up? well, they really haven't. instead there are a
+% handful of disparate attempts at making distributed programming easier from a
+% higher level (handling concerns like consistency etc)
+%
+% Meanwhile, functional programming is also on the rise, gaining popularity as
+% functional languages begin to mainstream.
+%
+%
+% furthermore, we propose a new dist. prog. model that at the same time (a)
+% embraces these improved building blocks and (b) generalizes existing, well-known
+% prog.models.
+%
+% the ultimate goal is to simplify the lives of both users and developers of dist.
+% systems
+%
+% we believe the ideas and systems in this diss. are steps towards this goal; this
+% is also witnessed by strong interest from industry in some of these systems
+%
+%
+%  Recently, a
+%
+%  rash of distributed systems have
+% sprung up, each promising to unlock information hidden in these mountains of
+% messy data. Here too,
+%
+% The internet and other the network is
+% now baked into most of the programming that we do.
+%
+%
+% Distributed programming is fundamentally different than . Without even realizing
+% it,. It requires a
+% To date, no mainstream programming language has been designed with distribution in mind since the start. ...No...
+%
+% Programming for distributed systems is hard. All it takes is a quick glance at
+% the literature, both academic and industrial, to see that distributed systems
+% builders have long since grappled with fundamental concerns like consistency,
+% availability, and latency across systems designs.
+%
+% The performance characteristics of the underlying programming language and
+% runtime, however, should not weigh in
+%
+% Major goal of this thesis is to retroactively add support for distributed
+% computation to an existing and widespread language with functional features.
+%
+% Many efforts have been undertaken to design from scratch a new foundation for
+% distribution. Cite Leo.
+%
+%
+% The closest the literature gets at present to the intersection of programming
+% languages and falls in the direction of Datalog and the idea that ensuring that
+% properties like monotonicity
+%
+% Nitty gritty concerns like serialization or ensuring that are left largely
+% unconsidered. As an industry, we simply deal with the fact that Java 8 now has
+% closures, but that closures have no added support to ensure that they are
+% serializable, instead suggesting ``the serialization of lambda expressions is
+% strongly discouraged.''\footnote{From the official Java documentation on lambda
+% expressions, available at
+% \url{https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html\#serialization}}
+%
+% \section{Distributing Computation}
+%
+%
+%
+% Erlang, Elixir. But no types. Go for fault tolerance? Bloom language.
+%
+% Sequoia. (?)
+%
+% Oz dataflow.
+%
+% Up to 50\% of the time for some Spark jobs spent in
+% serialization~\cite{OusterhoutSerialization}.
+%
+% Datalog, Datomic, Cascalog. Query evaluation with Datalog is based on first
+% order logic, and is thus sound and complete. However, Datalog is not Turing
+% complete, and is thus used as a domain-specific language that can take advantage
+% of efficient algorithms developed for query resolution. Datalog is a lightweight
+% deductive database system where queries and database updates are expressed in
+% the logic language. The use of Datalog syntax and an implementation based on
+% tabling intermediate results ensures that all queries terminate.
+%
+% Datalog is a nonprocedural query language based on the logic-programming
+% language Prolog.  A user describes the information desired without giving a
+% specific procedure for obtaining that information. Datalog simplifies writing
+%
+% Much effort invested in a formal foundation for concurrent and distributed
+% programming -- e.g., process calculi. Pi calculus. Join calculus.
+%
+% Join-patterns provides a way to write concurrent, parallel and distributed
+% computer programs by message passing. Compared to the use of threads and locks,
+% this is a high level programming model using communication constructs model to
+% abstract the complexity of concurrent environment and to allow scalability. Its
+% focus is on the execution of a chord between messages atomically consumed from a
+% group of channels.
+%
+% Recent research has explored using Datalog-based languages to express a
+% distributed system as a set of logical invariants.
+%
+% Languages foundations like Dedalus~\cite{Dedalus} focus on providing a minimal set of
+% primitives for programming and reasoning about distributed systems. Dedalus
+% reduces to a subset of Datalog with negation, aggregate functions,
+% successor and choice, and admits an explicit representation of time into the
+% logic language in order to provide a declarative foundation for the two
+% signature features of distributed systems: mutable state, and asynchronous
+% processing and communication.
+%
+% NoSQL = Datalog! Function-passing is a stateless model of this idea. All about
+% using logic to reduce coordination.
+%
+% These languages and efforts differ from the effort presented in this thesis in
+% that logic-based . They are trying to figure out ways to jointly do
+% optimizations and to ensure a number of other properties important to
+% distributed systems with state remain in tact. When a theoretical result is
+% arrived at in this work of databases and data-centric programming systems, the
+% sole effort to date concerned with integrating these advancements into the
+% programming language has focused on providing a restricted logic programming
+% language to attempt to ensure correctness and ease of reasoning. These are not
+% the goals of this thesis. Instead, we focus less on providing langauge featuers designed to shield users from complications that arise when having to worry about consistency (after all,
+%
+%
+% The rationale of some in purporting a language to be more adept at distributed
+% programming has focused on languages which remove limitations and which enable
+% more features to be distributed.
+%
+% That is not the central tenet of this thesis. Rather, this thesis argues that
+% while indeed more language features ought to be more reliably distributed (e.g.,
+% function closures) it might not be preferable that all features be given
+% unrestricted support for distribution. That is, in this thesis,
+%
+% This thesis follows the advice given in 's Note On Distributed computing, where
+% important advice is to avoid abstracting over network communication. Other
+% models tout such abstraction to be a feature, or to from a programming language
+% perspective provide for a more powerful or otherwise desirable . Like Note, we
+% argue that this is not the case. Designers of distributed systems must have a
+% handle on and be aware of all situations that could cause network communication.
+%
+% The distributed model of computation behind Oz~\cite{DistributedOz} abstracts
+% over communication boundaries. Network transparency
+% ~\cite{ConceptsTechniquesModelsProgramming}
+%
+% In this thesis, rather than abstracting over network communication, we provide
+% firmer, more desirable primitives to initiate your own network communication.
 
 
 \section{Thesis}
