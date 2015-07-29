@@ -23,28 +23,50 @@ distributed systems that can help more users make sense of it--clusters of
 machines working together to churn through datasets too large to fit in the
 memory of a single machine.
 
-Meanwhile, we're witnessing a renaissance of functional programming so prevalent
-that it has permeated the daily routines of software developers on all ends of
-the the software development spectrum, from the client-side\footnote{Popular
-functional languages for the client-side include: numerous JavaScript libraries
-such as \href{http://underscorejs.org}{Underscore.js}, Elm~\cite{Elm},
+This is the new computing landscape; the network has become ubiquitous and is
+now baked into much of the programming that professional developers do.
+
+Meanwhile, at the same time, we're witnessing a renaissance of functional
+programming so prevalent that it has permeated the daily routines of software
+developers on all ends of the the software development spectrum, from the
+client-side\footnote{Popular functional languages for the client-side include:
+numerous JavaScript libraries such as
+\href{http://underscorejs.org}{Underscore.js}, Elm~\cite{Elm},
 \href{http://www.purescript.org/}{PureScript},
 \href{http://www.scala-js.org/}{Scala.js}, amongst many others.} to the
 server-side.\footnote{Popular functional languages for the server-side include:
 Scala~\cite{Odersky10}, Clojure~\cite{Clojure}, Erlang~\cite{Erlang},
-Haskell~\cite{Haskell}, amongst many others.} The distributed system core of
-services like Twitter are based on functional APIs~\cite{Eriksen2013}, big data
-has . Just about everywhere you look now a days, you'll find
-functionally-inspired system.
+Haskell~\cite{Haskell}, amongst many others.} Further, the distributed system
+core of services like Twitter are based on functional APIs~\cite{Eriksen2013},
+and frameworks for big data analytics like Spark~\cite{Spark} credit functional
+patterns for enabling more powerful computation patterns; \ie general graphs of
+computations built up of compositions of higher order combinators rather just
+maps and reduces like in MapReduce~\cite{MateiScalaByTheBay}. Just about
+everywhere you look now a days, you'll find functionally-inspired software
+springing up in the wild.
+
+
+% , and that
+% style of development is becoming increasingly functional.
+
+But how have our most important tools in professional software development --
+programming languages -- kept up as the network and functional programming have
+begun to proliferate software development environments?
+
+A goal of this dissertation is to revisit the fundamental concepts of modern
+languages, objects and functions, and to make them safer and more efficient to
+use in a distributed environment. We focus on three important and orthogonal
+building blocks for distributed programming:
+
+
+\begin{itemize}
+  \item {\bf \em Pickling (serialization)}
+  \item {\bf \em Functions}
+  \item {\bf \em Asynchronous programming}
+\end{itemize}
 
 % This is
 % where Scala shines.
-
-This is the new computing landscape; the network has become ubiquitous and is
-now baked into much of the programming that professional developers do, and that
-style of development is becoming increasingly functional. But how have our most
-important tools in professional software development -- programming languages --
-kept up throughout this ongoing shift?
 
 % Languages themselves have actually done little
 
@@ -72,17 +94,6 @@ higher level (handling concerns like consistency etc)
 Meanwhile, functional programming is also on the rise, gaining popularity as
 functional languages begin to mainstream.
 
-A goal of this dissertation is to revisit the fundamental concepts of modern
-languages, objects and functions, and to make them safer and more efficient to
-use in a distributed environment. We focus on three important and orthogonal
-building blocks for distributed programming:
-
-
-\begin{itemize}
-  \item {\bf \em Pickling (serialization)}
-  \item {\bf \em Functions}
-  \item {\bf \em Asynchronous programming}
-\end{itemize}
 
 furthermore, we propose a new dist. prog. model that at the same time (a)
 embraces these improved building blocks and (b) generalizes existing, well-known
