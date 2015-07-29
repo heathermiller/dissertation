@@ -53,22 +53,16 @@ But how have our most important tools in professional software development --
 programming languages -- kept up as the network and functional programming have
 begun to proliferate software development environments?
 
-Researchers and practitioners have explored different approaches to make dist.
-prog. simpler, more reliable, and more performant. (1) message passing, (2) ..., ...
+As it turns out, there are still numerous issues using language constructs such
+as objects and functions in a distributed setting. Moreover, due to their nature
+of being built-in to the language, it is impossible to rely on libraries and
+frameworks to provide support for the reliable distribution of these constructs.
+As a result, even mature libraries and frameworks can exhibit bugs that are hard
+to diagnose and fix.
 
-The majority of widely-used PLs relegate distribution to libraries. While many
-of the above-mentioned approaches have been realized as libraries for
-widely-used languages, there are still numerous issues using language constructs
-such as objects and functions in a distributed setting. Moreover, due to their
-nature of being built-in to the language, it is impossible to rely on libraries
-and frameworks to provide support for the reliable distribution of these
-constructs. As a result, even mature libraries and frameworks can exhibit bugs
-that are hard to diagnose and fix (or suffer from the limitations of their
-underlying languages/runtimes).
-
-For example, in mainstream languages like Java, even the act of serializing
-simple objects, a prerequisite for sending them across the network, can lead to
-runtime errors that can be difficult to diagnose and fix. While alternative
+For example, in mainstream languages like Java, even the serialization of simple
+objects, a prerequisite for sending them across the network, can lead to runtime
+errors that can be difficult to diagnose and fix. While alternative
 serialization frameworks exist, they feature only rudimentary language
 integration, in stark contrast to native platform support.
 
@@ -76,29 +70,54 @@ This issue is exacerbated when using closures, which are increasingly appearing
 in popular distributed frameworks such as Spark~\cite{Spark} and
 Scalding~\cite{Scalding}. One of the main reasons is that closures, as they
 exist in virtually all wide-spread languages, leave essential components, such
-as their captured variables, implicit, preventing custom treatment necessary to
+as their captured variables, implicit, preventing customizations necessary to
 make closures safer and more efficient to distribute.
-
-[connect]
-
-Scala is a functional programming language that runs on the
-JVM\footnote{Although Scala now also targets JavaScript with a Scala-to-JS
-compiler known as \href{http://www.scala-js.org/}{Scala.js}} which features both a rich object model as well as extensive support for functional programming.
-Scala delegates aspects such as serialization to its underlying platform, typically Java. As a result, Scala developers are transitively also affected by issues of Java's built-in serialization. Functions too bring a whole host of complications wh
-
-Given that we desire solutions to issues traditionally impossible to fix using libraries alone, the question arises how to best extend languages in a way that does not require intrusive changes to their specification, compilers, and tools.
-
-A goal of this dissertation is to revisit the fundamental concepts of modern
-languages, objects and functions, and to make them safer and more efficient to
-use in a distributed environment. We focus on three important and orthogonal
-building blocks for distributed programming:
-
 
 \begin{itemize}
   \item {\bf \em Pickling (serialization)}
   \item {\bf \em Functions}
   \item {\bf \em Asynchronous programming}
 \end{itemize}
+
+% Researchers and practitioners have explored different approaches to make dist.
+% prog. simpler, more reliable, and more performant. (1) message passing, (2) ..., ...
+%
+% The majority of widely-used PLs relegate distribution to libraries. While many
+% of the above-mentioned approaches have been realized as libraries for
+% widely-used languages, there are still numerous issues using language constructs
+% such as objects and functions in a distributed setting. Moreover, due to their
+% nature of being built-in to the language, it is impossible to rely on libraries
+% and frameworks to provide support for the reliable distribution of these
+% constructs. As a result, even mature libraries and frameworks can exhibit bugs
+% that are hard to diagnose and fix (or suffer from the limitations of their
+% underlying languages/runtimes).
+%
+% For example, in mainstream languages like Java, even the act of serializing
+% simple objects, a prerequisite for sending them across the network, can lead to
+% runtime errors that can be difficult to diagnose and fix. While alternative
+% serialization frameworks exist, they feature only rudimentary language
+% integration, in stark contrast to native platform support.
+%
+% This issue is exacerbated when using closures, which are increasingly appearing
+% in popular distributed frameworks such as Spark~\cite{Spark} and
+% Scalding~\cite{Scalding}. One of the main reasons is that closures, as they
+% exist in virtually all wide-spread languages, leave essential components, such
+% as their captured variables, implicit, preventing custom treatment necessary to
+% make closures safer and more efficient to distribute.
+%
+% [connect]
+%
+% Scala is a functional programming language that runs on the
+% JVM\footnote{Although Scala now also targets JavaScript with a Scala-to-JS
+% compiler known as \href{http://www.scala-js.org/}{Scala.js}} which features both a rich object model as well as extensive support for functional programming.
+% Scala delegates aspects such as serialization to its underlying platform, typically Java. As a result, Scala developers are transitively also affected by issues of Java's built-in serialization. Functions too bring a whole host of complications wh
+%
+% Given that we desire solutions to issues traditionally impossible to fix using libraries alone, the question arises how to best extend languages in a way that does not require intrusive changes to their specification, compilers, and tools.
+%
+% A goal of this dissertation is to revisit the fundamental concepts of modern
+% languages, objects and functions, and to make them safer and more efficient to
+% use in a distributed environment. We focus on three important and orthogonal
+% building blocks for distributed programming:
 
 % This is
 % where Scala shines.

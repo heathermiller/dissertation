@@ -32,12 +32,12 @@ reliable foundation on which to build distributed systems.
 
 This thesis presents a new approach to serialization called {\em pickling} based
 on the idea of generating and composing functional pickler combinators
-statically. The approach shifts the burden of serialization to runtime as much
-as possible, enabling users to catch serialization errors at compile time rather
-than at runtime. Further, by virtue of serialization code being generated at
-compile time, our framework is shown to be significantly more performant than
+statically. The approach shifts the burden of serialization to compile time as
+much as possible, enabling users to catch serialization errors at compile time
+rather than at runtime. Further, by virtue of serialization code being generated
+at compile time, our framework is shown to be significantly more performant than
 other state-of-the-art serialization frameworks. We also generalize our
-technique for
+technique for generating serialization code to  generic functions other than pickling.
 
 \vspace{0.2cm}
 
@@ -55,17 +55,18 @@ concurrent frameworks that this safe foundation for closures facilitates.
 
 \vspace{0.2cm}
 
-Finally, we bring together above building blocks, pickling and spores, to form
-the basis of a new programming model called {\em function-passing}.
-Function-passing is based on the idea that a distributed persistent data
-structure which stores in its nodes transformations to data rather than the
-distributed data itself, simplifying fault recovery by design. Lazy evaluation
-is also central to our model; by incorporating laziness into our design only at
-the point of initiating network communication, our model remains easy to reason
+Finally, we bring together the above building blocks, pickling and spores, to
+form the basis of a new programming model called {\em function-passing}.
+Function-passing is based on the idea of a distributed persistent data structure
+which stores in its nodes transformations to data rather than the distributed
+data itself, simplifying fault recovery by design. Lazy evaluation is also
+central to our model; by incorporating laziness into our design only at the
+point of initiating network communication, our model remains easy to reason
 about while remaining efficient in time and memory. We formalize our programming
 model in the form of a small-step operational semantics which includes a precise
 specification of the semantics of functional fault recovery, and we provide an
-open-source implementation of our model in and for the Scala
+open-source implementation of our model in and for Scala.
+
 
 
 
