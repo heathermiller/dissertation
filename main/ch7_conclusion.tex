@@ -1,21 +1,78 @@
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
 
-Conclusion and Future Work.
+\vspace{-0.5cm}
 
-\section{Future Work}
+This thesis presented a number of extensions and libraries in and for Scala
+aimed at providing a more reliable foundation upon which to build distributed
+systems. Throughout, we have been concerned with two essential aspects of
+distribution: communication and concurrency.
 
-\paragraph{Function-Passing} A great deal of future work remains. In the
-short-term, we aim to continue to build different sorts of distributed
-frameworks and applications atop F-P in an effort to work towards a
-production-ready implementation of our model for consumption by the Scala
-community at large.
+First, we presented a new approach to communicate both objects and functions between distributed nodes safely and efficiently.
 
-In the long-term, we plan to better understand concerns of separate compilation
-in order to evaluate whether our model could be of help in coordinating between
-microservices.\footnote{Microservices are small, independent
-(separately-compiled) services running on different machines which communicate
-with each other to together make up a single and complex application. They are a
-predominant trend in industry amongst rich and complicated web-based services.}
+We began with objects; we saw scala/pickling, an approach for functionally
+composing serialization logic. Generation and composition of
+functionally-inspired object oriented picklers could be effectively generated
+and composed at compile time. This had the benefit of shifting the burden of
+serialization to compile time, allowing users to statically catch serialization
+errors while gaining performance through the static generation of performant
+serialization code. Scala/pickling has since become a popular open source
+library, and the go-to library for serialization in Scala; it has more than 630
+stars and about 70 watchers on GitHub\footnote{Project repositories may be
+starred or watched. Starred indicates interest (akin to ``liking'' on a social
+network like Facebook) and users who ``watch'' subscribe to notifications of all
+project updates}, and has been taken up by flagship Scala projects such as sbt,
+Scala's universal build tool.
 
-More benchmarks, experience building real systems.
+We then moved on to functions; functions were made able to be communicated over
+the network through the introduction of spores, an abstraction that when
+combined with scala/pickling can provide extra static checking in order to
+ensure that closure is able to be reliably serialized. We also saw ways in which
+the accompanying spore type system was able to control specific hazards from
+being captured.
+
+Second, we saw a novel lock-free concurrency abstraction suitable for building
+large-scale distributed systems. We covered FlowPools, an abstraction and
+backing data structure for non-blocking, fully asynchronous programming. We saw
+that FlowPools were provably deterministic, lock-free, and linearizable, in
+addition to having concrete performance benefits over comparable concurrent
+collections in Java's standard library.
+
+Finally, we brought together our two approaches to communicate both objects and
+functions between distributed nodes safely and efficiently, pickling and spores,
+in the context of a new distributed programming model. Designed from the ground
+up using our new primitives for distribution, the model generalizes existing
+widely-used programming systems for data-intensive computing.
+
+% On the one hand, .
+%
+% On the other
+%
+% We identified a number of challenges faced by system builders with today's
+% languages and ecosystems laying across three axes; serialization, functions, and
+% asynchronous programming.
+%
+%
+% We began with asynchronous programming. We saw futures and FlowPools,
+% abstractions and data structures for non-blocking, fully asynchronous
+% programming, and we showed that FlowPools were not only asynchronous and
+% lock-free, but . We then covered a novel approach to serialization. Then we moved on to serialization and saw.
+
+
+
+% \section{Future Work}
+
+% \paragraph{Function-Passing} A great deal of future work remains. In the
+% short-term, we aim to continue to build different sorts of distributed
+% frameworks and applications atop F-P in an effort to work towards a
+% production-ready implementation of our model for consumption by the Scala
+% community at large.
+%
+% In the long-term, we plan to better understand concerns of separate compilation
+% in order to evaluate whether our model could be of help in coordinating between
+% microservices.\footnote{Microservices are small, independent
+% (separately-compiled) services running on different machines which communicate
+% with each other to together make up a single and complex application. They are a
+% predominant trend in industry amongst rich and complicated web-based services.}
+%
+% More benchmarks, experience building real systems.
