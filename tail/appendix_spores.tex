@@ -254,7 +254,7 @@ property names.
 
 \subsection{Subtyping}\label{appdx:subtyping}
 
-Figure~\ref{appdx:fig:subtyping} shows the subtyping rules. Record (\textsc{S-Rec})
+Figure~\ref{appdx:subtyping} shows the subtyping rules. Record (\textsc{S-Rec})
 and function (\textsc{S-Fun}) subtyping are standard.
 
 The subtyping rule for spores (\textsc{S-Spore}) is analogous to the subtyping
@@ -270,7 +270,7 @@ first-class values: functions operating on spores with arbitrary environments
 can simply demand an abstract spore type. The way both the captured types and
 the properties are modeled corresponds to (but simplifies) the subtyping rule
 for refinement types in Scala (see
-Section~\ref{appdx:adv-usage-type-constraints}).
+Section~\ref{sec:adv-usage-type-constraints}).
 
 Rule \textsc{S-SporeFun} expresses the fact that spore types are refinements of
 their corresponding function types, giving rise to a subtyping relationship.
@@ -390,7 +390,7 @@ Besides the standard variable environment $\Gamma$ we use a property environment
 $\Delta$ which is a sequence of property names that are ``active'' while
 deriving the type $T$ of term $t$. The property environment is reminiscent of
 the implicit parameter context used in the original work on implicit
-parameters~\cite{LewisLMS00}; it is an environment for names whose definition
+parameters~\cite{Lewis2000}; it is an environment for names whose definition
 sites ``just happen to be far removed from their usages.''
 
 In the typing rules we assume the existence of a global property mapping $P$
@@ -573,7 +573,7 @@ captured variables of both argument spores.
 \subsection{Soundness}\label{appdx:soundness}
 
 This section presents a soundness proof of the spore type system. The proof is
-based on a pair of progress and preservation theorems~\cite{WrightF94}. In
+based on a pair of progress and preservation theorems~\cite{Wright1994}. In
 addition to standard lemmas, such as Lemma~\ref{appdx:lem:substitution} and
 Lemma~\ref{appdx:lem:weak}, we also prove a lemma specific to our type system,
 namely Lemma~\ref{appdx:lem:pres-import}, which ensures types are preserved
@@ -741,7 +741,7 @@ correspond to the pragmatic model of spores in Scala:
 \subsection{Excluded types}
 
 This section shows how the formal model can be extended with excluded types as
-described above (see Section~\ref{appdx:adv-usage-type-constraints}).
+described above (see Section~\ref{sec:adv-usage-type-constraints}).
 Figure~\ref{appdx:fig:syntax-ext} shows the syntax extensions: first, spore terms and
 values are augmented with a sequence of excluded types; second, spore types and
 abstract spore types get another member $\texttt{type}~\mathcal{E} = \seq{T}$
