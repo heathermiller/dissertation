@@ -12,7 +12,7 @@ ago.
 
 Today, large swaths of most applications have been woven into ``the cloud'' or
 other network services. Web applications are becoming patchwork quilts made up
-of calls to multitudes of different microservices. Modest mobile apps now make
+of calls to multitudes of different microservices. Modest mobile ``apps'' now make
 network calls to dozens or even hundreds of services. Meanwhile as software
 becomes evermore pervasive, weaving itself more into more of our daily habits in
 more places, content providers are focusing their energies on collecting any and
@@ -28,21 +28,21 @@ now baked into much of the programming that professional developers do.
 
 Meanwhile, at the same time, we are witnessing a renaissance of functional
 programming so prevalent that it has permeated the daily routines of software
-developers on all ends of the the software development spectrum, from the
-client-side\footnote{Popular functional languages for the client-side include:
+developers on all ends of the software development spectrum, from the
+client side\footnote{Popular functional languages for the client side include:
 numerous JavaScript libraries such as
 \href{http://underscorejs.org}{Underscore.js}, Elm~\cite{Elm},
 \href{http://www.purescript.org/}{PureScript},
 \href{http://www.scala-js.org/}{Scala.js}, amongst many others.} to the
-server-side.\footnote{Popular functional languages for the server-side include:
+server side.\footnote{Popular functional languages for the server side include:
 Scala~\cite{Odersky10}, Clojure~\cite{Clojure}, Erlang~\cite{Erlang},
 Haskell~\cite{Haskell}, amongst many others.} Further, the distributed system
-core of services like Twitter are based on functional APIs~\cite{Eriksen2013},
+cores of services like Twitter are based on functional APIs~\cite{Eriksen2013},
 and frameworks for big data analytics like Spark~\cite{Spark} credit functional
 patterns for enabling more powerful computation patterns; \ie general graphs of
-computations built up of compositions of higher order combinators rather just
+computations built up of compositions of higher-order combinators rather than just
 maps and reduces like in MapReduce~\cite{MateiScalaByTheBay}. Just about
-everywhere you look now a days, you'll find functionally-inspired software
+everywhere you look nowadays, you will find functionally-inspired software
 springing up in the wild.
 
 
@@ -62,9 +62,7 @@ to diagnose and fix.
 
 For example, in mainstream languages like Java, even the serialization of simple
 objects, a prerequisite for sending them across the network, can lead to runtime
-errors that can be difficult to diagnose and fix. While alternative
-serialization frameworks exist, they feature only rudimentary language
-integration, in stark contrast to native platform support.
+errors that can be difficult to diagnose and fix. Consequently, many frameworks and systems use alternative serialization frameworks, such as Google's Protocol Buffers, Apache Avro, or Kryo. However, these typically have their own set of limitations: weaker or no type safety, a fixed serialization format, more restrictions placed on the objects to-be-serialized, or only rudimentary language integration.
 
 This issue is exacerbated when using closures, which are increasingly appearing
 in popular distributed frameworks such as Spark~\cite{Spark} and
@@ -73,7 +71,7 @@ exist in virtually all wide-spread languages, leave essential components, such
 as their captured variables, implicit, preventing customizations necessary to
 make closures safer and more efficient to distribute.
 
-A goal of this dissertation is to revisit the fundamental concepts of modern
+The goal of this dissertation is to revisit the fundamental concepts of modern
 languages, objects and functions, and to make them safer and more efficient to
 use in a distributed environment. We focus on three important and orthogonal
 building blocks for distributed programming:
@@ -300,11 +298,20 @@ building blocks for distributed programming:
 % This dissertation seeks to improve the above state of affairs from the
 % perspective of
 
-This dissertation addresses the following questions:
+This thesis is concerned with two essential aspects of distribution:
+communication and concurrency. First, we present a new approach to communicate
+both objects and functions between distributed nodes safely and efficiently.
+Second, we present novel lock-free concurrency abstractions suitable for
+building large-scale distributed systems. Finally, we integrate the two
+approaches in the context of a new distributed programming model. Designed from
+the ground up using our new primitives for distribution, the model generalizes
+existing widely-used programming systems for data-intensive computing.
+
+More specifically, this dissertation aims to address the following questions:
 
 \begin{itemize}
 
-	\item How can existing programming language features be improved in order to
+	\item How can existing programming-language features be improved in order to
 	better support concerns like performance and latency across a general slice of
 	distributed systems?
 
@@ -336,14 +343,45 @@ In detail, our contributions are the following:
 
 \begin{itemize}
 
-	\item Abstractions and data structures for asynchronous programming.
+	\item We describe an abstraction and underlying data structure for parallel dataflow programming, {\em FlowPools}. FlowPools are fully asynchronous, and functionally-inspired, and as a result are composable. We prove several important properties about FlowPools, including lock-freedom, linearizability, and determinism. We also show through a detailed evaluation that FlowPools can outperform similar concurrent collections in the Java standard library.
 
-	\item
+	\item We introduce an extension to pickler combinators, well-known in functional programming, to support the core concepts of object-oriented programming namely subtyping polymorphism, open class hierarchies, and object identity.
 
-  
-A new data-centric programming model for functional pro- cessing of distributed data which makes important concerns like fault tolerance simple by design. The main computational principle is based on the idea of sending safe, guaranteed serial- izable functions to stationary data. Using standard monadic op- erations our model enables creating immutable DAGs of com- putations, supporting decentralized distributed computations. Lazy evaluation enables important optimizations while keeping programs simple to reason about.
-• A formalization of our programming model based on a small- step operational semantics. To our knowledge it is the first for- mal account of fault recovery based on lineage in a purely func- tional setting. Inspired by widespread systems like Spark, our formalization closely models real-world fault recovery mecha- nisms. The presented semantics is clearly stratified into a deter- ministic layer and a concurrent/distributed layer. Importantly, reasoning techniques for sequential programs are not invali- dated by the distributed layer.
-• A distributed implementation of the programming model in and for Scala. We present experiments that show some of the
+	\item We provide a framework called {\em scala/pickling} based on object-oriented pickler combinators which (a) enables retrofitting existing types with pickling support, (b) supports automatically generating picklers at compile time and at runtime, (c) supports pluggable pickle formats, and (d) does not require changes to the host language or the underlying virtual machine. We also provide an experimental evaluation that shows scala/pickling to outperform Java serialization and Kryo on a number of data types used in real-world, large-scale distributed applications and frameworks.
+
+	\item We generalize the generation technique used in scala/pickling to generic functions other than pickling. The technique, called {\em Self Assembly}, is a general technique for defining generic operations
+  or properties that operate over a large class of types which requires little
+  boilerplate; shares the extensibility and customizability properties of type
+  classes; and, due to compile-time code generation, provides high performance. Importantly, our approach enables the
+  definition of datatype-generic functions that support features present in
+  production OO languages, including subtyping, object identity, and generics.
+
+  \item We describe how \selfassembly enables the definition
+  of custom lightweight static type checks to guarantee that certain static
+  properties hold at runtime, \eg immutability.
+
+  \item We cover the \selfassembly library, a complete and full-featured
+  implementation of our technique in and for Scala. The library includes several
+  auxiliary definitions, such as generic queries and transformations, that help
+  define new lightweight static checks of generic properties. Importantly,
+  \selfassembly doesn't require any extension to the language or compiler. We also evaluate
+  the expressivity and performance of \selfassembly by porting scala/pickling, keeping the same published performance numbers while
+  reducing the code size for type class instance generation by 56\%.
+
+	\item We introduce a closure-like abstraction and type system, called {\em spores} which avoids typical hazards when using closures in a concurrent or distributed setting through controlled variable capture and customizable user-defined constraints for captured types. Further, we describe an approach for type-based constraints on spores that can be combined with existing type systems to express a variety of properties from the literature, including, but not limited to, serializability and thread-safety/immutability. We formalize spores with these type constraints and prove soundness of the type system.
+
+	\item We present an implementation of spores in and for the full Scala language, and (a) demonstrate the practicality of spores through a small empirical study using a collection of real-world Scala programs, and (b) show the power of the guarantees
+spores provide through case studies using parallel and distributed frameworks.
+
+    \item We introduce a new data-centric programming model called {\em function-passing}, based on pickling and spores, for functional processing of distributed data which makes important concerns like fault tolerance simpler by design. The main computational principle is based on the idea of sending safe, guaranteed serializable functions to stationary data. Using standard monadic operations our model enables creating immutable DAGs of computations, supporting decentralized distributed computations. Lazy evaluation enables important optimizations while keeping programs simple to reason about. We describe a distributed implementation of the programming model in and for Scala.
+
+    \item A provide a formalization of our programming model based on a small-step operational semantics. Inspired by widespread
+systems like Spark~\cite{Spark}, our formalization is a first step towards a
+formal, operational account of real-world fault recovery mechanisms. The
+presented semantics is clearly stratified into a deterministic layer and a
+concurrent/distributed layer. Importantly, reasoning techniques for sequential
+programs are not invalidated by the distributed layer.
+
 
 \end{itemize}
 
@@ -353,27 +391,26 @@ The rest of this dissertation is organized as follows.
 
 \begin{itemize}
 
-	\item Chapter 2 describes {\em futures} and {\em FlowPools}, funtionally-inspired
+	\item Chapter 2 describes {\em futures} and {\em FlowPools}, functionally-inspired
 	and fully asynchronous and non-blocking single-assignment variables (futures)
 	and pools (FlowPools) useful for reducing coordination in distributed systems.
 	The chapter sketches a proof of linearizability, lock-freedom, and determinism
-	of FlowPools. The full proof of lock-freedom can be found in
+	of FlowPools. The full proof of lock freedom can be found in
 	Appendix~\ref{appdx:flowpools}, and the full proofs of linearizability and
 	determinism can be found in the companion technical report~\cite{Prokopec12}.
 
-	\item Chapter 3 introduces {\em object oriented picklers} and {\em
+	\item Chapter 3 introduces {\em object-oriented picklers} and {\em
 	scala/pickling}, a new distribution-focused approach to serialization that
 	generates serialization code statically, allowing for more type safety. The
-	chapter includes a formalization of object oriented picklers as well as a
+	chapter includes a formalization of object-oriented picklers as well as a
 	description of the generation algorithm used for automatically generating
 	picklers for arbitrary types. A performance evaluation is also included which
 	examines the performance of the serialization framework across different sorts
-	of serilaization workloads, and which compares scala/pickling against other
-	state-of-the art serialization systems like Java and Kryo, and reports
+	of serialization workloads, and which compares scala/pickling against other
+	state-of-the-art serialization systems like Java and Kryo, and reports
 	significant speedups.
 
-	\item Chapter 4 covers a new technique for extensible and static datatype
-	generic programming. In this chapter, the generation technique used for
+	\item Chapter 4 covers a new technique for extensible and static datatype-generic programming. In this chapter, the generation technique used for
 	generating pickling code is generalized to be able to generate arbitrary type
 	class instances, at compile time.
 
@@ -384,7 +421,7 @@ The rest of this dissertation is organized as follows.
 
 	\item Chapter 6 describes a new programming model for functional distributed
 	programming called {\em function-passing} which aims to simplify the
-	implementation and reasoning of fault tolerance mechanisms.
+	implementation of and reasoning about fault-recovery mechanisms.
   % Because the model
 	% requires user programs to themselves be stateless, issues like consistency are
 	% moot.
@@ -399,7 +436,7 @@ The rest of this dissertation is organized as follows.
 
 This dissertation draws heavily on earlier work described in the following
 papers, written jointly with several collaborators (in the order of appearance
-in this disseratation):
+in this dissertation):
 
 \begin{itemize}
 
@@ -429,7 +466,7 @@ of the writing remain in technical report form include:
 
 \begin{itemize}
 
-	\item Miller, Haller, and C. D. S. Oliveira (2015). \href{http://infoscience.epfl.ch/record/199389}{Self-Assembly: Lightweight language extension and datatype generic programming, all-in-one!}. EPFL technical report \#EPFL-CONF-199389.
+	\item Miller, Haller, and C. D. S. Oliveira (2015). \href{http://infoscience.epfl.ch/record/199389}{Self-Assembly: Lightweight language extension and datatype generic programming, all-in-one!} EPFL technical report \#EPFL-CONF-199389.
 
 	\item Miller and Haller (2015).
 	\href{http://infoscience.epfl.ch/record/205822}{Function Passing: A model for
