@@ -1781,8 +1781,7 @@ of \verb|T|. Pickling followed by unpickling must instantiate an
 situation requires writing the dynamic (array) type name to the pickle. This
 is possible, since array types are not erased on the JVM (unlike generic
 types). This allows instantiating an array with the expected dynamic type upon
-unpickling. At the time of writing only support for primitive arrays has been
-implemented in scala/pickling.
+unpickling.
 
 
 \subsection{Object Identity and Sharing}
@@ -2063,7 +2062,7 @@ between 25ms and 28ms.
 The Evactor benchmark evaluates the performance of pickling a large number of
 small objects (in this case, events exchanged by actors). The benchmark
 creates a large number of events using the datatypes of the Evactor complex
-event processor  (see Section 6.4); all created events are inserted into a
+event processor; all created events are inserted into a
 collection and then pickled, and finally unpickled. As the results in
 Figure~\ref{fig:evactor} show, Java serialization struggles with extreme memory
 consumption and crashes with an out-of-memory error when a collection with
@@ -2218,9 +2217,9 @@ based on picklers for their component types. Given the close
 relationship of our implicit picklers to type classes, this generation
 mechanism is related to Haskell's {\em deriving}
 mechanism~\cite{MagalhaesDJL10}. One of the main differences is that
-our mechanism is faithful to subtyping. So far, our mechanism is
-specialized for pickling; an extension to a generic mechanism for
-composing type class instances is left for future work.
+our mechanism is faithful to subtyping. So far, as presented in this chapter,
+our mechanism is specialized for pickling; an extension to a generic mechanism for
+composing type class instances is described in Chapter~\ref{ch:self-assembly}.
 
 Pickling in programming languages has a long history dating back to
 CLU~\cite{HerlihyL82} and Modula-3~\cite{CardelliDJKN89}. The most

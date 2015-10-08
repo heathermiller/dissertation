@@ -1,6 +1,6 @@
 \chapter{Asynchronous Programming}
 
-Now a days, providing a modest experience on a mobile app, or even rendering
+Nowadays, providing a modest experience on a mobile app, or even rendering
 simple web pages typically requires the collaboration of dozens of network
 services each speaking many different languages or protocols to one another.
 Such systems are one of many flavors of a {\em distributed system}, and as such
@@ -336,7 +336,7 @@ present in the rest of the combinators, as well.
 Importantly, since the methods \verb|map|, \verb|flatMap|, and \verb|withFilter|
 methods are provided on futures (there is an automatic desugaring from
 for-comprehensions to calls of these methods), Scala can provide built-in
-support for doing using for-comprehensions on futures. We will now see an
+support using for-comprehensions on futures. We will now see an
 example where a for-comprehension is desirable over using chained higher-order
 combinators.
 
@@ -599,7 +599,7 @@ asynchronously in a completely non-blocking way, as elements of FlowPools in the
 dataflow graph become available.
 
 % I don't like how it says "we show"
-Finally, present how FlowPools are able to overcome practical issues, such as
+Finally, we present how FlowPools are able to overcome practical issues, such as
 out-of-memory errors, thus enabling programs based upon FlowPools to run
 indefinitely. By using a \textit{builder} abstraction, instead of something like
 iterators or streams (which can lead to non-determinism) we are able to garbage
@@ -734,7 +734,7 @@ elements. Unlike a typical collection, FlowPools also act as nodes and edges
 of a directed acyclic computation graph (DAG), in which the executed operations
 are registered with the FlowPool.
 
-Nodes in this directed acyclic graph are data containers which are first class
+Nodes in this DAG are data containers which are first class
 values. This makes it possible to use FlowPools as function arguments or to receive
 them as return values. Edges, on the other hand, can be thought of as
 combinators or higher-order functions whose user-defined functions are the
@@ -1073,7 +1073,7 @@ def foreach[U](f: T => U) {
 The \verb=tabulate= generator starts by creating a FlowPool of an
 arbitrary type \verb=T= and creating its builder instance.
 It then starts an asynchronous computation using the \verb=future=
-construct (see the companion technical report \cite{Prokopec12}
+construct (Appendix~\ref{appdx:flowpools}
 for explanation and examples), which recursively applies \verb=f= to each number and
 adds it to the builder.
 The reference to the pool \verb=p= is returned \emph{immediately},

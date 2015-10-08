@@ -1,4 +1,5 @@
 \chapter{Static and Extensible Datatype Generic Programming}
+\label{ch:self-assembly}
 
 In the previous chapter, we covered {\em object oriented picklers}, and we had a
 glimpse of an associated mechanism for the automatic generation of these type
@@ -238,7 +239,7 @@ account for such features.
 % Language integrated approaches (such as Java serialization) and approaches like type classes, are at
 
 Baked-in compiler-based approaches to adding functionality is at odds with
-library-based approaches using type classes. odds with one another. On the one
+library-based approaches using type classes. On the one
 hand, language-integrated approaches can be more powerful in the sense that they
 can do a great deal of static analysis, and because they are so specialized,
 typically require no boilerplate to programmers. However this is done at the
@@ -779,17 +780,17 @@ trees in Scala using \emph{case classes}~\cite{Match} and \emph{sealed
 trait can only be implemented by definitions in the existing
 compilation unit.
 Together with case classes this allows modeling \emph{algebraic
-  datatypes}, which are a well-know concept from functional programming.
+  datatypes}, which are a well-known concept from functional programming.
 The \verb|Tree| trait is the type of trees. The case class
 \verb|Fork| models the binary nodes of the tree, wheres the case
-class \verb|Leaf| models the leafs containing an integer value.
+class \verb|Leaf| models the leaves containing an integer value.
 
 To define pretty printing for \verb|Tree| using the
 \verb|Show| type class we create an \verb|object TreeInst|.
 This object provides a definition for the
 \verb|show| method that pattern matches on the
 two tree constructors (cases) of \verb|Tree|. The implementation
-of the two cases is unremarcable: both cases print the
+of the two cases is unremarkable: both cases print the
 constructors names and the arguments.
 
 A simple test program illustrating the use of \verb|TreeInst|
@@ -1776,7 +1777,7 @@ Figure~\ref{fig:class-hierarchy}, a dynamic dispatch is generated to select a
 specific type class instance based on the runtime classtype of the object that the type
 class is applied to (\verb|visitee|):\footnote{Simplified; handling of \texttt{null} values is omitted for simplicity.}
 
-\begin{figure*}
+% \begin{figure*}[ht!]
   \begin{minted}{scala}
   implicit object PersonInst extends Show[Person] {
     def show(visitee: Person): String =
@@ -1788,7 +1789,7 @@ class is applied to (\verb|visitee|):\footnote{Simplified; handling of \texttt{n
       }
   }
   \end{minted}
-\end{figure*}
+% \end{figure*}
 
 % Concrete instances of this type have subtypes (dynamically) which are case
 % classes (according to our initial simplified view). Therefore, the type class
@@ -1970,7 +1971,7 @@ class instances that traverse an object graph and return a single result of a
 possibly different type. In contrast, a transformation generates type class
 instances that perform a deep copy of an object graph, applying
 transformations to objects of selected types. While
-Sections~\ref{sec:basic-self-assembly}-\ref{sec:oo} were focussed on generic
+Sections~\ref{sec:basic-self-assembly}-\ref{sec:oo} were focused on generic
 queries, this section provides an overview of generic transformations.
 
 % We first introduce generic transformations by means of a typical example.
@@ -2516,7 +2517,8 @@ our compile-time approach.
 There are several approaches for providing pluggable type system extensions
 for statically-typed OO languages~\cite{DietlChecker, PapiChecker,
 SemanticTypeQualifiers}, but unlike \sselfassembly, they do not provide DGP
-capabilities. Furthermore, \selfassembly provides LLEs, which can cannot
+capabilities. Furthermore, \selfassembly provides lightweight added type checks,
+which can cannot
 extend program syntax (like, \eg SugarJ~\cite{SugarJ}) or change Scala's
 built-in type checking.
 
